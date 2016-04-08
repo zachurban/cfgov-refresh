@@ -29,6 +29,7 @@
     "gulp-sitespeedio": "0.0.8",
     "gulp-sourcemaps": "1.6.0",
     "gulp-uglify": "1.5.3",
+    "gulp-wrapper": "1.0.0",
     "imports-loader": "0.6.5",
     "require-dir": "0.3.0",
     "validate.js": "0.9.0",
