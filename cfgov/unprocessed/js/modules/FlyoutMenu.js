@@ -93,12 +93,14 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
 
     var triggerClickedBinded = fnBind( _triggerClicked, this );
     var triggerOverBinded = fnBind( _triggerOver, this );
+    var triggerOutBinded = fnBind( _triggerOut, this );
 
     // Set initial `aria-expanded="false"` attribute.
     _setAriaExpandedAttr( _triggerDom, 'false' );
 
     _triggerDom.addEventListener( 'click', triggerClickedBinded );
     _triggerDom.addEventListener( 'mouseover', triggerOverBinded );
+    _triggerDom.addEventListener( 'mouseout', triggerOutBinded );
 
     if ( _altTriggerDom ) {
       // If menu contains a submenu but doesn't have
@@ -120,7 +122,8 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
         // Set initial `aria-expanded="false"` attribute.
         _setAriaExpandedAttr( _altTriggerDom, 'false' );
 
-        // TODO: alt trigger should probably listen for a mouseover event too.
+        // TODO: alt trigger should probably listen
+        //       for a mouseover/mouseout event too.
         _altTriggerDom.addEventListener( 'click', triggerClickedBinded );
       }
     }
@@ -150,6 +153,16 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
     if ( !_suspended ) {
       this.dispatchEvent( 'triggerOver',
                           { target: this, type: 'triggerOver' } );
+    }
+  }
+
+  /**
+   * Event handler for when the search input trigger is hovered out.
+   */
+  function _triggerOut() {
+    if ( !_suspended ) {
+      this.dispatchEvent( 'triggerOut',
+                          { target: this, type: 'triggerOut' } );
     }
   }
 
