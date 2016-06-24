@@ -78,7 +78,7 @@ pip install virtualenv virtualenvwrapper
 
 #### Autoenv module
 
-[Install Autoenv](https://github.com/kennethreitz/autoenv#install) however you’d like.
+To automatically define environment variables, [install Autoenv](https://github.com/kennethreitz/autoenv#install).
 (We use [Homebrew](http://brew.sh)):
 
 Run:
@@ -106,12 +106,29 @@ brew info autoenv
 > **NOTE:** If you use ZSH you’ll need to use [zsh-autoenv](https://github.com/Tarrasch/zsh-autoenv),
   but we can’t provide support for issues that may arise.
 
+#### Environment variables
+
+The project uses a number of environment variables.
+Inside the `.env` file you can customize the project environment configuration.
+
+Copy the `.env_SAMPLE` file and un-comment each variable after
+adding your own values.
+```bash
+cp -a .env_SAMPLE .env && open .env
+```
+
+Then load the environment variables with:
+```bash
+source .env
+```
+
 #### Elasticsearch
 
 [Install Elasticsearch](http://www.elastic.co/guide/en/elasticsearch/reference/current/setup.html)
-however you’d like. (We use [Homebrew](http://brew.sh)):
+however you’d like. (We use [Homebrew](http://brew.sh)). Currently, only Elasticsearch v1.7 supports indexing our Sheer sites:
+
 ```bash
-brew install elasticsearch
+brew install homebrew/versions/elasticsearch17
 ```
 
 Just as with autoenv, Homebrew will output similar instructions after installation:
@@ -192,7 +209,7 @@ pip install git+git://github.com/rosskarchner/govdelivery
   in the [Project Configuration](https://github.com/cfpb/cfgov-refresh/blob/flapjack/INSTALL.md#4-project-configuration).
 
 
-## 2. Front-end setup
+## 3. Front-end setup
 
 The cfgov-refresh front-end currently uses the following frameworks / tools:
 
@@ -213,7 +230,7 @@ The cfgov-refresh front-end currently uses the following frameworks / tools:
 npm install -g gulp bower
 ```
 
-## 3. Install dependencies
+## 4. Install dependencies
 
 > **NOTE:**
   Protractor (for the test suite)
@@ -235,34 +252,6 @@ Next, install dependencies with:
   See the usage section
   [updating all the project dependencies](README.md#updating-all-dependencies).
 
-
-## 4. Project configuration
-
-The project uses a number of environment variables.
-The `setup.sh` script will create a `.env` file for you
-from the `.env_SAMPLE` file found in the repository,
-if you don't already have one.
-
-Inside the `.env` file you can customize the project environment configuration.
-
-If you would like to manually copy the environment settings,
-copy the `.env_SAMPLE` file and un-comment each variable after
-adding your own values.
-```bash
-cp -a .env_SAMPLE .env && open .env
-```
-
-Then load the environment variables with:
-```bash
-. ./.env
-```
-
-If you need to test this project without Autoenv,
-you can set each environment variable
-by directly setting its value from the command-line with:
-```
-export [CONSTANTNAME]=[CONSTANTVALUE]
-```
 
 ### 5. Usage
 
