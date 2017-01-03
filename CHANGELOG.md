@@ -16,25 +16,52 @@ Given the `MAJOR.MINOR.PATCH` pattern, here is how we decide to increment:
 ## Unreleased
 
 ## Added
-- New AWS_S3_ROOT setting to specify root S3 path.
-- New PlaceholderFieldBlock and PlaceholderCharBlock to set block placeholder text.
 - Add RSS subscription button to newsroom posts.
+- New `validate_page_html` command for checking/fixing HTTP image links in legacy pages.
+- OAH-api upgraded to v0.9.92
 
 ## Changed
-- external-site redirector now requires URLs to either be whitelisted or signed
-- Move logic for activity snippets out of template
-- Update privacy policy URL
-- Upgrade npm shrinkwrap endpoints to HTTPS
 - Upgrade to Wagtail 1.7
 - Added redirect for `Leadership Calendar` Wagtail Page.
+- Moved CSS npm dev modules to devDependencies in `package.json`.
+- Updated `gulp-clean-css` from `2.0.6` to `2.3.2`.
+- Updated `gulp-imagemin` from `3.0.3` to `3.1.1`.
+- Updated `gulp-less` from `3.1.0` to `3.3.0`.
 
 ## Removed
-- Removed deprecated Django careers-related models, views, and templates.
 - Removed layout.less enhancements that have been moved to Capital Framework.
 - Wagtail pages from the Django admin
 - Delete option from Wagtail templates
 - Removed deprecated fellowship view/model.
 - Removed deprecated fellowship notification sign up form.
+- Spokesperson who is no longer with the Bureau from the press page.
+- Removed legacy calendar app.
+- cleaned up unusued, legacy code
+
+### Fixed
+- Now correctly allows for hyphens in the video ID of a Video Player's `video_url` field.
+- Fix blog post RSS subscription links
+- Fix for Wagtail admin page status string when live but not shared.
+- Fixed legacy supervision jobs page.
+- Fix for External Redirect proceed button and jQuery reference.
+- Fixed use of `moto.mock_s3` in unit tests.
+- Fixed handling of invalid date query string parameters for filterable list forms.
+
+## 4.3.2
+
+### Changed
+- external-site redirector now requires URLs to either be whitelisted or signed
+- Move logic for activity snippets out of template
+- Update privacy policy URL
+- Upgrade npm shrinkwrap endpoints to HTTPS
+- Updated Owning-a-home feedback modules to use Ajax form submission
+
+### Added
+- New PlaceholderFieldBlock and PlaceholderCharBlock to set block placeholder text.
+- New AWS_S3_ROOT setting to specify root S3 path.
+
+## Removed
+- Removed deprecated Django careers-related models, views, and templates.
 
 ### Fixed
 - Fixed bug stopping videos in HTTPS pages.
@@ -42,23 +69,12 @@ Given the `MAJOR.MINOR.PATCH` pattern, here is how we decide to increment:
 - Sort activity snippets by latest date
 - Added missing uniqueness constraint on CFGOVRendition.
 - Fix for YouTube API failures
-- Now correctly allows for hyphens in the video ID of a Video Player's `video_url` field.
-- Fix blog post RSS subscription links
-- Fix for Wagtail admin page status string when live but not shared.
-
-
-## 4.3.2
-
-### Changed
-- Updated Owning-a-home feedback modules to use Ajax form submission
-
 
 ## 4.3.1
 
 ### Changed
 - Fix incorrect django settings for picard
 - Bump picard to 1.5.5 to fix false positive error report
-
 
 ## 4.3.0
 
