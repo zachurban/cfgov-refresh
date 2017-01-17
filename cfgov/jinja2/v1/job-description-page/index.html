@@ -2,6 +2,11 @@
 
 {% import 'macros/time.html' as time %}
 
+{% block css %}
+    {{ super() }}
+    <script type="application/ld+json">{{ page.json_ld | safe }}</script>
+{% endblock %}
+
 {% block content_main_modifiers -%}
     {{ super() }} content__flush-bottom
 {%- endblock %}

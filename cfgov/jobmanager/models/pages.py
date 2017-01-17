@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import json
+
 from django.db import models
 from wagtail.wagtailadmin.edit_handlers import (FieldPanel, FieldRowPanel,
                                                 InlinePanel, MultiFieldPanel,
@@ -66,3 +68,32 @@ class JobListingPage(CFGOVPage):
         """
         grades = set(g.grade.grade for g in self.grades.all())
         return sorted(grades, key=lambda g: int(g) if g.isdigit() else g)
+
+    @property
+    def json_ld(self):
+        """Generate valid JSON-LD for this job posting.
+
+        For reference:
+
+            http://json-ld.org/spec/latest/json-ld/
+            https://schema.org/JobPosting
+
+        """
+        return json.dumps({
+            '@context': 'http://schema.org',
+            '@type': 'JobPosting',
+            'url': self.full_url,
+            'title': self.title,
+            'description': self.description,
+            'baseSalary': {
+                '@type': 'PriceSpecification',
+                'minPrice': int(self.salary_min),
+                'maxPrice': int(self.salary_max),
+                'priceCurrency': 'USD',
+            },
+            'salaryCurrency': 'USD',
+            'jobLocation': {
+                '@type': 'Place',
+                'name': self.region.name,
+            },
+        })

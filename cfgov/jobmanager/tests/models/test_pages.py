@@ -1,7 +1,10 @@
+import json
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from mock import patch
 from model_mommy import mommy
+from wagtail.wagtailcore.models import Site
 
 from jobmanager.models.django import Grade, JobCategory, JobRegion
 from jobmanager.models.pages import JobListingPage
@@ -12,7 +15,7 @@ from v1.tests.wagtail_pages.helpers import save_new_page
 class JobListingPageTestCase(TestCase):
     def setUp(self):
         self.division = mommy.make(JobCategory)
-        self.region = mommy.make(JobRegion)
+        self.region = mommy.make(JobRegion, name='Headquarters')
 
         page_clean = patch('jobmanager.models.pages.CFGOVPage.clean')
         page_clean.start()
@@ -94,3 +97,64 @@ class JobListingPageTestCase(TestCase):
         page = self.make_page_with_grades('3', '2', '1')
         for grade in page.ordered_grades:
             self.assertIsInstance(grade, basestring)
+
+    def prepare_job_for_json_ld(self):
+        return self.prepare_job_listing_page(
+            title=u'My job listing with unicod\xeb',
+            slug='my-job-listing',
+            description=u'Description of my job with unicod\xeb',
+            salary_min=10000,
+            salary_max=100000,
+            region=self.region,
+        )
+
+    def make_job_for_json_ld(self):
+        page = self.prepare_job_for_json_ld()
+        save_new_page(page)
+        return page
+
+    def test_json_ld_metadata(self):
+        page = self.prepare_job_for_json_ld()
+        ld = json.loads(page.json_ld)
+        self.assertEqual(
+            (ld['@context'], ld['@type']),
+            ('http://schema.org', 'JobPosting')
+        )
+
+    def test_json_ld_url(self):
+        page = self.make_job_for_json_ld()
+        ld = json.loads(page.json_ld)
+        default_site = Site.objects.get(is_default_site=True)
+        self.assertEqual(
+            ld['url'],
+            '{}/{}/'.format(default_site.root_url, page.slug)
+        )
+
+    def test_json_ld_title(self):
+        page = self.prepare_job_for_json_ld()
+        ld = json.loads(page.json_ld)
+        self.assertEqual(ld['title'], page.title)
+
+    def test_json_ld_description(self):
+        page = self.prepare_job_for_json_ld()
+        ld = json.loads(page.json_ld)
+        self.assertEqual(ld['description'], page.description)
+
+    def test_json_ld_salary(self):
+        page = self.prepare_job_for_json_ld()
+        ld = json.loads(page.json_ld)
+        self.assertEqual(ld['salaryCurrency'], 'USD')
+        self.assertEqual(ld['baseSalary'], {
+            '@type': 'PriceSpecification',
+            'minPrice': page.salary_min,
+            'maxPrice': page.salary_max,
+            'priceCurrency': 'USD',
+        })
+
+    def test_json_ld_place(self):
+        page = self.prepare_job_for_json_ld()
+        ld = json.loads(page.json_ld)
+        self.assertEqual(ld['jobLocation'], {
+            '@type': 'Place',
+            'name': 'Headquarters',
+        })
