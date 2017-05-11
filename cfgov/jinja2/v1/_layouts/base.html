@@ -50,12 +50,11 @@
             {%- endif %}
         {%- endblock title %}
     </title>
+    {% set meta_description = page.search_description or 'Our vision is a consumer finance marketplace that works for American consumers, responsible providers, and the economy as a whole.' %}
     <meta name="description"
           content="
             {%- block desc -%}
-                {{- page.search_description if page and page.search_description
-                    else 'Our vision is a consumer finance marketplace that works for American consumers, responsible providers, and the economy as a whole.'
-                -}}
+                {{- meta_description -}}
             {%- endblock -%}
           ">
 
@@ -76,9 +75,7 @@
         <meta property="og:description"
               content="
                   {%- block og_desc -%}
-                      {%- if page -%}
-                          {{- page.search_description or page.seo_title or page.title -}}
-                      {%- endif -%}
+                      {{- meta_description -}}
                   {%- endblock -%}
               ">
         <meta property="og:site_name" content="Consumer Financial Protection Bureau">
