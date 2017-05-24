@@ -82,6 +82,10 @@
 
   }
 
+  if (hud_data.counseling_agencies.length) {
+    $('.hud_hca_api_results_save').removeClass('pdf-loading');
+  }
+
   $('#generate-pdf-link').on('click', function downloadPDF(ev) {
     ev.preventDefault();
     $.getScript('/static/hud/jspdf.min.js', generatePDF);

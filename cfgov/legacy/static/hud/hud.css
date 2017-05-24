@@ -258,4 +258,8 @@
 .bread {
   margin: 0;
 }
+
+.pdf-loading {
+	display: none;
+}
 /* End HUD HCA API Landing Page additions */
