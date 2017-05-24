@@ -83,7 +83,7 @@ Find a housing counselor
                     <span class="icon-print"></span>
                     <span class="hud_hca_api_results_print"></span>
                     <span class="icon-save"></span>
-                    <span class="hud_hca_api_results_save"><a id="generate-pdf-link" href="/save-hud-counselors-list/?zip={{ zipcode|escape }}" target="_blank">Save list as PDF</a></span>
+                    <span class="hud_hca_api_results_save"><a id="generate-pdf-link" href="#pdf">Save list as PDF</a></span>
                 </p>
             </div><!-- end .hud_hca_api_results_actions -->
         </div><!-- end .hud_hca_api_results_info -->
@@ -197,5 +197,6 @@ var hud_data = JSON.parse("{{ api_json|jsonify|escapejs }}"),
     mapbox_access_token = "{{ mapbox_access_token }}";
 </script>
 <script type='text/javascript' src='{% static 'hud/hud.js' %}'></script>
+<script type='text/javascript' src='{% static 'hud/hud_pdf.js' %}' async></script>
 
 {% endblock %}
