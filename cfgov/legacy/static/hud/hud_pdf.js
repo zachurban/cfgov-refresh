@@ -47,7 +47,7 @@
           y = coords.y;
       var yOffset = 0;
       var title = doc.splitTextToSize(agency.nme, 6.5);
-      var services = doc.splitTextToSize(agency.services, 6);
+      var services = doc.splitTextToSize(agency.services.replace('&#44;', ','), 6);
       var info = [
         agency.adr1,
         agency.city + " " + agency.statecd + " " + agency.zipcd,
