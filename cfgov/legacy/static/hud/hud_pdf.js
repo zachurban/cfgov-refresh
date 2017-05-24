@@ -82,7 +82,12 @@
 
   }
 
-  if (hud_data.counseling_agencies.length) {
+  function isIE() {
+    var myNav = navigator.userAgent.toLowerCase();
+    return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
+  }
+
+  if (hud_data.counseling_agencies.length && (!isIE() || isIE() > 9)) {
     $('.hud_hca_api_results_save').removeClass('pdf-loading');
   }
 
