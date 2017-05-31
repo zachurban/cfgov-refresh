@@ -10,7 +10,8 @@ if [ "$RUNTEST" == "frontend" ]; then
     gulp "test:unit"
     gulp "test:coveralls"
 elif [ "$RUNTEST" == "backend" ]; then
-    tox
+    pip install -r requirements/test.txt
+    PYTHONPATH=cfgov DJANGO_SETTINGS_MODULE=cfgov.settings.test python cfgov/manage.py test
     flake8
     coveralls
 elif [ "$RUNTEST" == "acceptance" ]; then
