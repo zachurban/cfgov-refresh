@@ -1,13 +1,15 @@
-from __future__ import print_function
-
 import csv
 import json
 import math
+import multiprocessing
 import os
 
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.template import loader
+from six import print_
+
+from core.utils import slice_list
 
 
 def assert_counselor_data_exists():
@@ -19,7 +21,7 @@ def assert_counselor_data_exists():
     if not count:
         raise RuntimeError('missing counselor data')
 
-    print('{} housing counselor(s) in database'.format(count))
+    print_(count, 'housing counselor(s) in database', flush=True)
 
 
 def load_zipcodes(filename):
@@ -98,7 +100,7 @@ class HUDGenerator(object):
     def generate(self, zipcodes):
         for zipcode, data in self.generate_zipcode_data(zipcodes):
             self.write_json(zipcode, data)
-            self.write_pdf(zipcode, data)
+            self.write_html(zipcode, data)
 
     @staticmethod
     def generate_zipcode_data(zipcodes):
@@ -122,7 +124,7 @@ class HUDGenerator(object):
         with open(json_filename, 'w') as f:
             f.write(json.dumps(data))
 
-    def write_pdf(self, zipcode, data):
+    def write_html(self, zipcode, data):
         html_filename = os.path.join(self.target, '{}.html'.format(zipcode))
 
         html = self.template.render({
@@ -141,19 +143,54 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('zipcode_filename')
         parser.add_argument('target')
+        parser.add_argument('-m', '--multiprocess', type=int, default=0)
 
     def handle(self, *args, **options):
         assert_counselor_data_exists()
 
         zipcode_filename = options['zipcode_filename']
         zipcodes = load_zipcodes(zipcode_filename)
-        print('loaded {} zipcodes from {}'.format(
-            len(zipcodes),
-            zipcode_filename
-        ))
+        print_('loaded', len(zipcodes), 'from', zipcode_filename, flush=True)
 
         target = options['target']
-        print('generating files into {}'.format(target))
+        print_('generating files into', target, flush=True)
 
+        processes = options['multiprocess']
+        if processes > 1:
+            self.generate_multiprocess(zipcodes, target, processes=processes)
+        else:
+            self.generate(zipcodes, target)
+
+    @staticmethod
+    def generate(zipcodes, target):
+        print_('generating', len(zipcodes), 'into', target, flush=True)
         generator = HUDGenerator(target)
         generator.generate(zipcodes)
+
+    def generate_multiprocess(self, zipcodes, target, processes):
+        print_('starting', processes, 'processes', flush=True)
+        pool = multiprocessing.Pool(processes=processes)
+
+        zipcode_chunks = slice_list(zipcodes, processes)
+
+        try:
+            results = []
+            for chunk in zipcode_chunks:
+                result = pool.apply_async(
+                    do_generate_multiprocess,
+                    (chunk, target),
+                )
+                results.append(result)
+
+            for result in results:
+                result.get()
+
+        except KeyboardInterrupt:
+            pool.terminate()
+
+
+def do_generate_multiprocess(zipcodes, target):
+    try:
+        Command.generate(zipcodes, target)
+    except KeyboardInterrupt:
+        pass
