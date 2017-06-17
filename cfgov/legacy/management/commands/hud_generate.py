@@ -7,6 +7,7 @@ import os
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.template import loader
+from progressbar import ProgressBar
 from six import print_
 
 from core.utils import slice_list
@@ -98,7 +99,8 @@ class HUDGenerator(object):
         self.template = loader.get_template(self.template_name)
 
     def generate(self, zipcodes):
-        for zipcode, data in self.generate_zipcode_data(zipcodes):
+        pbar = ProgressBar(maxval=len(zipcodes))
+        for zipcode, data in pbar(self.generate_zipcode_data(zipcodes)):
             self.write_json(zipcode, data)
             self.write_html(zipcode, data)
 
