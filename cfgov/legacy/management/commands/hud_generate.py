@@ -1,28 +1,14 @@
+from __future__ import absolute_import, print_function
+
 import csv
 import json
-import math
-import multiprocessing
 import os
+import requests
+import sqlite3
 
-from django.core.management.base import BaseCommand
-from django.db import connection
-from django.template import loader
-from progressbar import Percentage, ProgressBar
+from django.core.management.base import BaseCommand, CommandError
+from math import acos, cos, radians, sin
 from six import print_
-
-from core.utils import slice_list
-
-
-def assert_counselor_data_exists():
-    """Assert that counselor data exists in the database."""
-    cursor = connection.cursor()
-    cursor.execute('SELECT COUNT(*) FROM hud_api_replace_counselingagency')
-    count = int(cursor.fetchone()[0])
-
-    if not count:
-        raise RuntimeError('missing counselor data')
-
-    print_(count, 'housing counselor(s) in database', flush=True)
 
 
 def load_zipcodes(filename):
@@ -30,116 +16,112 @@ def load_zipcodes(filename):
 
     See https://www.census.gov/geo/maps-data/data/gazetteer2016.html
 
-    Returns a tuple of strings: (zipcode, latitude_degrees, longitude_degrees)
+    Returns a tuple: (zipcode, latitude_degreees, longitude_degrees)
     """
+    print_('Reading zipcodes from', filename, flush=True)
     with open(filename, 'r') as f:
         reader = csv.reader(f, delimiter='\t')
         next(reader)
 
-        return [(row[0], row[5].strip(), row[6].strip()) for row in reader]
+        zipcodes = [
+            (row[0], float(row[5].strip()), float(row[6].strip()))
+            for row in reader
+        ]
+
+    print_('Loaded', len(zipcodes), 'zipcodes', flush=True)
+    return zipcodes
 
 
-def dictfetchall(cursor):
-    """Return all rows from a cursor as a dict."""
-    columns = [col[0] for col in cursor.description]
-    return [dict(zip(columns, row)) for row in cursor.fetchall()]
+def download_hud_counselors():
+    """Download counselor data from HUD."""
+    url = (
+        'https://data.hud.gov/Housing_Counselor/searchByLocation?'
+        'Lat=38.8951&Long=-77.0367&Distance=5000'
+    )
+
+    print_('Downloading HUD counselors from', url, flush=True)
+    response = requests.get(url)
+    response.raise_for_status()
+    counselors = response.json()
+
+    if not counselors:
+        raise CommandError('Could not download HUD counselors')
+
+    print_('Retrieved', len(counselors), 'counselors', flush=True)
+    return counselors
 
 
-def query_counselors(latitude_degrees, longitude_degrees, limit=10):
-    """Find housing counselors closest to a location.
-
-    Requires existing dataset load from django-hud.
+def distance_in_miles(lat1_radians, lng1_radians, lat2_radians, lng2_radians):
+    """Estimate distance in miles between two points in radians.
 
     Uses simplified algorithm to determine proximity based on latitude and
     longitude, described at https://stackoverflow.com/q/1916953.
     """
     earth_radius_in_miles = 3959
 
-    if connection.vendor == 'sqlite':
-        connection.connection.create_function('acos', 1, math.acos)
-        connection.connection.create_function('cos', 1, math.cos)
-        connection.connection.create_function('radians', 1, math.radians)
-        connection.connection.create_function('sin', 1, math.sin)
+    return earth_radius_in_miles * acos(
+        cos(lat1_radians) *
+        cos(lat2_radians) *
+        cos(lng2_radians - lng1_radians) +
+        sin(lat1_radians) *
+        sin(lat2_radians)
+    )
 
-    sql = """
-SELECT
-    *,
-    (%s * acos(
-        cos(radians(CAST(%s AS FLOAT))) *
-        cos(radians(CAST(agc_ADDR_LATITUDE AS FLOAT))) *
-        cos(
-            radians(CAST(agc_ADDR_LONGITUDE AS FLOAT)) -
-            radians(CAST(%s AS FLOAT))
-        ) +
-        sin(radians(CAST(%s AS FLOAT))) *
-        sin(radians(CAST(agc_ADDR_LATITUDE AS FLOAT)))
-    )) AS distance
-FROM hud_api_replace_counselingagency
-ORDER BY distance ASC
-LIMIT %s
+
+def get_db_connection():
+    connection = sqlite3.connect(':memory:')
+    connection.create_function('distance_in_miles', 4, distance_in_miles)
+
+    return connection
+
+
+def fill_db(connection, counselors):
+    def prepare_counselors(counselors):
+        for counselor in counselors:
+            yield (
+                radians(float(counselor['agc_ADDR_LATITUDE'])),
+                radians(float(counselor['agc_ADDR_LONGITUDE'])),
+                json.dumps(counselor)
+            )
+
+    create_sql = """
+CREATE TABLE counselors (
+    latitude_radians REAL,
+    longitude_radians REAL,
+    json TEXT
+)
 """
 
-    cursor = connection.cursor()
-    cursor.execute(sql, [
-        earth_radius_in_miles,
-        latitude_degrees,
-        longitude_degrees,
-        latitude_degrees,
-        limit
-    ])
+    insert_sql = """
+INSERT INTO
+    counselors(latitude_radians, longitude_radians, json)
+VALUES (?, ?, ?)
+"""
 
-    return dictfetchall(cursor)
+    connection.execute(create_sql)
+    connection.executemany(insert_sql, prepare_counselors(counselors))
 
 
-class HUDGenerator(object):
-    template_name = 'hud/housing_counselor_pdf_selfcontained.html'
+def query_db(connection, latitude_radians, longitude_radians):
+    sql = """
+SELECT
+    json,
+    distance_in_miles(latitude_radians, longitude_radians, ?, ?) AS distance
+FROM
+    counselors
+ORDER BY distance ASC
+LIMIT 10
+    """
 
-    def __init__(self, target):
-        self.target = target
-        self.template = loader.get_template(self.template_name)
+    response = connection.execute(sql, (latitude_radians, longitude_radians))
 
-    def generate(self, zipcodes):
-        pbar = ProgressBar(
-            maxval=len(zipcodes),
-            widgets=ProgressBar._DEFAULT_WIDGETS + ['\n']
-        )
-        for zipcode, data in pbar(self.generate_zipcode_data(zipcodes)):
-            self.write_json(zipcode, data)
-            self.write_html(zipcode, data)
+    results = []
+    for row in response:
+        result = json.loads(row[0])
+        result['distance'] = row[1]
+        results.append(result)
 
-    @staticmethod
-    def generate_zipcode_data(zipcodes):
-        for zipcode, latitude_degrees, longitude_degrees in zipcodes:
-            counselors = query_counselors(latitude_degrees, longitude_degrees)
-
-            zipcode_data = {
-                'zip': {
-                    'zipcode': zipcode,
-                    'lat': float(latitude_degrees),
-                    'lng': float(longitude_degrees),
-                },
-                'counseling_agencies': counselors,
-            }
-
-            yield zipcode, zipcode_data
-
-    def write_json(self, zipcode, data):
-        json_filename = os.path.join(self.target, '{}.json'.format(zipcode))
-
-        with open(json_filename, 'w') as f:
-            f.write(json.dumps(data))
-
-    def write_html(self, zipcode, data):
-        html_filename = os.path.join(self.target, '{}.html'.format(zipcode))
-
-        html = self.template.render({
-            'zipcode': zipcode,
-            'zipcode_valid': True,
-            'api_json': data,
-        })
-
-        with open(html_filename, 'w') as f:
-            f.write(html.encode('utf-8'))
+    return results
 
 
 class Command(BaseCommand):
@@ -148,54 +130,34 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('zipcode_filename')
         parser.add_argument('target')
-        parser.add_argument('-m', '--multiprocess', type=int, default=0)
 
     def handle(self, *args, **options):
-        assert_counselor_data_exists()
+        zipcodes = load_zipcodes(options['zipcode_filename'])
+        counselors = download_hud_counselors()
 
-        zipcode_filename = options['zipcode_filename']
-        zipcodes = load_zipcodes(zipcode_filename)
-        print_('loaded', len(zipcodes), 'from', zipcode_filename, flush=True)
+        connection = get_db_connection()
+        fill_db(connection, counselors)
 
         target = options['target']
         print_('generating files into', target, flush=True)
 
-        processes = options['multiprocess']
-        if processes > 1:
-            self.generate_multiprocess(zipcodes, target, processes=processes)
-        else:
-            self.generate(zipcodes, target)
+        for zipcode, latitude_degrees, longitude_degrees in zipcodes:
+            counselors = query_db(
+                connection,
+                radians(latitude_degrees),
+                radians(longitude_degrees)
+            )
 
-    @staticmethod
-    def generate(zipcodes, target):
-        print_('generating', len(zipcodes), 'into', target, flush=True)
-        generator = HUDGenerator(target)
-        generator.generate(zipcodes)
+            zipcode_data = {
+                'zip': {
+                    'zipcode': zipcode,
+                    'lat': latitude_degrees,
+                    'lng': longitude_degrees,
+                },
+                'counseling_agencies': counselors,
+            }
 
-    def generate_multiprocess(self, zipcodes, target, processes):
-        print_('starting', processes, 'processes', flush=True)
-        pool = multiprocessing.Pool(processes=processes)
+            json_filename = os.path.join(target, '{}.json'.format(zipcode))
 
-        zipcode_chunks = slice_list(zipcodes, processes)
-
-        try:
-            results = []
-            for chunk in zipcode_chunks:
-                result = pool.apply_async(
-                    do_generate_multiprocess,
-                    (chunk, target),
-                )
-                results.append(result)
-
-            for result in results:
-                result.get()
-
-        except KeyboardInterrupt:
-            pool.terminate()
-
-
-def do_generate_multiprocess(zipcodes, target):
-    try:
-        Command.generate(zipcodes, target)
-    except KeyboardInterrupt:
-        pass
+            with open(json_filename, 'w') as f:
+                f.write(json.dumps(zipcode_data))
