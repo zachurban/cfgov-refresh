@@ -32,6 +32,12 @@ def load_zipcodes(filename):
     return zipcodes
 
 
+def get_json_from_url(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.json()
+
+
 def download_hud_counselors():
     """Download counselor data from HUD."""
     url = (
@@ -40,15 +46,40 @@ def download_hud_counselors():
     )
 
     print_('Downloading HUD counselors from', url, flush=True)
-    response = requests.get(url)
-    response.raise_for_status()
-    counselors = response.json()
+    counselors = get_json_from_url(url)
 
     if not counselors:
         raise CommandError('Could not download HUD counselors')
 
     print_('Retrieved', len(counselors), 'counselors', flush=True)
     return counselors
+
+
+def replace_counselor_values(counselors, attribute, url):
+    print_('Downloading counselor', attribute, 'from', url, flush=True)
+    values = get_json_from_url(url)
+    values_dict = dict((lang['key'], lang['value']) for lang in values)
+
+    for counselor in counselors:
+        abbreviations = counselor[attribute]
+        counselor[attribute] = map(
+            lambda key: values_dict[key],
+            abbreviations.split(',') if abbreviations else []
+        )
+
+    return counselors
+
+
+def replace_counselor_languages(counselors):
+    """Update counselor languages with names from HUD."""
+    url = 'https://data.hud.gov/Housing_Counselor/getLanguages'
+    return replace_counselor_values(counselors, 'languages', url)
+
+
+def replace_counselor_services(counselors):
+    """Update counselor services with names from HUD."""
+    url = 'https://data.hud.gov/Housing_Counselor/getServices'
+    return replace_counselor_values(counselors, 'services', url)
 
 
 def distance_in_miles(lat1_radians, lng1_radians, lat2_radians, lng2_radians):
@@ -125,7 +156,7 @@ LIMIT 10
 
 
 class Command(BaseCommand):
-    help = 'Generate bulk housing counselor data'
+    help = 'Generate bulk housing counselor JSON data'
 
     def add_arguments(self, parser):
         parser.add_argument('zipcode_filename')
@@ -135,11 +166,14 @@ class Command(BaseCommand):
         zipcodes = load_zipcodes(options['zipcode_filename'])
         counselors = download_hud_counselors()
 
+        replace_counselor_languages(counselors)
+        replace_counselor_services(counselors)
+
         connection = get_db_connection()
         fill_db(connection, counselors)
 
         target = options['target']
-        print_('generating files into', target, flush=True)
+        print_('generating JSON into', target, flush=True)
 
         for zipcode, latitude_degrees, longitude_degrees in zipcodes:
             counselors = query_db(

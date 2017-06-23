@@ -250,7 +250,7 @@ img.hud_hca_api_print_logo {
 															<span class="show-hide-name">View</span>
 															languages offered at this location														</a>
 													<div class="show-hide-content hud_hca_api_print_show">
-														<span class="hud_hca_api_results_listing_title">Languages:</span> <span class="hud_hca_api_lang">{{ counselor.languages }}</span>
+														<span class="hud_hca_api_results_listing_title">Languages:</span> <span class="hud_hca_api_lang">{{ counselor.languages|join:", " }}</span>
 													</div>
 												</div>
 											</div>
@@ -260,7 +260,7 @@ img.hud_hca_api_print_logo {
 											<div class="hud_hca_api_services">
 												<span class="hud_hca_api_results_listing_title cfpb_hide hud_hca_api_print_show">Services: </span>
 												<span class="hud_hca_api_serv">
-													<span class="hud_hca_api_serv_item">{{ counselor.services }}</span>
+                          <span class="hud_hca_api_serv_item">{% if counselor.services %}{{ counselor.services|join:", " }}{% else %}Not available{% endif %}</span>
                         </span>
 											</div>
 										</div>
