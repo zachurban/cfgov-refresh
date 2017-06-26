@@ -3,101 +3,77 @@ from __future__ import absolute_import, unicode_literals
 import re
 
 
-class HousingCounselorCleaner(object):
-    """Class that cleans raw counselor data from HUD."""
-    REQUIRED_COUNSELOR_KEYS = {
-        'adr1', 'adr2', 'agc_ADDR_LATITUDE', 'agc_ADDR_LONGITUDE', 'city',
-        'email', 'languages', 'nme', 'phone1', 'services', 'statecd', 'weburl',
-        'zipcd',
-    }
+REQUIRED_COUNSELOR_KEYS = {
+    'adr1', 'adr2', 'agc_ADDR_LATITUDE', 'agc_ADDR_LONGITUDE', 'city', 'email',
+    'languages', 'nme', 'phone1', 'services', 'statecd', 'weburl', 'zipcd',
+}
 
-    def __init__(self, fetcher):
-        self.fetcher = fetcher
 
-    def clean(self):
-        """Returns a cleaned set of HUD housing counselors."""
-        return map(self.clean_counselor, self.fetcher.counselors)
+def clean_counselors(counselors):
+    """Returns a cleaned set of HUD housing counselors."""
+    return map(clean_counselor, counselors)
 
-    def clean_counselor(self, counselor):
-        """Cleans a single housing counselor."""
-        counselor = dict(counselor)
 
-        if not self.REQUIRED_COUNSELOR_KEYS.issubset(set(counselor.keys())):
-            raise ValueError('missing keys in counselor')
+def clean_counselor(counselor):
+    """Cleans a single housing counselor."""
+    counselor = dict(counselor)
 
-        self.replace_abbreviations(
-            counselor,
-            'languages',
-            self.fetcher.languages
-        )
+    if not REQUIRED_COUNSELOR_KEYS.issubset(set(counselor.keys())):
+        raise ValueError('missing keys in counselor')
 
-        self.replace_abbreviations(
-            counselor,
-            'services',
-            self.fetcher.services
-        )
+    lat_lng_keys = ('agc_ADDR_LATITUDE', 'agc_ADDR_LONGITUDE')
+    for key in lat_lng_keys:
+        counselor[key] = float_or_none(counselor[key])
 
-        for key in ('agc_ADDR_LATITUDE', 'agc_ADDR_LONGITUDE'):
-            counselor[key] = self.float_or_none(counselor[key])
+    for key in ('city', 'nme'):
+        counselor[key] = title_case(counselor[key])
 
-        for key in ('city', 'nme'):
-            counselor[key] = self.title_case(counselor[key])
+    counselor['email'] = reformat_email(counselor['email'])
+    counselor['weburl'] = reformat_weburl(counselor['weburl'])
 
-        counselor['email'] = self.reformat_email(counselor['email'])
-        counselor['weburl'] = self.reformat_weburl(counselor['weburl'])
+    return counselor
 
-        return counselor
 
-    @staticmethod
-    def replace_abbreviations(counselor, key, lookups):
-        """Replace abbreviations in a counselor key with names."""
-        abbreviations = counselor[key]
-        counselor[key] = map(
-            lambda k: lookups[k],
-            abbreviations.split(',') if abbreviations else []
-        )
+def float_or_none(s):
+    """Ensure a value is of type float if it is not none."""
+    if s:
+        return float(s)
 
-    @staticmethod
-    def float_or_none(s):
-        """Convert a string to a float."""
-        if s:
-            return float(s)
 
-    @staticmethod
-    def title_case(s):
-        """Convert a string to have title case."""
-        if not s:
-            return None
+def reformat_email(s):
+    s = (s or '').strip()
+    if '.' in s and '@' in s:
+        return s
 
-        s = s.lower()
-        parts = s.split(' ')
-        lower_case = (
-            'a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or',
-            'the', 'to', 'with'
-        )
 
-        parts[0] = parts[0].title()
-        parts = map(
-            lambda part: part.title() if part not in lower_case else part,
-            parts
-        )
+def reformat_weburl(s):
+    """Convert invalid URLs to null."""
+    s = (s or '').strip()
 
-        return ' '.join(parts)
+    if s and '.' in s and 'notavailable' not in s:
+        match = re.match(r'^http(s)?://', s)
+        if not match:
+            s = 'http://' + s
 
-    @staticmethod
-    def reformat_weburl(s):
-        """Convert invalid URLs to null."""
-        s = (s or '').strip()
+        return s
 
-        if s and '.' in s and 'notavailable' not in s:
-            match = re.match(r'^http(s)?://', s)
-            if not match:
-                s = 'http://' + s
 
-            return s
+def title_case(s):
+    """Convert a string to have title case."""
+    if not s:
+        return None
 
-    @staticmethod
-    def reformat_email(s):
-        s = (s or '').strip()
-        if '.' in s and '@' in s:
-            return s
+    s = s.lower()
+    parts = s.split(' ')
+    lower_case = (
+        'a', 'an', 'and', 'as', 'at', 'by', 'for', 'in', 'of', 'on', 'or',
+        'the', 'to', 'with'
+    )
+
+    parts[0] = parts[0].title()
+    parts = map(
+        lambda part: part.title() if part not in lower_case else part,
+        parts
+    )
+
+    return ' '.join(parts)
