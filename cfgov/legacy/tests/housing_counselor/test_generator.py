@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function
+
 import json
 import os
 import shutil
@@ -6,7 +8,9 @@ import tempfile
 from mock import patch
 from unittest import TestCase
 
-from legacy.housing_counselor.generator import generate_counselor_json
+from legacy.housing_counselor.generator import (
+    generate_counselor_json, get_counselor_json_files
+)
 
 
 class TestGeneratorCounselorJson(TestCase):
@@ -61,3 +65,40 @@ class TestGeneratorCounselorJson(TestCase):
                 },
             ],
         })
+
+
+class TestGetCounselorJsonFiles(TestCase):
+    def setUp(self):
+        self.tempdir = tempfile.mkdtemp()
+
+        patched = patch('legacy.housing_counselor.generator.print_')
+        patched.start()
+        self.addCleanup(patched.stop)
+
+    def tearDown(self):
+        shutil.rmtree(self.tempdir)
+
+    def make_empty_file(self, filename):
+        open(os.path.join(self.tempdir, filename), 'w').close()
+
+    def test_no_files_raises_runtime_error(self):
+        with self.assertRaises(RuntimeError):
+            list(get_counselor_json_files(self.tempdir))
+
+    def test_no_matching_files_raises_runtime_error(self):
+        self.make_empty_file('something.json')
+        with self.assertRaises(RuntimeError):
+            list(get_counselor_json_files(self.tempdir))
+
+    def test_matching_files_returns_zipcodes_and_filenames(self):
+        self.make_empty_file('20001.json')
+        self.make_empty_file('20002.json')
+        self.make_empty_file('something.json')
+
+        self.assertEqual(
+            list(get_counselor_json_files(self.tempdir)),
+            [
+                ('20001', os.path.join(self.tempdir, '20001.json')),
+                ('20002', os.path.join(self.tempdir, '20002.json')),
+            ]
+        )

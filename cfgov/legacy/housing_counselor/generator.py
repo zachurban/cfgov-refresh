@@ -1,9 +1,12 @@
 from __future__ import absolute_import, unicode_literals
 
+import glob
 import json
 import os
+import re
 import sqlite3
 
+from django.template import loader
 from math import acos, cos, radians, sin
 from six import print_
 
@@ -107,3 +110,46 @@ def generate_counselor_json(counselors, zipcodes, target):
 
         with open(json_filename, 'w') as f:
             f.write(json.dumps(zipcode_data))
+
+
+def generate_counselor_html(source_dir, target_dir):
+    template_name = 'hud/housing_counselor_pdf_selfcontained.html'
+    template = loader.get_template(template_name)
+
+    for zipcode, filename in get_counselor_json_files(source_dir):
+        with open(filename, 'r') as f:
+            zipcode_data = json.loads(f.read())
+
+        html = template.render({
+            'zipcode': zipcode,
+            'zipcode_valid': True,
+            'api_json': zipcode_data,
+        })
+
+        html_filename = os.path.join(target_dir, '{}.html'.format(zipcode))
+
+        with open(html_filename, 'w') as f:
+            f.write(html.encode('utf-8'))
+
+
+def get_counselor_json_files(directory):
+    """Returns an iterable list of JSON files and associated zipcodes.
+
+    Returns iterator of (zipcode, filename) pairs.
+    """
+    search_path = os.path.join(directory, '*.json')
+    filenames = filter(
+        lambda f: re.search(r'/\d{5}.json$', f),
+        glob.glob(search_path)
+    )
+
+    if not filenames:
+        raise RuntimeError('no input files found in {}'.format(directory))
+
+    print_('Found', len(filenames), 'input files', flush=True)
+
+    for filename in filenames:
+        match = re.search(r'/(\d{5}).json$', filename)
+        zipcode = match.group(1)
+
+        yield zipcode, filename

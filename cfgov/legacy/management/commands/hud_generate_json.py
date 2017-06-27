@@ -20,7 +20,7 @@ def load_zipcodes(filename):
     """
     print_('Reading zipcodes from', filename, flush=True)
     with open(filename, 'r') as f:
-        reader = csv.reader(f, delimiter='\t')
+        reader = csv.reader(f, delimiter=str('\t'))
         next(reader)
 
         zipcodes = dict(
@@ -49,7 +49,7 @@ class Command(BaseCommand):
         counselors = geocode_counselors(counselors, zipcodes=zipcodes)
 
         # Standardize formatting of counselor data.
-        counselors = clean_counselors(counselors, zipcodes)
+        counselors = clean_counselors(counselors)
 
         # Generate JSON files for each zipcode.
-        generate_counselor_json(counselors, zipcodes)
+        generate_counselor_json(counselors, zipcodes, options['target'])

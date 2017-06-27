@@ -1,9 +1,11 @@
 from __future__ import absolute_import, unicode_literals
 
+from six import print_
+
 
 def geocode_counselors(counselors, **kwargs):
     """Fill in missing latitude/longitude data for housing counselors."""
-    ZipCodeBasedGeocoder(**kwargs).geocode(counselors)
+    return ZipCodeBasedGeocoder(**kwargs).geocode(counselors)
 
 
 class ZipCodeBasedGeocoder(object):
@@ -28,6 +30,7 @@ class ZipCodeBasedGeocoder(object):
         if all(counselor.get(k) is not None for k in lat_lng_keys):
             return counselor
 
+        print_('need to geocode this counselor: ', counselor, flush=True)
         zipcode = counselor['zipcd'][:5]
 
         if zipcode not in self.zipcodes:
