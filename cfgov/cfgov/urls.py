@@ -105,6 +105,9 @@ urlpatterns = [
         include(SheerSite('know-before-you-owe').urls)),
 
     url(r'^adult-financial-education/',
+        RedirectView.as_view(
+            url='/practioner-resources/adult-financial-education/', permanent=True)),
+    url(r'^practioner-resources/adult-financial-education/',
         include(fin_ed.urls_for_prefix('adult-financial-education'))),
     url(r'^parents/(?P<path>.*)$',
         RedirectView.as_view(
@@ -228,7 +231,10 @@ urlpatterns = [
                 template_name='transcripts/how-to-apply-for-a-federal-job-with-the-cfpb/index.html'),  # noqa: E501
                 name='how-to-apply-for-a-federal-job-with-the-cfpb'), ],
         namespace='transcripts')),
-    url(r'^paying-for-college/',
+    url(r'^paying-for-college/(?P<path>.*)$',
+        RedirectView.as_view(
+            url='/consumer-tools/paying-for-college/%(path)s', permanent=True)),
+    url(r'^consumer-tools/paying-for-college/',
         include_if_app_enabled('comparisontool', 'comparisontool.urls')),
     url(r'^paying-for-college2/',
         include_if_app_enabled(
