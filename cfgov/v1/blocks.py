@@ -186,3 +186,35 @@ class PlaceholderFieldBlock(blocks.FieldBlock):
 
 class PlaceholderCharBlock(PlaceholderFieldBlock, blocks.CharBlock):
     pass
+
+
+class Link(blocks.StructBlock):
+    link_text = blocks.CharBlock(required=True)
+    page_link = blocks.PageChooserBlock(
+                    required=False,
+                    help_text='Link to a page in Wagtail.')
+    external_link = blocks.CharBlock(required=False, 
+                        max_length=1000,
+                        default="#",
+                        help_text="Enter url for page outside Wagtail.")
+
+
+class NavItem2(blocks.StructBlock):
+    link = Link(required=False)
+
+
+class NavGroup2(blocks.StructBlock):
+    nav_items =  blocks.ListBlock(NavItem2())
+
+
+class NavItem(blocks.StructBlock):
+    link = Link(required=False)
+    nav_groups = blocks.StreamBlock([
+            ('nav_group', NavGroup2())
+        ])
+    
+
+class NavGroup(blocks.StructBlock):
+    group_title = blocks.CharBlock(required=False)
+    hide_group_title = blocks.BooleanBlock(required=False)
+    nav_items =  blocks.ListBlock(NavItem())
