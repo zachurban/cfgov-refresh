@@ -55,6 +55,7 @@ INSTALLED_APPS = (
     'taggit',
     'wagtailsharing',
     'flags',
+    'watchman',
     'haystack',
     'ask_cfpb',
     'overextends',
@@ -74,7 +75,8 @@ INSTALLED_APPS = (
     'django_extensions',
     'reversion',
     'tinymce',
-    'jobmanager'
+    'jobmanager',
+    'wellbeing',
 )
 
 OPTIONAL_APPS = [
@@ -151,9 +153,9 @@ TEMPLATES = [
             V1_TEMPLATE_ROOT,
             V1_TEMPLATE_ROOT.child('_includes'),
             V1_TEMPLATE_ROOT.child('_layouts'),
-            PROJECT_ROOT.child('static_built')
+            PROJECT_ROOT.child('static_built'),
         ],
-        'APP_DIRS': False,
+        'APP_DIRS': True,
         'OPTIONS': {
             'environment': 'v1.environment',
             'extensions': [
@@ -491,7 +493,10 @@ CSP_SCRIPT_SRC = ("'self'",
                   '*.youtube.com',
                   '*.ytimg.com',
                   'trk.cetrk.com',
-                  'universal.iperceptions.com')
+                  'universal.iperceptions.com',
+                  'sample.crazyegg.com',
+                  'about:'
+                  )
 
 # These specify valid sources of CSS code
 CSP_STYLE_SRC = (
@@ -514,6 +519,7 @@ CSP_IMG_SRC = (
     '*.googletagmanager.com',
     'api.mapbox.com',
     '*.tiles.mapbox.com',
+    'stats.search.usa.gov',
     'data:')
 
 # These specify what URL's we allow to appear in frames/iframes
@@ -532,6 +538,8 @@ CSP_FONT_SRC = ("'self'", 'fast.fonts.net')
 CSP_CONNECT_SRC = ("'self'",
                    '*.tiles.mapbox.com',
                    'bam.nr-data.net',
+                   'files.consumerfinance.gov',
+                   's3.amazonaws.com',
                    'api.iperceptions.com')
 
 # Feature flags
@@ -556,11 +564,6 @@ FLAGS = {
     # Fix for margin-top when using the text inset
     # When enabled, the top margin of full-width text insets is increased
     'INSET_TEST': {},
-
-    # Footer link for the Office of Administrative Adjudication
-    # When enabled, a link to "Administrative Adjudication" appears in the
-    # footer
-    'OAA_FOOTER_LINK': {},
 
     # When enabled, serves `/es/` pages from this
     # repo ( excluding /obtener-respuestas/ pages ).
@@ -591,4 +594,27 @@ FLAGS = {
     # The template will render for the front-end, but the sortable code is missing
     # and the table will not be sortable until cf-tables from CF 4.x is implemented
     'SORTABLE_TABLES': {},
+
+    # The release of the consumer Financial Well Being Scale app
+    'FWB_RELEASE': {},
 }
+
+
+# Watchman tokens, used to authenticate global status endpoint
+WATCHMAN_TOKENS = os.environ.get('WATCHMAN_TOKENS', os.urandom(32))
+
+# This specifies what checks Watchman should run and include in its output
+# https://github.com/mwarkentin/django-watchman#custom-checks
+WATCHMAN_CHECKS = (
+    'watchman.checks.databases',
+    'watchman.checks.storage',
+    'watchman.checks.caches',
+    'alerts.checks.check_clock_drift',
+)
+
+# Used to check server's time against in check_clock_drift
+NTP_TIME_SERVER = 'north-america.pool.ntp.org'
+
+# If server's clock drifts from NTP by more than specified offset
+# (in seconds), check_clock_drift will fail
+MAX_ALLOWED_TIME_OFFSET = 5

@@ -107,6 +107,8 @@ urlpatterns = [
 
     url(r'^adult-financial-education/',
         include(fin_ed.urls_for_prefix('adult-financial-education'))),
+    url(r'^your-story/$', TemplateView.as_view(
+        template_name='/your-story/index.html')),
     url(r'^parents/(?P<path>.*)$',
         RedirectView.as_view(
             url='/money-as-you-grow/%(path)s', permanent=True)),
@@ -377,6 +379,13 @@ urlpatterns = [
 
     es_conv_flag(r'^es/quienes-somos/$', TemplateView.as_view(
                  template_name='es/quienes-somos/index.html')),
+
+    url(r'^_status/', include_if_app_enabled('watchman', 'watchman.urls')),
+
+    flagged_url('FWB_RELEASE',
+                r'^(?i)consumer-tools/financial-well-being/',
+                include('wellbeing.urls')
+    ),
 ]
 
 if settings.ALLOW_ADMIN_URL:
