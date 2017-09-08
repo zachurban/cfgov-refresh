@@ -220,11 +220,7 @@ class MenuItem(models.Model):
     column_four = StreamField([
         ('nav_group', v1_blocks.NavGroup()),
         ('featured_content', blocks.StructBlock([
-            ('status', blocks.ChoiceBlock(choices=[
-                ('draft-production', 'Draft and production'),
-                ('production', 'Production'),
-                ('draft', 'Draft'),
-            ], default='draft-production')),
+            ('draft', blocks.BooleanBlock(required=False)),
             ('link', atoms.Hyperlink(required=False)),
             ('body', blocks.RichTextBlock(required=False)),
             ('image', atoms.ImageBasic(required=False)),

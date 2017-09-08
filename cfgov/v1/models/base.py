@@ -236,15 +236,22 @@ class CFGOVPage(Page):
             for col in ['column_one', 'column_two', 'column_three',
                 'column_four']:
                 column = getattr(item, col)
+                column_block = None
                 for block in column:
-                    status = block.value.get('status', '')
-                    if not (status == 'production' and draft_flag_enabled) \
-                        and not (status == 'draft' and not draft_flag_enabled):
-                        if block.block_type == 'nav_group':
-                            nav_groups.append(block)
-                        elif block.block_type == 'featured_content':
-                            setattr(item, 'featured_content', block)
+                    draft = block.value.get('draft', '')
+                    if not draft_flag_enabled and not draft:
+                        column_block = block
                         break
+                    elif draft_flag_enabled:
+                        column_block = block
+                        if draft:
+                            break
+
+                if column_block and column_block.block_type == 'nav_group':
+                    nav_groups.append(column_block)
+                elif column_block and column_block.block_type == 'featured_content':
+                    setattr(item, 'featured_content', column_block)
+
 
             setattr(item, 'nav_groups', nav_groups)
 

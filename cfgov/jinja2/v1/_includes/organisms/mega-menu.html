@@ -48,8 +48,7 @@
 {%- for nav_group in nav_groups %}
 
 {% set group = nav_group.value %}
-{% if not ( group.status == 'production' and flag_enabled('DRAFT_MENU', request) ) 
-   and not ( group.status == 'draft' and not flag_enabled('DRAFT_MENU', request) ) %}
+
 <div class="{{ _classes( nav_depth, '-list' ) }}">
     {% if group.group_title %} 
     <h3 class="h5 {{' hide-title' if group.hide_group_title else ''}}"
@@ -99,7 +98,6 @@
     {%- endfor %}
     </ul>
 </div>
-{% endif %}
 {%- endfor %}
 {% endmacro %}
 

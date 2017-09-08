@@ -214,13 +214,9 @@ class NavItem(blocks.StructBlock):
         ])
 
 class NavGroup(blocks.StructBlock):
+    draft = blocks.BooleanBlock(required=False)
     group_title = blocks.CharBlock(required=False,
         label="Column title")
     hide_group_title = blocks.BooleanBlock(required=False,
         label="Hide column title")
-    status = blocks.ChoiceBlock(choices=[
-        ('draft-production', 'Draft and production'),
-        ('production', 'Production'),
-        ('draft', 'Draft'),
-    ], default='draft-production')
     nav_items =  blocks.ListBlock(NavItem())
