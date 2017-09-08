@@ -217,4 +217,9 @@ class NavItem(blocks.StructBlock):
 class NavGroup(blocks.StructBlock):
     group_title = blocks.CharBlock(required=False)
     hide_group_title = blocks.BooleanBlock(required=False)
+    status = blocks.ChoiceBlock(choices=[
+        ('draft-production', 'Draft and production'),
+        ('production', 'Production only'),
+        ('draft', 'Draft only'),
+    ], default='draft-production')
     nav_items =  blocks.ListBlock(NavItem())

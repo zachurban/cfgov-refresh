@@ -46,7 +46,14 @@
 
 {% macro _nav_list( nav_depth, nav_groups ) %}
 {%- for nav_group in nav_groups %}
+
 {% set group = nav_group.value %}
+{{group.status}}
+{{flag_enabled('DRAFT_MENU', request)}}
+{{ group.status == 'production' and flag_enabled('DRAFT_MENU', request) }}
+{{ group.status == 'draft' and not flag_enabled('DRAFT_MENU', request) }}
+{% if not ( group.status == 'production' and flag_enabled('DRAFT_MENU', request) ) 
+   and not ( group.status == 'draft' and not flag_enabled('DRAFT_MENU', request) ) %}
 <div class="{{ _classes( nav_depth, '-list' ) }}">
     {% if group.group_title %} 
     <h3 class="h5 {{' hide-title' if group.hide_group_title else ''}}"
@@ -65,35 +72,38 @@
     {%- endif %}
     {%- for item in group.nav_items %}
 
-    {% set link = item.link if item.link else item %}
-    {% if link.page_link %}
-      {% set item_url = link.page_link.url %}
-    {% else %}
-      {% set item_url = link.external_link %}
-    {% endif %}
-    {% set text = link.link_text %}
-    
+      
 
-    <li class="m-list_item
-               {{ _classes( nav_depth, '-item' ) }}"
-        {{ 'data-js-hook=behavior_flyout-menu' if item.nav_groups | count > 0 else '' }}>
-        {# TODO: Disable link (or overview link) of page user is currently on (on mobile). #}
-        <a class="{{ 'u-link__disabled' if item_url == '' else '' }}
-                  {{ _classes( nav_depth, '-link' ) }}
-                  {{ _classes( nav_depth, '-link__has-children' ) if item.nav_groups | count > 0 else '' }}
-                  {{ _classes( nav_depth, '-link__current' ) if item_url == request.path else '' }}"
-           {{ '' if item_url == '' else 'href=' + item_url | e }}
-           {{ 'data-js-hook=behavior_flyout-menu_trigger' if item.nav_groups | count > 0 else '' }}
-           {{ 'aria-pressed=false' if item.nav_groups | count > 0 else '' }}>
-            {{ text }}
-        </a>
-        {% if item.nav_groups | count > 0 %}
-            {{ _nav( nav_depth | int + 1, item.nav_groups, text ~ ' Overview', item_url, item.featured_media_content if item.featured_media_content else '', item.footer if item.footer else '' ) }}
-        {% endif %}
-    </li>
+      {% set link = item.link if item.link else item %}
+      {% if link.page_link %}
+        {% set item_url = link.page_link.url %}
+      {% else %}
+        {% set item_url = link.external_link %}
+      {% endif %}
+      {% set text = link.link_text %}
+      
+
+      <li class="m-list_item
+                 {{ _classes( nav_depth, '-item' ) }}"
+          {{ 'data-js-hook=behavior_flyout-menu' if item.nav_groups | count > 0 else '' }}>
+          {# TODO: Disable link (or overview link) of page user is currently on (on mobile). #}
+          <a class="{{ 'u-link__disabled' if item_url == '' else '' }}
+                    {{ _classes( nav_depth, '-link' ) }}
+                    {{ _classes( nav_depth, '-link__has-children' ) if item.nav_groups | count > 0 else '' }}
+                    {{ _classes( nav_depth, '-link__current' ) if item_url == request.path else '' }}"
+             {{ '' if item_url == '' else 'href=' + item_url | e }}
+             {{ 'data-js-hook=behavior_flyout-menu_trigger' if item.nav_groups | count > 0 else '' }}
+             {{ 'aria-pressed=false' if item.nav_groups | count > 0 else '' }}>
+              {{ text }}
+          </a>
+          {% if item.nav_groups | count > 0 %}
+              {{ _nav( nav_depth | int + 1, item.nav_groups, text ~ ' Overview', item_url, item.featured_media_content if item.featured_media_content else '', item.footer if item.footer else '' ) }}
+          {% endif %}
+      </li>
     {%- endfor %}
     </ul>
 </div>
+{% endif %}
 {%- endfor %}
 {% endmacro %}
 
@@ -192,6 +202,8 @@
 
    ========================================================================== #}
 {% macro mega_menu( menu_items ) %}
+
+
 <nav class="{{ base_class }}
             u-hidden"
      data-js-hook="behavior_flyout-menu"

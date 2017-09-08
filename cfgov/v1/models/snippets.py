@@ -211,7 +211,6 @@ class MenuItem(models.Model):
 
     featured_media_content = StreamField([
         ('featured_content', blocks.StructBlock([
-            ('is_horizontal', blocks.BooleanBlock(required=False)),
             ('link', atoms.Hyperlink(required=False)),
             ('body', blocks.RichTextBlock(required=False)),
             ('image', atoms.ImageBasic(required=False)),
