@@ -29,6 +29,7 @@ from v1 import get_protected_url
 from v1.atomic_elements import molecules, organisms
 from v1.models.snippets import ReusableText, ReusableTextChooserBlock
 from v1.util import ref
+from flags.template_functions import flag_enabled, flag_disabled
 
 
 class CFGOVAuthoredPages(TaggedItemBase):
@@ -228,6 +229,25 @@ class CFGOVPage(Page):
         from v1.models.snippets import MenuItem
         menu_items = [menu_item for menu_item in
                       MenuItem.objects.all().order_by('order')]
+        draft_flag_enabled = flag_enabled('DRAFT_MENU', request)
+
+        for item in menu_items:
+            nav_groups = []
+            for col in ['column_one', 'column_two', 'column_three',
+                'column_four']:
+                column = getattr(item, col)
+                for block in column:
+                    status = block.value.get('status', '')
+                    if not (status == 'production' and draft_flag_enabled) \
+                        and not (status == 'draft' and not draft_flag_enabled):
+                        if block.block_type == 'nav_group':
+                            nav_groups.append(block)
+                        elif block.block_type == 'featured_content':
+                            setattr(item, 'featured_content', block)
+                        break
+
+            setattr(item, 'nav_groups', nav_groups)
+
         return [{'value': {'nav_items': menu_items}}]
 
     def get_appropriate_descendants(self, hostname, inclusive=True):

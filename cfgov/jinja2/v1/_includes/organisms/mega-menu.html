@@ -48,10 +48,6 @@
 {%- for nav_group in nav_groups %}
 
 {% set group = nav_group.value %}
-{{group.status}}
-{{flag_enabled('DRAFT_MENU', request)}}
-{{ group.status == 'production' and flag_enabled('DRAFT_MENU', request) }}
-{{ group.status == 'draft' and not flag_enabled('DRAFT_MENU', request) }}
 {% if not ( group.status == 'production' and flag_enabled('DRAFT_MENU', request) ) 
    and not ( group.status == 'draft' and not flag_enabled('DRAFT_MENU', request) ) %}
 <div class="{{ _classes( nav_depth, '-list' ) }}">
@@ -97,7 +93,7 @@
               {{ text }}
           </a>
           {% if item.nav_groups | count > 0 %}
-              {{ _nav( nav_depth | int + 1, item.nav_groups, text ~ ' Overview', item_url, item.featured_media_content if item.featured_media_content else '', item.footer if item.footer else '' ) }}
+              {{ _nav( nav_depth | int + 1, item.nav_groups, text ~ ' Overview', item_url, item.featured_content if item.featured_content else '', item.footer if item.footer else '' ) }}
           {% endif %}
       </li>
     {%- endfor %}
@@ -171,11 +167,7 @@
          {% endif %}
             </div>
             {% if media %}
-                {% for block in media %}
-                {% if block.block_type == 'featured_content' %}
-                    {{ featured_menu_content.render(block.value)}}
-                {% endif %}
-                {% endfor %}
+                {{ featured_menu_content.render(media.value)}}     
             {% endif %}
          
         {# Close Wrapper if needed #}

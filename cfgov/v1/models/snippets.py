@@ -205,25 +205,41 @@ class MenuItem(models.Model):
 
     footer = RichTextField(blank=True)
 
-    nav_groups = StreamField([
+    column_one = StreamField([
         ('nav_group', v1_blocks.NavGroup())
     ], blank=True)
 
-    featured_media_content = StreamField([
+    column_two = StreamField([
+        ('nav_group', v1_blocks.NavGroup())
+    ], blank=True)
+
+    column_three = StreamField([
+        ('nav_group', v1_blocks.NavGroup())
+    ], blank=True)
+
+    column_four = StreamField([
+        ('nav_group', v1_blocks.NavGroup()),
         ('featured_content', blocks.StructBlock([
+            ('status', blocks.ChoiceBlock(choices=[
+                ('draft-production', 'Draft and production'),
+                ('production', 'Production'),
+                ('draft', 'Draft'),
+            ], default='draft-production')),
             ('link', atoms.Hyperlink(required=False)),
             ('body', blocks.RichTextBlock(required=False)),
             ('image', atoms.ImageBasic(required=False)),
         ]))
-    ])
+    ], blank=True)
 
     panels = [
         FieldPanel('link_text'),
         PageChooserPanel('page_link'),
         FieldPanel('external_link'),
         FieldPanel('order'),
-        StreamFieldPanel('nav_groups'),
-        StreamFieldPanel('featured_media_content'),
+        StreamFieldPanel('column_one'),
+        StreamFieldPanel('column_two'),
+        StreamFieldPanel('column_three'),
+        StreamFieldPanel('column_four'),
         FieldPanel('footer'),
     ]
 
