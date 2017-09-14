@@ -251,7 +251,7 @@ urlpatterns = [
                 template_name='transcripts/how-to-apply-for-a-federal-job-with-the-cfpb/index.html'),  # noqa: E501
                 name='how-to-apply-for-a-federal-job-with-the-cfpb'), ],
         namespace='transcripts')),
-    url(r'^paying-for-college/',
+    url(r'^consumer-tools/paying-for-college/',
         include_if_app_enabled('comparisontool', 'comparisontool.urls')),
     url(r'^paying-for-college2/',
         include_if_app_enabled(
@@ -342,6 +342,10 @@ urlpatterns = [
             RedirectView.as_view(
                 url='/consumer-tools/money-as-you-grow/%(path)s',
                 permanent=True)),
+
+    # paying-for-college redirects
+    url(r'^paying-for-college/(?P<path>.*)$', RedirectView.as_view(
+        url='/consumer-tools/paying-for-college/%(path)s', permanent=True)),
 
     # ask-cfpb
     url(r'^askcfpb/$',
