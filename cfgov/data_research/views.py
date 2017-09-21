@@ -12,6 +12,7 @@ from data_research.models import (
     MortgageMetaData, NationalMortgageData)
 
 DAYS_LATE_RANGE = ['30-89', '90']
+CORS_HEADERS = {'Access-Control-Allow-Origin': '*'}
 
 
 class MetaData(APIView):
@@ -26,7 +27,7 @@ class MetaData(APIView):
         except MortgageMetaData.DoesNotExist:
             return Response("No metadata object found.")
         meta_json = record.json_value
-        return Response(meta_json)
+        return Response(meta_json, headers=CORS_HEADERS)
 
 
 class TimeSeriesNational(APIView):
@@ -44,7 +45,7 @@ class TimeSeriesNational(APIView):
                          'fips_type': 'national'},
                 'data': [record.time_series(days_late)
                          for record in records]}
-        return Response(data)
+        return Response(data, headers=CORS_HEADERS)
 
 
 class TimeSeriesData(APIView):
@@ -74,7 +75,7 @@ class TimeSeriesData(APIView):
                              'fips_type': 'state'},
                     'data': [record.time_series(days_late)
                              for record in records]}
-            return Response(data)
+            return Response(data, headers=CORS_HEADERS)
         if 'non' in fips:
             records = NonMSAMortgageData.objects.filter(
                 fips=fips)
@@ -84,7 +85,7 @@ class TimeSeriesData(APIView):
                              'fips_type': 'non_msa'},
                     'data': [record.time_series(days_late)
                              for record in records]}
-            return Response(data)
+            return Response(data, headers=CORS_HEADERS)
 
         if fips in reference_lists['msa_fips']:
             metro_area = MetroArea.objects.get(fips=fips, valid=True)
@@ -94,7 +95,7 @@ class TimeSeriesData(APIView):
                              'fips_type': 'msa'},
                     'data': [record.time_series(days_late)
                              for record in records]}
-            return Response(data)
+            return Response(data, headers=CORS_HEADERS)
         else:  # must be a county request
             try:
                 county = County.objects.get(fips=fips, valid=True)
@@ -107,7 +108,7 @@ class TimeSeriesData(APIView):
                              'fips_type': 'county'},
                     'data': [record.time_series(days_late)
                              for record in records]}
-        return Response(data)
+        return Response(data, headers=CORS_HEADERS)
 
 
 def validate_year_month(year_month):
@@ -203,4 +204,4 @@ class MapData(APIView):
                     non_data_series.update({'name': non_name})
                     del non_data_series['date']
                     payload['data'].update({record.fips: non_data_series})
-        return Response(payload)
+        return Response(payload, headers=CORS_HEADERS)

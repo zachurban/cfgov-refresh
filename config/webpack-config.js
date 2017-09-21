@@ -35,7 +35,7 @@ const COMMON_MODULE_CONFIG = {
     exclude: {
       test: /node_modules/,
       // The below regex will capture all node modules that start with `cf`.
-      exclude: /node_modules\/cf(.+)/
+      exclude: /node_modules\/(cf|atomic)(.+)/
     }
   } ]
 };
