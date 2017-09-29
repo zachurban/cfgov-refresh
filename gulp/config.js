@@ -106,6 +106,14 @@ module.exports = {
         paths.modules + '/ustream-embedapi/dist/ustream-embedapi.min.js'
       ],
       dest: paths.processed + '/js/'
+    },
+    lightbox: {
+      src: paths.modules + '/lightbox2/dist/**/*',
+      dest: paths.processed + '/lightbox/'
+    },
+    timeline: {
+      src: paths.modules + '/TimelineJS#2.36.0/build/**/*',
+      dest: paths.processed + '/timeline/'
     }
   }
 };

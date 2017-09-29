@@ -63,6 +63,16 @@ gulp.task( 'copy:vendorjs', () => {
   return _genericCopy( vendorJs.src, vendorJs.dest );
 } );
 
+gulp.task( 'copy:lightbox', () => {
+  const lightbox = configCopy.lightbox;
+  return _genericCopy( lightbox.src, lightbox.dest );
+} );
+
+gulp.task( 'copy:timeline', () => {
+  const timeline = configCopy.timeline;
+  return _genericCopy( timeline.src, timeline.dest );
+} );
+
 gulp.task( 'copy',
   [
     'copy:icons',
@@ -70,6 +80,8 @@ gulp.task( 'copy',
     'copy:vendorfonts',
     'copy:vendorcss',
     'copy:vendorimg',
-    'copy:vendorjs'
+    'copy:vendorjs',
+    'copy:lightbox',
+    'copy:timeline'
   ]
 );
