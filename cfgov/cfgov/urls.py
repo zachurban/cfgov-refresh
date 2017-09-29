@@ -99,8 +99,16 @@ urlpatterns = [
         RedirectView.as_view(
             url='/static/know-before-you-owe/static/%(path)s',
             permanent=True)),
-    url(r'^know-before-you-owe/',
-        include(SheerSite('know-before-you-owe').urls)),
+            
+    url(r'^know-before-you-owe/$', TemplateView.as_view(
+        template_name='know-before-you-owe/index.html'),
+        name='know-before-you-owe'),
+    url(r'^know-before-you-owe/compare/$', TemplateView.as_view(
+        template_name='know-before-you-owe/compare/index.html'),
+        name='know-before-you-owe-compare'),
+    url(r'^know-before-you-owe/timeline/$', TemplateView.as_view(
+        template_name='know-before-you-owe/timeline/index.html'),
+        name='know-before-you-owe-timeline'),
     url(r'^adult-financial-education/$', TemplateView.as_view(
         template_name='/adult-financial-education/index.html')),
     url(r'^fin-ed/privacy-act-statement/$',

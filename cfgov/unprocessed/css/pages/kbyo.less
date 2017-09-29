@@ -1,0 +1,145 @@
+.kbyo {
+    .m-hero {
+        background-color: #d6e5e4;
+        &_image {
+            background-image: url('https://s3.amazonaws.com/files.consumerfinance.gov/f/images/kbyo-hero_laptop-2x.original.png');
+            filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(
+                src='/f/images/kbyo-hero_laptop-2x.original.png',
+                sizingMethod='scale');
+            padding-bottom: 41.4893617%;
+        }
+        
+        @media screen and (min-width: 37.5625em) {
+            .m-hero_image {
+                background-image: url('https://s3.amazonaws.com/files.consumerfinance.gov/f/images/kbyo-hero_laptop-2x.original.png');
+                filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(
+                    src='/f/images/kbyo-hero_laptop-2x.original.png',
+                    sizingMethod='scale');
+                padding-bottom: 41.4893617%
+            }
+
+            .m-hero__overlay .m-hero_wrapper {
+                background-image: url('https://s3.amazonaws.com/files.consumerfinance.gov/f/images/kbyo-hero_laptop-2x.original.png');
+                background-size: cover;
+                filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(
+                    src='/f/images/kbyo-hero_laptop-2x.original.png',
+                    sizingMethod='scale');
+            }
+        }
+    }
+
+    .kbyo-video{
+        .responsive-object {
+            border: 1px solid @gray-20;
+            .u-flexible-container();
+
+            iframe {
+                .u-flexible-container_inner();
+            }
+        }
+    }
+
+    .kbyo-tools {
+        .respond-to-min(@bp-lg-min, {
+            margin-bottom: 0;
+            .content-l_col-1 {
+                .grid_column(6);
+                margin-bottom: unit(45px / @base-font-size-px, em);
+                & + .content-l_col-1 {
+                  margin-top: 0 !important;
+                }
+            }
+        });
+        
+        .m-info-unit__inline {
+            .respond-to-min(@bp-sm-min, {
+              .u-info-unit-base__inline( @m-info-unit_img__lg );
+            });
+        }
+  
+        &__loan-estimate .m-info-unit_image { background-image: url('https://s3.amazonaws.com/files.consumerfinance.gov/f/images/loan-estimate_324.original.png'); }
+        &__closing-disclosure .m-info-unit_image { background-image: url('https://s3.amazonaws.com/files.consumerfinance.gov/f/images/closing-disclosure_324.original.png'); }
+        &__owning-a-home .m-info-unit_image { background-image: url('https://s3.amazonaws.com/files.consumerfinance.gov/f/images/owning-a-home_324.original.png'); }
+        &__home-loan-toolkit .m-info-unit_image { background-image: url('https://s3.amazonaws.com/files.consumerfinance.gov/f/images/home-loan-toolkit_324.original.png'); }
+    }
+    
+    .kbyo-timeline {
+        &__wrapper {
+            display: none;
+            border: 1px solid @gray-20;
+            .respond-to-min(@bp-sm-min, {
+                  display: block;
+            });
+        }
+    }
+    
+    .kbyo-footer,
+    .kbyo-professional-resources {
+        background-color: @block__bg;
+        padding: unit( @grid_gutter-width * 1.5 / @base-font-size-px, em ) 0;
+    }
+  
+    //timeline page
+    .kbyo-timeline-page {
+        &__event {
+            //margin-top: unit(60px / @base-font-size-px, em);
+            border-top: 1px solid @gray-20;
+            padding-top: unit(30px / @base-font-size-px, em);
+            margin-bottom: unit(30px / @base-font-size-px, em);
+        }
+        &__date {
+            color: @gray;
+        }
+    }
+
+    //compare page
+    .kbyo-compare-tiles {
+        margin-bottom: unit(15px / @base-font-size-px, em);
+        position: relative; // makes absolute positioned elements inside (overlayed tiles) to be positioned inside this box
+        img {
+            border: 1px solid #c5c3c1;
+            box-shadow: 3px 3px 3px #c5c3c1;
+            display: inline-block;
+            zoom: 1;
+            margin: 10px 10px 0 0;
+            vertical-align: top;
+        }
+    }
+
+    .kbyo-compare-tiles-overlay {
+        height: 374px; // since images inside this box are absolutely positioned, box has zero height by default.
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200px;
+            z-index: 100;
+        }
+        a+a img {
+            position: absolute;
+            top: 50px;
+            left: 75px;
+            z-index: 90;
+        }
+        a+a+a img {
+            position: absolute;
+            top: 100px;
+            left: 150px;
+            z-index: 80;
+        }
+    }
+    
+    .kbyo-footer,
+    .kbyo-compare-details {
+        .respond-to-min( @bp-sm-min, {
+
+            .content-l_col-1-2:nth-of-type( n+3 ){
+                margin-top: unit( @grid_gutter-width * 1.5 / @base-font-size-px, em );
+            }
+        } );
+    }
+    
+    p {
+        max-width: 41.875em;
+    }
+}

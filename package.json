@@ -61,6 +61,7 @@
     "imagemin-optipng": "5.2.1",
     "imagemin-svgo": "5.2.2",
     "is-reachable": "2.3.2",
+    "lightbox2": "2.8.2",
     "localtunnel": "1.8.3",
     "psi": "3.0.0",
     "require-dir": "0.3.2",
@@ -84,6 +85,7 @@
     "mocha": "3.2.0",
     "mocha-jsdom": "1.1.0",
     "mockery": "2.1.0",
+    "napa": "3.0.0",
     "protractor": "5.1.2",
     "protractor-accessibility-plugin": "github:cfpb/protractor-accessibility-plugin#on-page-load",
     "protractor-cucumber-framework": "3.1.2",
@@ -96,6 +98,7 @@
     "es5-sham": "./node_modules/es5-shim/es5-sham.min.js"
   },
   "scripts": {
+    "install": "napa NUKnightLab/TimelineJS#2.36.0",
     "test": "snyk test"
   },
   "snyk": true
