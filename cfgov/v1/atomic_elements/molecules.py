@@ -155,12 +155,6 @@ class Hero(blocks.StructBlock):
 
 
 class FormFieldWithButton(blocks.StructBlock):
-    btn_text = blocks.CharBlock(required=False)
-
-    required = blocks.BooleanBlock(required=False)
-
-    info = blocks.RichTextBlock(required=False, label="Disclaimer")
-    label = blocks.CharBlock(required=True)
     type = blocks.ChoiceBlock(choices=[
         ('text', 'Text'),
         ('checkbox', 'Checkbox'),
@@ -169,7 +163,11 @@ class FormFieldWithButton(blocks.StructBlock):
         ('url', 'URL'),
         ('radio', 'Radio'),
     ], required=False)
+    label = blocks.CharBlock(required=True)
     placeholder = blocks.CharBlock(required=False)
+    is_required = blocks.BooleanBlock(required=False)
+    btn_text = blocks.CharBlock(required=False)
+    info = blocks.RichTextBlock(required=False, label='Disclaimer')
 
     class Meta:
         icon = 'mail'

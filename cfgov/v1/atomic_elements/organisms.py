@@ -207,21 +207,36 @@ class PostPreviewSnapshot(blocks.StructBlock):
         icon = 'order'
 
 
-class EmailSignUp(blocks.StructBlock):
+class GovDeliverySignUp(blocks.StructBlock):
     heading = blocks.CharBlock(required=False)
     text = blocks.CharBlock(required=False)
-    gd_code = blocks.CharBlock(required=False)
-
-    form_field = blocks.ListBlock(molecules.FormFieldWithButton(),
-                                  icon='mail',
-                                  required=False)
+    gd_code = blocks.CharBlock(
+        required=False,
+        label='GovDelivery code',
+        help_text='Corresponds to the "topic" code in GovDelivery this form '
+                  'should subscribe people to.',
+    )
+    allow_text_message_signups = blocks.BooleanBlock(
+        required=False,
+        help_text='Allow users to enter their phone number to subscribe to '
+                  'SMS updates from this topic. Topic must have "Wireless '
+                  'Alerts Enabled" set in its options in GovDelivery. '
+                  'If this is checked, your field type must be set to "Text".',
+    )
+    form_fields = blocks.ListBlock(
+        molecules.FormFieldWithButton(),
+        required=False,
+        label="Form field",
+        help_text='You probably shouldn\'t add more than one field here.',
+    )
 
     class Meta:
         icon = 'mail'
-        template = '_includes/organisms/email-signup.html'
+        label = 'GovDelivery sign-up form'
+        template = '_includes/organisms/govdelivery-signup.html'
 
     class Media:
-        js = ['email-signup.js']
+        js = ['govdelivery-signup.js']
 
 
 class RegComment(blocks.StructBlock):

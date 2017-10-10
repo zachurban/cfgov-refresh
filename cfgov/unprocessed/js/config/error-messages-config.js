@@ -22,7 +22,15 @@ var ERROR_MESSAGES = {
     REQUIRED: 'Please enter an email address.',
     REQUIRED_ES: 'Por favor, introduzca una dirección de correo electrónico.'
   },
+  PHONE: {
+    INVALID: 'You have entered an invalid phone number.',
+    INVALID_ES: 'TKTKTK',
+    REQUIRED: 'Please enter a phone number.',
+    REQUIRED_ES: 'TKTKTK'
+  },
   FIELD: {
+    INVALID: 'You have entered something invalid for this field.',
+    INVALID_ES: 'TKTKTK',
     REQUIRED: 'This field is required.',
     REQUIRED_ES: 'Este campo es obligitario.'
   },

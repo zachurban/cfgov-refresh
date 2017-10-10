@@ -12,7 +12,7 @@
 
    value.label:             String for form input label.
 
-   value.required:          Boolean on whether the input is required or not.
+   value.is_required:       Boolean on whether the input is required or not.
 
    value.type:              String for the type of HTML input.
 
@@ -30,17 +30,15 @@
     <div class="form-group">
         <label for="{{ form_id }}">
             <b>{{ value.label }}</b>
-            {# TODO: Update required param name to is_required
-                     to make clear it's a boolean. #}
-            {{ _('(required)') if value.required else '' }}
+            {{ _('(required)') if value.is_required else '' }}
         </label>
 
         <input id="{{ form_id }}"
                type="{{ value.type }}"
                placeholder="{{ value.placeholder }}"
-               name="{{ field or '' }}"
+               name="{{ field_name or '' }}"
                class="m-form-field-with-button_field a-text-input"
-               {{ 'required' if value.required else '' }}>
+               {{ 'required' if value.is_required else '' }}>
     </div>
     {{ parse_links(value.info) | safe }}
     <input class="a-btn a-btn__full-on-xs" type="submit" value="{{ value.btn_text }}">

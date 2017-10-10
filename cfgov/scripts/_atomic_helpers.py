@@ -258,8 +258,8 @@ html_block = {
     }
 }
 
-email_signup = {
-    'type': 'email_signup',
+govdelivery_signup = {
+    'type': 'govdelivery_signup',
     'value': {
         'heading': 'Email Sign Up',
         'text': 'Sign up for our newsletter.',
@@ -277,8 +277,8 @@ email_signup = {
     }
 }
 
-email_signup_required = {
-    'type': 'email_signup',
+govdelivery_signup_required = {
+    'type': 'govdelivery_signup',
     'value': {
         'heading': 'Email Sign Up',
         'text': 'Sign up for our newsletter.',

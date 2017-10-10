@@ -93,7 +93,7 @@ class CFGOVPage(Page):
         ('related_links', molecules.RelatedLinks()),
         ('related_posts', organisms.RelatedPosts()),
         ('related_metadata', molecules.RelatedMetadata()),
-        ('email_signup', organisms.EmailSignUp()),
+        ('govdelivery_signup', organisms.GovDeliverySignUp()),
         ('sidebar_contact', organisms.SidebarContactInfo()),
         ('rss_feed', molecules.RSSFeed()),
         ('social_media', molecules.SocialMedia()),

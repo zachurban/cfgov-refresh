@@ -34,7 +34,7 @@ function date( field, currentStatus ) {
 }
 
 /**
- * email Determines if a field contains a email date.
+ * email Determines if a field contains an email address.
  *
  * @param {Object} field         Field to test.
  * @param {Object} currentStatus A previous tested status for the field.
@@ -64,6 +64,7 @@ function email( field, currentStatus, options ) {
     status.msg = status.msg || '';
     status.msg += ERROR_MESSAGES.EMAIL[key];
     status.email = false;
+    // status.result = state;
   } else if ( emailRegex.test( field.value ) === false ) {
     state = 'INVALID';
     key = opts.language === 'es' ? state + '_ES' : state;
@@ -71,9 +72,106 @@ function email( field, currentStatus, options ) {
     status.msg = status.msg || '';
     status.msg += ERROR_MESSAGES.EMAIL[key];
     status.email = false;
+    // status.result = state;
   }
   return status;
 }
+
+
+/**
+ * phone Determines if a field contains a phone number.
+ *
+ * @param {Object} field         Field to test.
+ * @param {Object} currentStatus A previous tested status for the field.
+ * @param {Object} options       Options object.
+ * @returns {Object} An empty object if the field passes,
+ *   otherwise an object with msg and type properties if it failed.
+ */
+function phone( field, currentStatus, options ) {
+  var status = currentStatus || {};
+  var opts = options || {};
+  // Note about the below regex: It ignores punctuation because the regex
+  // checks against the field value stripped of everything but digits.
+  /* eslint-disable no-inline-comments */
+  var regex = '/^' +        // match from the beginning of the string
+              '1?' +        // optional U.S. country code of 1
+              '[2-9]' +     // first digit of area code cannot be 0 or 1
+              '[0-9]{2}' +  // remaining two digits of area code
+              '[2-9]' +     // first digit of exchange code cannot be 0 or 1
+              '[0-9]{6}' +  // remaining 6 digits
+              '$/';         // match to end of the string
+  /* eslint-enable no-inline-comments */
+  var phoneRegex = new RegExp( regex, 'i' );
+  var emptyValidation = empty( field );
+  var isFilled = typeof emptyValidation.required === 'undefined' ?
+                 true : emptyValidation.required;
+  var state;
+  var key;
+
+  if ( !isFilled ) {
+    // TODO: Create a language checker instead of doing this inline like this
+    state = 'REQUIRED';
+    key = opts.language === 'es' ? state + '_ES' : state;
+
+    status.msg = status.msg || '';
+    status.msg += ERROR_MESSAGES.PHONE[key];
+    status.phone = false;
+    status.result = state;
+  } else if ( !phoneRegex.test( field.value.replace( /[^0-9]/, '' ) ) ) {
+    state = 'INVALID';
+    key = opts.language === 'es' ? state + '_ES' : state;
+
+    status.msg = status.msg || '';
+    status.msg += ERROR_MESSAGES.PHONE[key];
+    status.phone = false;
+    status.result = state;
+  }
+
+  return status;
+}
+
+
+/**
+ * emailOrPhone Determines if a field contains a phone number.
+ *
+ * @param {Object} field         Field to test.
+ * @param {Object} currentStatus A previous tested status for the field.
+ * @param {Object} options       Options object.
+ * @returns {Object} An empty object if the field passes,
+ *   otherwise an object with msg and type properties if it failed.
+ */
+function emailOrPhone( field, currentStatus, options ) {
+  var status = currentStatus || {};
+  var opts = options || {};
+  var state;
+  var key;
+
+  var phoneStatus = phone( field, currentStatus, options );
+  var emailStatus = phone( field, currentStatus, options );
+
+  // Empty status objects means they passed validation
+  if ( phoneStatus.length === 0 ) {
+    return phoneStatus;
+  } else if ( emailStatus.length === 0 ) {
+    return emailStatus;
+  } else if ( phoneStatus.result === 'REQUIRED' ) {
+    // If phone came back as required, email would have as well
+    state = 'REQUIRED';
+  } else {
+    // At this point, we know both came back invalid
+    state = 'INVALID';
+  }
+
+  // TODO: Create a language checker instead of doing this inline like this
+  key = opts.language === 'es' ? state + '_ES' : state;
+  status.msg = status.msg || '';
+  status.msg += ERROR_MESSAGES.FIELD[key];
+  status.emailOrPhone = false;
+  status.result = state;
+
+  return status;
+}
+
 
 /**
  * empty Determines if a required field contains a value.
@@ -151,9 +249,11 @@ function _checkableInput( field, currentStatus, fieldset, type ) {
 }
 
 module.exports = {
-  date:     date,
-  email:    email,
-  empty:    empty,
-  checkbox: checkbox,
-  radio:    radio
+  date:         date,
+  email:        email,
+  phone:        phone,
+  emailOrPhone: emailOrPhone,
+  empty:        empty,
+  checkbox:     checkbox,
+  radio:        radio
 };
