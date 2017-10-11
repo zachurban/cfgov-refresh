@@ -299,7 +299,7 @@ function FilterableListControls( element ) {
       validation.status = validators[type]( field, validation, fieldset );
     }
 
-    return validators.empty( field, validation );
+    return validators.required( field, validation );
   }
 
   this.init = init;

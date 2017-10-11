@@ -50,7 +50,7 @@ function email( field, currentStatus, options ) {
     '\u007F-\uffff!#$%&\'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9]' +
     '(?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z]{2,}$';
   var emailRegex = new RegExp( regex, 'i' );
-  var emptyValidation = empty( field );
+  var emptyValidation = required( field );
   var isFilled = typeof emptyValidation.required === 'undefined' ?
                  true : emptyValidation.required;
   var state;
@@ -64,7 +64,7 @@ function email( field, currentStatus, options ) {
     status.msg = status.msg || '';
     status.msg += ERROR_MESSAGES.EMAIL[key];
     status.email = false;
-    // status.result = state;
+    status.result = state;
   } else if ( emailRegex.test( field.value ) === false ) {
     state = 'INVALID';
     key = opts.language === 'es' ? state + '_ES' : state;
@@ -72,7 +72,7 @@ function email( field, currentStatus, options ) {
     status.msg = status.msg || '';
     status.msg += ERROR_MESSAGES.EMAIL[key];
     status.email = false;
-    // status.result = state;
+    status.result = state;
   }
   return status;
 }
@@ -93,16 +93,16 @@ function phone( field, currentStatus, options ) {
   // Note about the below regex: It ignores punctuation because the regex
   // checks against the field value stripped of everything but digits.
   /* eslint-disable no-inline-comments */
-  var regex = '/^' +        // match from the beginning of the string
+  var regex = '^' +        // match from the beginning of the string
               '1?' +        // optional U.S. country code of 1
               '[2-9]' +     // first digit of area code cannot be 0 or 1
               '[0-9]{2}' +  // remaining two digits of area code
               '[2-9]' +     // first digit of exchange code cannot be 0 or 1
               '[0-9]{6}' +  // remaining 6 digits
-              '$/';         // match to end of the string
+              '$';         // match to end of the string
   /* eslint-enable no-inline-comments */
-  var phoneRegex = new RegExp( regex, 'i' );
-  var emptyValidation = empty( field );
+  var phoneRegex = new RegExp( regex );
+  var emptyValidation = required( field );
   var isFilled = typeof emptyValidation.required === 'undefined' ?
                  true : emptyValidation.required;
   var state;
@@ -117,7 +117,7 @@ function phone( field, currentStatus, options ) {
     status.msg += ERROR_MESSAGES.PHONE[key];
     status.phone = false;
     status.result = state;
-  } else if ( !phoneRegex.test( field.value.replace( /[^0-9]/, '' ) ) ) {
+  } else if ( !phoneRegex.test( field.value.replace( /[^0-9]/g, '' ) ) ) {
     state = 'INVALID';
     key = opts.language === 'es' ? state + '_ES' : state;
 
@@ -147,12 +147,12 @@ function emailOrPhone( field, currentStatus, options ) {
   var key;
 
   var phoneStatus = phone( field, currentStatus, options );
-  var emailStatus = phone( field, currentStatus, options );
+  var emailStatus = email( field, currentStatus, options );
 
   // Empty status objects means they passed validation
-  if ( phoneStatus.length === 0 ) {
+  if ( Object.keys( phoneStatus ).length === 0 ) {
     return phoneStatus;
-  } else if ( emailStatus.length === 0 ) {
+  } else if ( Object.keys( emailStatus ).length === 0 ) {
     return emailStatus;
   } else if ( phoneStatus.result === 'REQUIRED' ) {
     // If phone came back as required, email would have as well
@@ -174,15 +174,15 @@ function emailOrPhone( field, currentStatus, options ) {
 
 
 /**
- * empty Determines if a required field contains a value.
+ * required Determines if a required field contains a value.
  *
  * @param {Object} field         Field to test.
  * @param {Object} currentStatus A previous tested status for the field.
- * @returns {Object} An empty object if the field passes,
+ * @returns {Object} An required object if the field passes,
  *   otherwise an object with msg and type properties if it failed.
  */
  // TODO: Rename this so it's clearer it's checking a required attribute
-function empty( field, currentStatus ) {
+function required( field, currentStatus ) {
   var status = currentStatus || {};
   var isRequired = field.getAttribute( 'required' ) !== null;
   if ( isRequired && typeCheckers.isEmpty( field.value ) ) {
@@ -253,7 +253,7 @@ module.exports = {
   email:        email,
   phone:        phone,
   emailOrPhone: emailOrPhone,
-  empty:        empty,
+  required:     required,
   checkbox:     checkbox,
   radio:        radio
 };
