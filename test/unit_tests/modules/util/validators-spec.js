@@ -9,7 +9,7 @@ const validators = require( BASE_JS_PATH + 'modules/util/validators.js' );
 let testField;
 let returnedObject;
 
-describe( 'Validators date field', () => {
+describe( 'Date field validator', () => {
   jsdom();
 
   beforeEach( () => {
@@ -42,7 +42,7 @@ describe( 'Validators date field', () => {
   } );
 } );
 
-describe( 'Validators email field', () => {
+describe( 'Email field validator', () => {
   jsdom();
 
   beforeEach( () => {
@@ -56,7 +56,29 @@ describe( 'Validators email field', () => {
     expect( returnedObject ).to.be.empty;
   } );
 
-  it( 'should return an error object for a missing domain', () => {
+  it( 'should return an error message for an empty field', () => {
+    testField.setAttribute( 'required', '' );
+    testField.value = '';
+    returnedObject = validators.email( testField );
+
+    expect( returnedObject )
+      .to.have.property( 'msg', ERROR_MESSAGES.EMAIL.REQUIRED );
+  } );
+
+  it( 'should return a Spanish-specific error message for an empty field', () => {
+    testField.setAttribute( 'required', '' );
+    testField.value = '';
+    returnedObject = validators.email(
+      testField,
+      null,
+      { 'language': 'es' }
+    );
+
+    expect( returnedObject )
+      .to.have.property( 'msg', ERROR_MESSAGES.EMAIL.REQUIRED_ES );
+  } );
+
+  it( 'should return an error message for a missing domain', () => {
     testField.value = 'test';
     returnedObject = validators.email( testField );
 
@@ -65,7 +87,22 @@ describe( 'Validators email field', () => {
       .to.have.property( 'msg', ERROR_MESSAGES.EMAIL.INVALID );
   } );
 
-  it( 'should return an error object for a missing user', () => {
+  it( 'should return a Spanish-specific error message for a missing domain',
+    () => {
+      testField.value = 'test';
+      returnedObject = validators.email(
+        testField,
+        null,
+        { 'language': 'es' }
+      );
+
+      expect( returnedObject ).to.have.property( 'email', false );
+      expect( returnedObject )
+        .to.have.property( 'msg', ERROR_MESSAGES.EMAIL.INVALID_ES );
+    }
+  );
+
+  it( 'should return an error message for a missing user', () => {
     testField.value = '@demo.com';
     returnedObject = validators.email( testField );
 
@@ -75,7 +112,144 @@ describe( 'Validators email field', () => {
   } );
 } );
 
-describe( 'Validators empty field', () => {
+describe( 'Phone number field validator', () => {
+  jsdom();
+
+  beforeEach( () => {
+    testField = document.createElement( 'input' );
+  } );
+
+  it( 'should return an empty object for a valid phone number', () => {
+    testField.value = '2345678901';
+    returnedObject = validators.phone( testField );
+
+    expect( returnedObject ).to.be.empty;
+  } );
+
+  it( 'should return an empty object for a valid phone number using spaces',
+    () => {
+      testField.value = '567 890 1234';
+      returnedObject = validators.phone( testField );
+
+      expect( returnedObject ).to.be.empty;
+    }
+  );
+
+  it( 'should return an empty object for a valid phone number using dashes',
+    () => {
+      testField.value = '890-723-4567';
+      returnedObject = validators.phone( testField );
+
+      expect( returnedObject ).to.be.empty;
+    }
+  );
+
+  it( 'should return an empty object for a valid phone number ' +
+    'using mixed separators',
+    () => {
+      testField.value = '(345) 678-9012';
+      returnedObject = validators.phone( testField );
+
+      expect( returnedObject ).to.be.empty;
+    }
+  );
+
+  it( 'should return an empty object for a valid phone number ' +
+    'using a US country code',
+    () => {
+      testField.value = '12345678901';
+      returnedObject = validators.phone( testField );
+
+      expect( returnedObject ).to.be.empty;
+    }
+  );
+
+  it( 'should return an error message for an empty field', () => {
+    testField.setAttribute( 'required', '' );
+    testField.value = '';
+    returnedObject = validators.phone( testField );
+
+    expect( returnedObject )
+      .to.have.property( 'msg', ERROR_MESSAGES.PHONE.REQUIRED );
+  } );
+
+  it( 'should return a Spanish-specific error message for an empty field',
+    () => {
+      testField.setAttribute( 'required', '' );
+      testField.value = '';
+      returnedObject = validators.phone(
+        testField,
+        null,
+        { 'language': 'es' }
+      );
+
+      expect( returnedObject )
+        .to.have.property( 'msg', ERROR_MESSAGES.PHONE.REQUIRED_ES );
+    }
+  );
+
+  it( 'should return an error message for a area code starting with 0',
+    () => {
+      testField.value = '0123456789';
+      returnedObject = validators.phone( testField );
+
+      expect( returnedObject ).to.have.property( 'phone', false );
+      expect( returnedObject )
+        .to.have.property( 'msg', ERROR_MESSAGES.PHONE.INVALID );
+    }
+  );
+
+  it( 'should return a Spanish-specific error message for a area code ' +
+    'starting with 0',
+    () => {
+      testField.value = '0123456789';
+      returnedObject = validators.phone(
+        testField,
+        null,
+        { 'language': 'es' }
+      );
+
+      expect( returnedObject ).to.have.property( 'phone', false );
+      expect( returnedObject )
+        .to.have.property( 'msg', ERROR_MESSAGES.PHONE.INVALID_ES );
+    }
+  );
+
+  it( 'should return an error message for a area code starting with 1',
+    () => {
+      testField.value = '1234567890';
+      returnedObject = validators.phone( testField );
+
+      expect( returnedObject ).to.have.property( 'phone', false );
+      expect( returnedObject )
+        .to.have.property( 'msg', ERROR_MESSAGES.PHONE.INVALID );
+    }
+  );
+
+  it( 'should return an error message for an exchange code starting with 0',
+    () => {
+      testField.value = '4560129876';
+      returnedObject = validators.phone( testField );
+
+      expect( returnedObject ).to.have.property( 'phone', false );
+      expect( returnedObject )
+        .to.have.property( 'msg', ERROR_MESSAGES.PHONE.INVALID );
+    }
+  );
+
+  it( 'should return an error message for an exchange code starting with 1',
+    () => {
+      testField.value = '4561029876';
+      returnedObject = validators.phone( testField );
+
+      expect( returnedObject ).to.have.property( 'phone', false );
+      expect( returnedObject )
+        .to.have.property( 'msg', ERROR_MESSAGES.PHONE.INVALID );
+    }
+  );
+} );
+
+describe( 'Required field validator', () => {
   jsdom();
 
   beforeEach( () => {
@@ -85,14 +259,14 @@ describe( 'Validators empty field', () => {
 
   it( 'should return an empty object for a filed field', () => {
     testField.value = 'testing';
-    returnedObject = validators.empty( testField );
+    returnedObject = validators.required( testField );
 
     expect( returnedObject ).to.be.empty;
   } );
 
-  it( 'should return an error object for am empty field', () => {
+  it( 'should return an error message for am empty field', () => {
     testField.value = '';
-    returnedObject = validators.empty( testField );
+    returnedObject = validators.required( testField );
 
     expect( returnedObject ).to.have.property( 'required', false );
     expect( returnedObject )
@@ -100,7 +274,7 @@ describe( 'Validators empty field', () => {
   } );
 } );
 
-describe( 'Validators checkbox field', () => {
+describe( 'Checkbox field validator', () => {
   jsdom();
 
   beforeEach( () => {
@@ -132,7 +306,7 @@ describe( 'Validators checkbox field', () => {
     expect( returnedObject ).to.be.empty;
   } );
 
-  it( 'should return an error object ' +
+  it( 'should return an error message ' +
        'when total checkboxes is less than required total', () => {
     const fieldset = [
       document.createElement( 'input' )
@@ -156,7 +330,7 @@ describe( 'Validators checkbox field', () => {
   } );
 } );
 
-describe( 'Validators radio field', () => {
+describe( 'Radio field validator', () => {
   jsdom();
 
   beforeEach( function() {
@@ -186,7 +360,7 @@ describe( 'Validators radio field', () => {
     expect( returnedObject ).to.be.empty;
   } );
 
-  it( 'should return an error object ' +
+  it( 'should return an error message ' +
       'when total checkboxes is less than required total', () => {
     const fieldset = [];
     returnedObject = validators.radio( testField, null, fieldset );

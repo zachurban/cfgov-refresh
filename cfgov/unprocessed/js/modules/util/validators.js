@@ -139,7 +139,7 @@ function phone( field, currentStatus, options ) {
  * @param {Object} options       Options object.
  * @returns {Object} An empty object if the field passes,
  *   otherwise an object with msg and type properties if it failed.
- */
+ *//*
 function emailOrPhone( field, currentStatus, options ) {
   var status = currentStatus || {};
   var opts = options || {};
@@ -171,7 +171,7 @@ function emailOrPhone( field, currentStatus, options ) {
 
   return status;
 }
-
+*/
 
 /**
  * required Determines if a required field contains a value.
@@ -252,7 +252,7 @@ module.exports = {
   date:         date,
   email:        email,
   phone:        phone,
-  emailOrPhone: emailOrPhone,
+  //emailOrPhone: emailOrPhone,
   required:     required,
   checkbox:     checkbox,
   radio:        radio
