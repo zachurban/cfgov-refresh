@@ -419,21 +419,22 @@ function spawnProtractor( ) {
 
 // Add automated WebPageTest checks
 
-const WebPageTest;
-const checkerId = envvars.WEBPAGETEST_API_KEY;
+const WebPageTest = require('webpagetest');
+const WEBPAGETEST_API_KEY = envvars.WEBPAGETEST_API_KEY;
 
-WebPageTest = require("webpagetest");
-
-gulp.task('test-perf', function() {
+gulp.task('test:performance', function() {
   var parameters, testSpecs, wpt;
-  wpt = new WebPageTest('www.webpagetest.org', 'APIKEY');
+  if (!WEBPAGETEST_API_KEY) {
+    const ERROR_MSG = 'Error: Could not find valid WebPageTest API key. Request a key: https://www.webpagetest.org/getkey.php';
+    gulpUtil.colors.enabled = true;
+    gulpUtil.log( gulpUtil.colors.red( ERROR_MSG ) );
+    return;
+  }
+  wpt = new WebPageTest('www.webpagetest.org', WEBPAGETEST_API_KEY);
   parameters = {
     disableHTTPHeaders: true,
-    "private": true,
     video: true,
-    location: 'Dulles:Chrome',
-    login: 'admin',
-    password: 'password'
+    location: 'Dulles:Chrome'
   };
   testSpecs = {
     runs: {
@@ -450,7 +451,7 @@ gulp.task('test-perf', function() {
       }
     }
   };
-  return wpt.runTest('http://someurl.com', parameters, function(err, data) {
+  return wpt.runTest('http://consumerfinance.gov', parameters, function(err, data) {
     var checkStatus, testID;
     testID = data.data.testId;
     checkStatus = function() {
