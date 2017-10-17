@@ -18,6 +18,7 @@ const envvars = {
   SAUCE_USERNAME:          process.env.SAUCE_USERNAME,
   SAUCE_ACCESS_KEY:        process.env.SAUCE_ACCESS_KEY,
   ACHECKER_ID:             process.env.ACHECKER_ID,
+  WEBPAGETEST_API_KEY:     process.env.WEBPAGETEST_API_KEY,
   HEADLESS_CHROME_BINARY:  process.env.HEADLESS_CHROME_BINARY,
   SAUCE_TUNNEL:            process.env.SAUCE_TUNNEL ||
                            new Date().getTime()
