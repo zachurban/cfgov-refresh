@@ -9,8 +9,6 @@ var validators = require( '../../modules/util/validators' );
 
 var BASE_CLASS = 'o-email-signup';
 var language = document.body.querySelector( '.content' ).lang;
-var acceptPhone = document.body.querySelector( '[name="accept_phone"]' );
-var validationType = acceptPhone ? 'emailOrPhone' : 'email';
 
 
 /**
@@ -20,12 +18,22 @@ var validationType = acceptPhone ? 'emailOrPhone' : 'email';
  * @returns {Object} - The `status` object from the called validation function
  */
 function validate( fields ) {
-  var status = validators[validationType](
-    fields.contact_info,
-    '',
-    { language: language }
-  );
-  return status.msg;
+  var statusMsg = '';
+
+  // console.log( fields );
+
+  for ( var field in fields ) {
+    var fieldProps = fields[field];
+    if ( fieldProps.type !== 'hidden' ) {
+      statusMsg += validators[fieldProps.name](
+        fieldProps,
+        '',
+        { language: language }
+      ).msg + ' ';
+    }
+  }
+
+  return statusMsg;
 }
 
 

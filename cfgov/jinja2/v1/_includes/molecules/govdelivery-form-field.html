@@ -1,0 +1,35 @@
+{# ==========================================================================
+
+   GovDelivery Form Field
+
+   ==========================================================================
+
+   Description:
+
+   Creates a form field for GovDelivery subscriptions given:
+
+   value:                   Object defined from a StreamField block.
+
+   value.type:              String for the type of field, 'email' or 'phone'.
+
+   value.label:             String for form input label.
+
+   value.gd_code:           String for GovDelivery topic code that the
+                            contact info entered into this field should be
+                            subscribed to.
+
+   ========================================================================== #}
+
+{% set placeholder = 'mail@example.com' if value.type == 'email' else '123-456-7890' %}
+
+<div class="m-form-field">
+    <label class="a-label a-label__heading" for="{{ value.type }}">
+        {{ value.label }}
+    </label>
+    <input class="a-text-input a-text-input__full"
+           type="{{ 'email' if value.type == 'email' else 'tel' }}"
+           id="{{ value.type }}"
+           name="{{ value.type }}"
+           placeholder="{{ placeholder }}">
+    <input type="hidden" name="gd_code_{{ value.type }}" value="{{ value.gd_code }}">
+</div>

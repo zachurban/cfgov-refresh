@@ -174,6 +174,30 @@ class FormFieldWithButton(blocks.StructBlock):
         template = '_includes/molecules/form-field-with-button.html'
 
 
+class GovDeliveryFormField(blocks.StructBlock):
+    type = blocks.ChoiceBlock(
+        required=True,
+        choices=[
+            ('email', 'Email'),
+            ('phone', 'Phone'),
+        ],
+        default='email',
+    )
+    label = blocks.CharBlock(required=True)
+    gd_code = blocks.CharBlock(
+        required=True,
+        label='GovDelivery topic code',
+        help_text='Corresponds to the topic code in GovDelivery this form '
+                  'should subscribe people to. Should be in the format '
+                  '"USCFPB_123", which also happens to be a code you can use '
+                  'for testing.',
+    )
+
+    class Meta:
+        icon = 'mail'
+        template = '_includes/molecules/govdelivery-form-field.html'
+
+
 class FeaturedContent(blocks.StructBlock):
     heading = blocks.CharBlock(required=False)
     body = blocks.RichTextBlock(required=False)

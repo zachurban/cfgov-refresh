@@ -208,26 +208,21 @@ class PostPreviewSnapshot(blocks.StructBlock):
 
 
 class GovDeliverySignUp(blocks.StructBlock):
-    heading = blocks.CharBlock(required=False)
+    heading = blocks.CharBlock(required=True)
     text = blocks.CharBlock(required=False)
-    gd_code = blocks.CharBlock(
-        required=False,
-        label='GovDelivery code',
-        help_text='Corresponds to the "topic" code in GovDelivery this form '
-                  'should subscribe people to.',
-    )
-    allow_text_message_signups = blocks.BooleanBlock(
-        required=False,
-        help_text='Allow users to enter their phone number to subscribe to '
-                  'SMS updates from this topic. Topic must have "Wireless '
-                  'Alerts Enabled" set in its options in GovDelivery. '
-                  'If this is checked, your field type must be set to "Text".',
-    )
     form_fields = blocks.ListBlock(
-        molecules.FormFieldWithButton(),
-        required=False,
-        label="Form field",
-        help_text='You probably shouldn\'t add more than one field here.',
+        molecules.GovDeliveryFormField(),
+        required=True,
+        label='Form fields',
+        help_text='You probably shouldn\'t add more than one email field and '
+                  'one phone field here.',
+    )
+    privacy_act_statement = blocks.PageChooserBlock(
+        required=True,
+        label='Privacy Act statement',
+        help_text='Select the appropriate Privacy Act statement page. When in '
+                  'doubt, choose the Generic Email Sign-up Privacy Act '
+                  'Statement.'
     )
 
     class Meta:

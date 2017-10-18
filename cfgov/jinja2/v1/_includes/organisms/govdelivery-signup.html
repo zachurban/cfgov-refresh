@@ -28,39 +28,37 @@
    ========================================================================== #}
 
 <div class="o-email-signup">
-{% if value.heading %}
     <header class="m-slug-header">
         <h2 class="a-heading">
             {{ value.heading }}
         </h2>
     </header>
-{% endif %}
 
-<form id="{{ value.id or ('o-email-signup_' ~ range(1, 100) | random) }}"
-      class="o-form o-form__email-signup"
-      action="/subscriptions/new/"
-      method="POST"
-      enctype="application/x-www-form-urlencoded">
-    <div class="u-mb15">
-	    {% import 'molecules/notification.html' as notification with context %}
-	    {{ notification.render('success', false, '') }}
-	</div>
-{% if value.text %}
-    <p>
-        {{ value.text }}
-    </p>
-{% endif %}
-
-{% set field_name = 'contact_info' %}
-{% for field in value.form_fields %}
-    {% include_block field %}
-{% endfor %}
-
-    <div class="form-group">
-        <input type="hidden" name="code" value="{{ value.gd_code }}">
-    {% if value.allow_text_message_signups %}
-        <input type="hidden" name="accept_phone">
+    <form id="{{ value.id or ('o-email-signup_' ~ range(1, 100) | random) }}"
+          class="o-form"
+          action="/subscriptions/new/"
+          method="POST"
+          enctype="application/x-www-form-urlencoded">
+    {% if value.text %}
+        <p>
+            {{ value.text }}
+        </p>
     {% endif %}
-    </div>
-</form>
+        <div class="u-mb15">
+            {% import 'molecules/notification.html' as notification with context %}
+            {{ notification.render('success', false, '') }}
+        </div>
+
+    {% for field in value.form_fields %}
+        {% include_block field %}
+    {% endfor %}
+
+        <div>
+            <a class="a-link a-link__jump" href="{{ value.privacy_act_statement.url }}">
+                View Privacy Act statement
+            </a>
+        </div>
+
+        <input class="a-btn a-btn__full-on-xs" type="submit" value="Sign up">
+    </form>
 </div>

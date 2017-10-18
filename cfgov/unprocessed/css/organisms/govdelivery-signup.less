@@ -37,14 +37,22 @@
 */
 
 .o-email-signup {
+    .m-form-field {
+        margin-top: unit( 30px / @base-font-size-px, em );
+        margin-bottom: unit( 30px / @base-font-size-px, em );
+    }
 
-    .respond-to-range(@bp-sm-min, @bp-sm-max {
-        .grid_column(6);
+    .a-btn {
+        margin-top: unit( 15px / @base-font-size-px, em );
+    }
 
-        &:last-child:nth-last-child(2) {
-            .grid_column(12);
+    .respond-to-range( @bp-sm-min, @bp-sm-max {
+        .grid_column( 6 );
+
+        &:last-child:nth-last-child( 2 ) {
+            .grid_column( 12 );
         }
-    });
+    } );
 }
 
 /* topdoc
