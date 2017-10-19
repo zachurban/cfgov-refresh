@@ -211,11 +211,6 @@ class GovDeliverySignUp(blocks.StructBlock):
     heading = blocks.CharBlock(required=True)
     text = blocks.CharBlock(required=False)
 
-    gd_code = blocks.CharBlock(required=False)
-    form_field = blocks.ListBlock(molecules.FormFieldWithButton(),
-                                  icon='mail',
-                                  required=False)
-
     form_fields = blocks.ListBlock(
         molecules.GovDeliveryFormField(),
         required=True,

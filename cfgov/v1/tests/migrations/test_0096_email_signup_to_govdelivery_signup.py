@@ -26,11 +26,11 @@ class EmailSignupToGovDeliverySignupTestCase(TestCase):
             'gd_code': u'GDCODE',
             'form_field': [{
                 'type': u'email',
-                'label': u'Email Address',
+                'label': u'Email address',
                 'info': u'<a href="/privacy/privacy-policy/">Privacy</a></p>',
-                'btn_text': u'Sign Up',
+                'btn_text': u'Sign up',
                 'is_required': None,
-                'placeholder': u'example@mail.com'
+                'placeholder': u'mail@example.com'
             }],
             'form_fields': [{}],
 
@@ -41,10 +41,35 @@ class EmailSignupToGovDeliverySignupTestCase(TestCase):
             migrated['form_fields'],
             [{
                 'type': 'email',
-                'label': 'Email Address',
+                'label': 'Email address',
                 'gd_code': 'GDCODE',
             }]
         )
 
     def test_backwards(self):
         """ Backwards migration """
+        data = {
+            'heading': u'Stay Informed',
+            'text': u'Subscribe to our newsletter.',
+            'gd_code': None,
+            'form_field': [{}],
+            'form_fields': [{
+                'type': 'email',
+                'label': 'Email address',
+                'gd_code': 'GDCODE',
+            }],
+            'privacy_act_statement': None
+        }
+        migrated = self.migration.migrate_email_signup_backwards(None, data)
+        self.assertEqual(
+            migrated['form_field'],
+            [{
+                'type': u'email',
+                'label': u'Email address',
+                'info': None,
+                'btn_text': u'Sign up',
+                'is_required': None,
+                'placeholder': u'mail@example.com'
+            }]
+        )
+        self.assertEqual(migrated['gd_code'], 'GDCODE')

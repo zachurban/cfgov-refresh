@@ -15,7 +15,7 @@ def migrate_email_signup_forwards(page_or_revision, data):
     form_fields = []
     for field in form_field:
         form_fields.append({
-            'type': field['type'],
+            'type': 'email',
             'label': field['label'],
             'gd_code': gd_code,
         })
@@ -28,10 +28,28 @@ def migrate_email_signup_forwards(page_or_revision, data):
 
 
 def migrate_email_signup_backwards(page_or_revision, data):
+    # raise Exception("Can't migrate email signups backwards")
 
     # Map new form_fields field to old form_field and gd_code fields
-    form_field
+    form_field = []
+    form_fields = data['form_fields']
+    for field in form_fields:
+        # if field['type'] is not 'email':
+        #     continue
 
+        form_field.append({
+            'type': field['type'],
+            'label': field['label'],
+            'info': None,
+            # These are defaults, since we lost the original values in the
+            # forwards migrations
+            'btn_text': u'Sign up',
+            'is_required': None,
+            'placeholder': u'mail@example.com'
+        })
+        data['gd_code'] = field['gd_code']
+
+    data['form_field'] = form_field
     return data
 
 
