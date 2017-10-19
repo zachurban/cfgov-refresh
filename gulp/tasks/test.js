@@ -420,59 +420,122 @@ function spawnProtractor( ) {
 // Add automated WebPageTest checks
 
 const WebPageTest = require('webpagetest');
-const WEBPAGETEST_API_KEY = envvars.WEBPAGETEST_API_KEY;
 
 gulp.task('test:performance', function() {
-  var parameters, testSpecs, wpt;
+  const WEBPAGETEST_API_KEY = envvars.WEBPAGETEST_API_KEY;
+
   if (!WEBPAGETEST_API_KEY) {
     const ERROR_MSG = 'Error: Could not find valid WebPageTest API key. Request a key: https://www.webpagetest.org/getkey.php';
     gulpUtil.colors.enabled = true;
     gulpUtil.log( gulpUtil.colors.red( ERROR_MSG ) );
     return;
   }
-  wpt = new WebPageTest('www.webpagetest.org', WEBPAGETEST_API_KEY);
-  parameters = {
-    disableHTTPHeaders: true,
-    video: true,
-    location: 'Dulles:Chrome'
-  };
-  testSpecs = {
-    runs: {
-      1: {
-        firstView: {
-          SpeedIndex: 1500
-        }
-      }
-    },
-    median: {
-      firstView: {
-        bytesIn: 1000000,
-        visualComplete: 4000
-      }
-    }
-  };
-  return wpt.runTest('http://consumerfinance.gov', parameters, function(err, data) {
-    var checkStatus, testID;
-    testID = data.data.testId;
-    checkStatus = function() {
-      return wpt.getTestStatus(testID, function(err, data) {
-        console.log("Status for " + testID + ": " + data.data.statusText);
-        if (!data.data.completeTime) {
-          return setTimeout(checkStatus, 5000);
-        } else {
-          return wpt.getTestResults(testID, {
-            specs: testSpecs
-          }, function(err, data) {
-            console.log("http://www.webpagetest.org/result/" + testID + "/");
-            if (err > 0) {
-              return process.exit(1);
-            }
-          });
-        }
-      });
+
+  _createPSITunnel( )
+  .then( function ( params ) {
+    _runWebPageTest( params.url )
+    params.tunnel.close();
+  } )
+  .catch( err => {
+    gulpUtil.log( err );
+    params.tunnel.close();
+    process.exit( 1 );
+  } );
+
+  function _runWebPageTest( url ) {
+    gulpUtil.log( 'Performance test with WebPageTest at URL: ' + url );
+    // psi.output( params.url, params.options )
+    const wpt = new WebPageTest('www.webpagetest.org', WEBPAGETEST_API_KEY);
+    const parameters = {
+      disableHTTPHeaders: true,
+      video: true,
+      location: 'Dulles:Chrome'
     };
-    return checkStatus();
-  });
+    const testSpecs = {
+      runs: {
+        1: {
+          firstView: {
+            SpeedIndex: 1500
+          }
+        }
+      },
+      median: {
+        firstView: {
+          bytesIn: 1000000,
+          visualComplete: 4000
+        }
+      }
+    };
+    wpt.runTest( url, function ( err, response ) {
+
+      gulpUtil.log( response );
+
+    });
+
+    // wpt.runTest( ( url, parameters ) =>  {
+      // var checkStatus, testID;
+      // testID = data.data.testId;
+
+      // checkStatus = function() {
+      //   return wpt.getTestStatus(testID, function(err, data) {
+      //     console.log("Status for " + testID + ": " + data.data.statusText);
+          
+      //     if (!data.data.completeTime) {
+      //       return setTimeout(checkStatus, 5000);
+      //     } else {
+      //       return wpt.getTestResults(testID, {
+      //         specs: testSpecs
+      //       }, function(err, data) {
+      //         console.log("http://www.webpagetest.org/result/" + testID + "/");
+      //         if (err > 0) {
+      //           return process.exit(1);
+      //         }
+      //       });
+      //     }
+
+      //   });
+      // };
+    // } )
+
+    // Catch Tunnel errors
+    // .then( () => {
+    //   gulpUtil.log( 'PSI tests done!' );
+    //   params.tunnel.close();
+    // } )
+    // .catch( err => {
+    //   gulpUtil.log( err.message );
+    //   params.tunnel.close();
+    //   process.exit( 1 );
+    // } );
+  }
+
+  // return wpt.runTest('https://www.consumerfinance.gov', parameters, function(err, data) {
+  //   var checkStatus, testID;
+  //   testID = data.data.testId;
+
+  //   checkStatus = function() {
+  //     return wpt.getTestStatus(testID, function(err, data) {
+  //       console.log("Status for " + testID + ": " + data.data.statusText);
+        
+  //       if (!data.data.completeTime) {
+  //         return setTimeout(checkStatus, 5000);
+  //       } else {
+  //         return wpt.getTestResults(testID, {
+  //           specs: testSpecs
+  //         }, function(err, data) {
+  //           console.log("http://www.webpagetest.org/result/" + testID + "/");
+  //           if (err > 0) {
+  //             return process.exit(1);
+  //           }
+  //         });
+  //       }
+
+  //     });
+  //   };
+
+  //   return checkStatus();
+  // });
+
 });
 
 
