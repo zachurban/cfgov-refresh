@@ -466,7 +466,7 @@ gulp.task('test:performance', function() {
         }
       }
     };
-    wpt.runTest( url, function ( err, response ) {
+    wpt.runTest( url, parameters, function ( err, response ) {
 
       gulpUtil.log( response );
 
