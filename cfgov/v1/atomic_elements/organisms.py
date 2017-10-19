@@ -207,26 +207,15 @@ class PostPreviewSnapshot(blocks.StructBlock):
         icon = 'order'
 
 
-class EmailSignUp(blocks.StructBlock):
-    heading = blocks.CharBlock(required=False)
+class GovDeliverySignUp(blocks.StructBlock):
+    heading = blocks.CharBlock(required=True)
     text = blocks.CharBlock(required=False)
-    gd_code = blocks.CharBlock(required=False)
 
+    gd_code = blocks.CharBlock(required=False)
     form_field = blocks.ListBlock(molecules.FormFieldWithButton(),
                                   icon='mail',
                                   required=False)
 
-    class Meta:
-        icon = 'mail'
-        template = '_includes/organisms/email-signup.html'
-
-    class Media:
-        js = ['email-signup.js']
-
-
-class GovDeliverySignUp(blocks.StructBlock):
-    heading = blocks.CharBlock(required=True)
-    text = blocks.CharBlock(required=False)
     form_fields = blocks.ListBlock(
         molecules.GovDeliveryFormField(),
         required=True,
