@@ -434,7 +434,7 @@ gulp.task('test:performance', function() {
   _createPSITunnel( )
   .then( function ( params ) {
     _runWebPageTest( params.url )
-    params.tunnel.close();
+    // params.tunnel.close();
   } )
   .catch( err => {
     gulpUtil.log( err );
