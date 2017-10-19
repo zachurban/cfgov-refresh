@@ -10,7 +10,6 @@ var validators = require( '../../modules/util/validators' );
 var BASE_CLASS = 'o-email-signup';
 var language = document.body.querySelector( '.content' ).lang;
 
-
 /**
  * validate - Call the validation function.
  *
@@ -19,8 +18,6 @@ var language = document.body.querySelector( '.content' ).lang;
  */
 function validate( fields ) {
   var statusMsg = '';
-
-  // console.log( fields );
 
   for ( var field in fields ) {
     var fieldProps = fields[field];
@@ -36,12 +33,10 @@ function validate( fields ) {
   return statusMsg;
 }
 
-
 var formSubmit = new FormSubmit(
   document.body.querySelector( '.' + BASE_CLASS ),
   BASE_CLASS,
   { validator: validate, language: language }
 );
-
 
 formSubmit.init();

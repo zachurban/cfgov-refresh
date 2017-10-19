@@ -130,49 +130,6 @@ function phone( field, currentStatus, options ) {
   return status;
 }
 
-
-/**
- * emailOrPhone Determines if a field contains a phone number.
- *
- * @param {Object} field         Field to test.
- * @param {Object} currentStatus A previous tested status for the field.
- * @param {Object} options       Options object.
- * @returns {Object} An empty object if the field passes,
- *   otherwise an object with msg and type properties if it failed.
- *//*
-function emailOrPhone( field, currentStatus, options ) {
-  var status = currentStatus || {};
-  var opts = options || {};
-  var state;
-  var key;
-
-  var phoneStatus = phone( field, currentStatus, options );
-  var emailStatus = email( field, currentStatus, options );
-
-  // Empty status objects means they passed validation
-  if ( Object.keys( phoneStatus ).length === 0 ) {
-    return phoneStatus;
-  } else if ( Object.keys( emailStatus ).length === 0 ) {
-    return emailStatus;
-  } else if ( phoneStatus.result === 'REQUIRED' ) {
-    // If phone came back as required, email would have as well
-    state = 'REQUIRED';
-  } else {
-    // At this point, we know both came back invalid
-    state = 'INVALID';
-  }
-
-  // TODO: Create a language checker instead of doing this inline like this
-  key = opts.language === 'es' ? state + '_ES' : state;
-  status.msg = status.msg || '';
-  status.msg += ERROR_MESSAGES.FIELD[key];
-  status.emailOrPhone = false;
-  status.result = state;
-
-  return status;
-}
-*/
-
 /**
  * required Determines if a required field contains a value.
  *
@@ -252,7 +209,6 @@ module.exports = {
   date:         date,
   email:        email,
   phone:        phone,
-  //emailOrPhone: emailOrPhone,
   required:     required,
   checkbox:     checkbox,
   radio:        radio
