@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.http import (Http404, HttpResponse, HttpResponseForbidden,
                          JsonResponse)
-from django.shortcuts import redirect
+from django.shortcuts import redirect, reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -20,7 +20,7 @@ from core.utils import extract_answers_from_request
 
 logger = logging.getLogger(__name__)
 
-REQUIRED_PARAMS_GOVDELIVERY = ['email', 'code']
+# REQUIRED_PARAMS_GOVDELIVERY = ['email', 'code']
 
 
 @csrf_exempt
@@ -32,32 +32,102 @@ def govdelivery_subscribe(request):
     in the case of AJAX, returns some JSON to tell the front-end.
     """
     is_ajax = request.is_ajax()
+    email_result = 'null'
+    phone_result = 'null'
+    query_string = '?'
+
     if is_ajax:
         passing_response = JsonResponse({'result': 'pass'})
         failing_response = JsonResponse({'result': 'fail'})
     else:
         passing_response = redirect('govdelivery:success')
         failing_response = redirect('govdelivery:server_error')
-    for required_param in REQUIRED_PARAMS_GOVDELIVERY:
-        if (required_param not in request.POST or
-                not request.POST.get(required_param)):
-            return failing_response if is_ajax else \
-                redirect('govdelivery:user_error')
-    email_address = request.POST['email']
-    codes = request.POST.getlist('code')
+
+    # for required_param in REQUIRED_PARAMS_GOVDELIVERY:
+    #     if (required_param not in request.POST or
+    #             not request.POST.get(required_param)):
+    #         return failing_response if is_ajax else \
+    #             redirect('govdelivery:user_error')
+
+    for item in request.POST:
+        if item == 'email':
+            includes_field = True
+            email_address = request.POST['email']
+        if item == 'phone':
+            includes_field = True
+            phone_number = request.POST['phone']
+        if item == 'gd_code_email':
+            includes_code = True
+            email_code = request.POST.getlist('gd_code_email')
+        if item == 'gd_code_phone':
+            includes_code = True
+            phone_code = request.POST.getlist('gd_code_phone')
+
+    if not includes_field and not includes_code:
+        return failing_response if is_ajax \
+            else redirect('govdelivery:user_error')
+
     gd = GovDelivery(account_code=settings.ACCOUNT_CODE)
-    try:
-        subscription_response = gd.set_subscriber_topics(email_address, codes)
-        if subscription_response.status_code != 200:
+
+    if email_address and email_code:
+        try:
+            subscription_response = gd.set_subscriber_topics(email_address,
+                                                             'email',
+                                                             email_code)
+            if subscription_response.status_code != 200:
+                if is_ajax:
+                    email_result = 'failure'
+                else:
+                    query_string += '&email=failure'
+            else:
+                if is_ajax:
+                    email_result = 'success'
+                else:
+                    query_string += '&email=success'
+        except Exception:  # ask a BEWD what would cause an exception
             return failing_response
-    except Exception:
-        return failing_response
-    answers = extract_answers_from_request(request)
-    for question_id, answer_text in answers:
-        gd.set_subscriber_answers_to_question(email_address,
-                                              question_id,
-                                              answer_text)
-    return passing_response
+
+        answers = extract_answers_from_request(request)
+        for question_id, answer_text in answers:
+            gd.set_subscriber_answers_to_question(email_address,
+                                                  question_id,
+                                                  answer_text)
+
+    if phone_number and phone_code:
+        try:
+            subscription_response = gd.set_subscriber_topics(phone_number,
+                                                             'phone',
+                                                             phone_code)
+            if subscription_response.status_code != 200:
+                if is_ajax:
+                    phone_result = 'failure'
+                else:
+                    query_string += '&phone=failure'
+            else:
+                if is_ajax:
+                    phone_result = 'success'
+                else:
+                    query_string += '&phone=success'
+        except Exception:
+            return failing_response
+
+        answers = extract_answers_from_request(request)
+        for question_id, answer_text in answers:
+            gd.set_subscriber_answers_to_question(phone_number,
+                                                  question_id,
+                                                  answer_text)
+
+    if is_ajax:
+        combo_response = JsonResponse(
+            {
+                'email': email_result,
+                'phone': phone_result
+            }
+        )
+    else:
+        combo_response = redirect(reverse('govdelivery:result') + query_string)
+
+    return combo_response
 
 
 REQUIRED_PARAMS_REGSGOV = [

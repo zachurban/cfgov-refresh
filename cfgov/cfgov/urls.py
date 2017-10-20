@@ -178,6 +178,11 @@ urlpatterns = [
             TemplateView.as_view(
                 template_name='govdelivery-subscribe/server-error/index.html'),
             name='server_error')],
+        url(r'^result/$',
+            TemplateView.as_view(
+                template_name='govdelivery-subscribe/result/index.html'
+            ),
+            name='result'),
         namespace='govdelivery')),
 
     url(r'^regulation-comment/new/$',
