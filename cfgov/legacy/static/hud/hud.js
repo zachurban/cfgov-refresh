@@ -116,6 +116,7 @@ var cfpb_hud_hca = (function() {
 			zip_marker = L.circle(ziplatlng, 3).addTo(map);
 
 			$.each( data.counseling_agencies, function(i, val) {
+			  console.log(val)
         var lat = val.agc_ADDR_LATITUDE;
         var lng = val.agc_ADDR_LONGITUDE
         var position = new L.LatLng(lat, lng);
@@ -135,13 +136,26 @@ var cfpb_hud_hca = (function() {
           iconUrl: '/static/nemo/_/img/hud_gmap/agc_' + number + '.png',
           iconAnchor: [20, 50]
         });
-
+             
+        var markerContent = number + '. ' + val.nme + '</a><br/>' + val.adr1 + '<br/><a href="#hud-result-' + number + '">Details'; 
+        if (val.weburl) {
+          markerContent = '<a href="' + val.weburl  + '">' + markerContent + '</a>';
+        } 
+        var markerText = '<div> ' + markerContent + '</div>'
+        
 				var marker = new L.Marker(position, {icon: icon}).addTo(map);
         marker_array[i] = marker;
 
-				marker.on('click', function() {
-					$(document.body).animate({'scrollTop':   $('#hud-result-' + number).offset().top }, 1000);
-				});
+				marker.bindPopup(markerText, {offset: new L.Point(-5, -35)}).openPopup();
+        $('#hud-result-' + number).on('click', function(e){
+          if ($(e.target).hasClass('hud_hca_api_num')) {
+            marker.openPopup()
+            
+            $("html, body").animate({'scrollTop':   $('#hud_hca_api_map_container').offset().top }, 500);
+            
+          }
+        })
+				
 			});
 
       //shift the max bounds so that the dropped pins are always on screen

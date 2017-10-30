@@ -14,7 +14,11 @@ a:hover, a:focus {
 .hud_hca_api_form_container {
 	background-color: #d7d2cb;
 	border: 1px solid #babbbd !important;
+	/*background-color: #e7e8e9;
+	border: 1px solid #b4b5b6 !important;*/
 	position: relative;
+	margin: 1em 0;
+	
 }
 
 .hud_hca_api_form_container a {
@@ -29,18 +33,17 @@ a:hover, a:focus {
 	border-bottom-width: solid;
 }
 
+.hud_hca_api_form_container .input-with-btn__bar {
+    max-width: 450px;
+}
+
 .hud_hca_api_form {
-	margin: 0 1em;
-	padding: 2.5em 0 1em;
+	margin: 0 15px;
+	padding: 1.5em 0 1em;
 }
 
 .hud_hca_api_form input {
-	border-bottom-right-radius: 0;
-	border-top-right-radius: 0;
-	margin-bottom: 2.5em;
-	padding: 2% 1%;
-	position: relative;
-	width: 95%;
+	width: 100%;
 }
 
 .hud_hca_api_form label {
@@ -48,7 +51,7 @@ a:hover, a:focus {
 	display: block;
 	font-family: "Avenir Next", Verdana, sans-serif;
 	font-weight: 600;
-	margin-bottom: 2.5em;
+	margin-bottom: 15px;
 }
 
 .hud_hca_api_form_button {
@@ -59,11 +62,29 @@ a:hover, a:focus {
 	width: 100%;
 }
 
-.hud_hca_api_more_info {
-	border-top: 1px solid #75787b;
-	margin: 0 1em;
-	padding: 1em 0;
+@media only all and (min-width:49.9475em){
+    .hud_hca_api_form form {
+        display: table;
+        width: 100%;
+    }
+
+    .hud_hca_api_form label {
+        white-space: nowrap;
+        display: table-cell;
+        width: 1%;
+        padding-right: 10px;
+    }
+
+    .hud_hca_api_form .search-bar {
+        display: table-cell;
+        width: 100%;
+    }
+
+    .hud_hca_api_form .input-with-btn_btn {
+        white-space: nowrap;
+    }
 }
+
 
 /* Flexible iFrame for Map
    http://niklausgerber.com/blog/responsive-google-or-bing-maps/
@@ -271,3 +292,132 @@ a:hover, a:focus {
 }
 
 /* End HUD HCA API Landing Page additions */
+
+/* Hide from both screenreaders and browsers: h5bp.com/u */
+.cfpb_hide {
+    display: none !important;
+    visibility: hidden;
+}
+
+/* Hide only visually, but have it available for screenreaders: h5bp.com/v */
+.cfpb_visually_hide {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+/* Extends the .visuallyhidden class to allow the element to be focusable
+ * when navigated to via the keyboard: h5bp.com/p */
+.cfpb_visually_hide.focusable:active,
+.cfpb_visually_hide.focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+}
+
+
+
+/* Hide visually and from screenreaders, but maintain layout */
+.cfpb_invisible {
+    visibility: hidden;
+}
+
+@media only all and (min-width:56.3125em){.wrapper,.content_wrapper{max-width:1200px;padding-right:15px;padding-left:15px;margin:0 auto;clear:both}}.wrapper__match-content,.content_wrapper__match-content{padding-left:15px;padding-right:15px}@media only all and (min-width:37.5625em){.wrapper__match-content,.content_wrapper__match-content{padding-left:30px;padding-right:30px;max-width:1200px}}.lt-ie9 .wrapper,.lt-ie9 .content_wrapper{max-width:960px}.lt-ie9 body{min-width:800px}
+@media only all and (min-width:37.5625em){.wrapper__match-content{max-width:1170px}}
+
+.breadcrumbs{display:inline-block;-webkit-box-sizing:border-box;box-sizing:border-box;border:solid transparent;border-width:0 15px 0 0;margin-right:-0.25em;vertical-align:top;padding-top:2.14285714em;font-size:.875em;overflow-x:auto;white-space:nowrap}.breadcrumbs:before{color:#0072ce;content:"\e000";font-family:'CFPB Minicons'}@media only all and (max-width:56.25em){.breadcrumbs{padding-top:1.07142857em;padding-bottom:1.07142857em}}.breadcrumbs_link{padding-left:4px}.breadcrumbs_link:not( :last-child ):after{padding-left:4px;color:#101820;content:' /'}@media print{.breadcrumbs{display:none}}.print  .breadcrumbs{display:none}
+
+.hud_hca_intro {
+    max-width:53rem;
+    margin-bottom: 30px;
+    
+}
+
+.share.mini {
+    float: right;
+    padding-top:2.14285714em;
+    
+}
+
+.content_main{margin-top:1.875em}
+
+.input-with-btn input{padding-top:7px;padding-bottom:7px;font-size:.875em}.input-with-btn input:focus{-webkit-box-shadow:0 0 0 1px #0072ce inset;box-shadow:0 0 0 1px #0072ce inset;outline:none}.input-with-btn__bar{display:table;width:100%}@supports ((display: -webkit-box) or (display: flex)){.input-with-btn__bar{display:-webkit-box;display:-ms-flexbox;display:flex;width:auto}}.input-with-btn__bar .input-with-btn_input{display:table-cell;width:100%;float:left;margin-bottom:0}@supports ((display: -webkit-box) or (display: flex)){.input-with-btn__bar .input-with-btn_input{display:-webkit-box;display:-ms-flexbox;display:flex;width:auto;float:none;-webkit-box-flex:1;-ms-flex:1;flex:1}}.input-with-btn__bar .input-with-btn_btn{margin:0;border:0;display:table-cell;width:1%;vertical-align:middle}@supports ((display: -webkit-box) or (display: flex)){.input-with-btn__bar .input-with-btn_btn{display:-webkit-box;display:-ms-flexbox;display:flex;width:auto}}.input-with-btn__bar .input-with-btn_btn button{border-top-left-radius:0;border-bottom-left-radius:0;height:33px}
+
+
+.a-overlay {
+    display: none;
+}
+
+@media only all and (max-width:49.9375em){
+    #hud_hca_api_results_table th {
+        display: none;
+    }
+    #hud_hca_api_results_table tr,
+    #hud_hca_api_results_table td {
+        display: block;
+        padding-left: 0;
+    }
+    #hud_hca_api_results_table td {
+        border-width: 0 !important;
+        padding: 0 !important;
+    }
+    .hud_hca_api_counselors_td div {
+        display: block;
+        float: none;
+    }
+    
+    .hud_hca_api_results_total,
+    .hud_hca_api_results_actions {
+        display: block;
+        float: none;
+        width: auto;
+    }
+    
+    .hud_hca_api_results_total p,
+    .hud_hca_api_results_actions p {
+        padding-left: 0;
+    }
+    
+    .hud_hca_api_results_actions p {
+        text-align: left;
+        display: block;
+    }
+    
+    .hud_hca_api_results_actions {
+        margin-top: .5em;
+        margin-bottom: .5em;
+    }
+    
+    .hud_hca_api_results_listing_title {
+        display: block !important;
+        visibility: visible !important;
+    }
+    .hud_hca_api_services, 
+    .hud_hca_api_distance {
+        margin-top: 1em;
+    }
+}
+
+.botshare {
+    display: none;
+}
+
+
+.hud_hca_api_more_info {
+	border-top: 1px solid #75787b;
+	margin: 0;
+	padding: 30px 0 45px 0;
+    
+}
+
+.hud_hca_api_more_info p {
+	max-width: 53rem;
+}
