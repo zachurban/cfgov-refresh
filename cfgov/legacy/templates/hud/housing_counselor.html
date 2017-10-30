@@ -62,40 +62,29 @@ Find a housing counselor
             <div id="hud_hca_api_interactions_container" class="hud_hca_api_interactions">
               <div class=" clearfix hud_hca_api_print_hide">
                   <div id="hud_hca_api_form_container" class="hud_hca_api_form_container ">
-                  <div id="hud_hca_api_form" class="hud_hca_api_form o-serch-bar">
-                    <form action="." method="get">
-                       
-                                       <label for="hud_hca_api_query"><h4>Search by ZIP code:</h4></label>
-                                   
-                                   <div class="search-bar">
-                                   <div class="input-with-btn input-with-btn__bar">
-                                                      <div class="input-with-btn_input">
-                                                          <input class="a-text-input" type="text" name="zipcode" id="hud_hca_api_query" value="{{ zipcode|default:'' }}" placeholder="Please enter a 5-digit ZIP code">
-                                                      </div>
-                                                      <div class="input-with-btn_btn">
-                                                          <button class="a-btn" type="submit">
-                                                              Find a counselor
-                                                          </button>
-                                                      </div>
-                                                  </div>
-                               </div>
-                               
-                               
-                       
-                                   
-                      
-                    </form>
-                    <a class="cfpb_visually_hide" href="#hud_hca_api_results_meta_container">Skip to results</a>
-                  </div>
-
-                </div><!-- end .hud_hca_api_form_container -->
-  
-
-  <div id="hud_hca_api_map_container" class="hud_hca_api_map col">
-    <div id="hud_hca_api_map_canvas" ></div>
-  </div><!-- end .hud_hca_api_map -->
-</div><!-- end .hud_hca_api_grid_twothird -->
-
+                      <div id="hud_hca_api_form" class="hud_hca_api_form">
+                          <form action="." method="get">
+                              <label for="hud_hca_api_query"><h4>Search by ZIP code:</h4></label>
+                              <div class="search-bar">
+                                  <div class="input-with-btn input-with-btn__bar">
+                                      <div class="input-with-btn_input">
+                                          <input class="a-text-input" type="text" name="zipcode" id="hud_hca_api_query" value="{{ zipcode|default:'' }}" placeholder="Please enter a 5-digit ZIP code">
+                                      </div>
+                                      <div class="input-with-btn_btn">
+                                          <button class="a-btn" type="submit">
+                                              Find a counselor
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                          <a class="cfpb_visually_hide" href="#hud_hca_api_results_meta_container">Skip to results</a>
+                      </div>
+                  </div><!-- end .hud_hca_api_form_container -->
+                  <div id="hud_hca_api_map_container" class="hud_hca_api_map col">
+                      <div id="hud_hca_api_map_canvas" ></div>
+                  </div><!-- end .hud_hca_api_map -->
+              </div><!-- end .hud_hca_api_grid_twothird -->
 {% if zipcode %}
 <div id="hud_hca_api_results_container" class="hud_hca_api_results">
   {% if not zipcode_valid %}
