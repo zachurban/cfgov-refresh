@@ -13,7 +13,20 @@
    ========================================================================== #}
 
 <div class="o-full-width-text-group">
+    {% if not value.lines_between %}
+    <div class="content-l">
+    {% endif %}
     {% for block in value %}
+        {% set prev_block = value.content[loop.index - 2] if loop.index > 1 else '' %}
+        {% if value.lines_between and 
+           ( loop.index == 1 or 
+           ( prev_block.block_type not in ['quote', 'related_links', 'image_inset'] and
+             not prev_block.value.is_inset )
+        ) %}
+        <div class="content-l content-l_top-divider">
+        {% endif %}
+        
+        <div class="content-l_col content-l_col-1">
         {% set block_type = block.block_type %}
         {% if 'content_with_anchor' in block_type %}
                 {{ render_stream_child(block) | safe }}
@@ -42,5 +55,16 @@
         {% else %}
             {{ block | safe }}
         {% endif %}
+        </div>
+        {% if value.lines_between and 
+           ( loop.index == value.content | length or 
+           ( block_type not in ['quote', 'related_links', 'image_inset'] and
+             not block.value.is_inset )
+        ) %}
+        </div>
+        {% endif %}
     {% endfor %}
+    {% if not value.lines_between %}
+    </div>
+    {% endif %}
 </div>

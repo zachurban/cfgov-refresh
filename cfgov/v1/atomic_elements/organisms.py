@@ -660,17 +660,32 @@ class ModelList(ModelBlock):
         icon = 'list-ul'
 
 
-class FullWidthText(blocks.StreamBlock):
-    content_with_anchor = molecules.ContentWithAnchor()
-    content = blocks.RichTextBlock(icon='edit')
-    media = images_blocks.ImageChooserBlock(icon='image')
-    quote = molecules.Quote()
-    cta = molecules.CallToAction()
-    related_links = molecules.RelatedLinks()
-    table = Table(editable=False)
-    table_block = AtomicTableBlock(table_options={'renderer': 'html'})
-    image_inset = molecules.ImageInset()
-    reusable_text = ReusableTextChooserBlock(ReusableText)
+class FullWidthText(blocks.StructBlock):
+    has_top_border = blocks.BooleanBlock(
+        required=False,
+        default=False,
+        help_text='Check to add top rule line',
+        label="Top rule line")
+    lines_between = blocks.BooleanBlock(
+        required=False,
+        default=False,
+        help_text='Check to add rule lines between items')
+    content = blocks.StreamBlock(
+        [
+            ('content_with_anchor', molecules.ContentWithAnchor()),
+            ('content', blocks.RichTextBlock(icon='edit')),
+            ('media', images_blocks.ImageChooserBlock(icon='image')),
+            ('quote', molecules.Quote()),
+            ('cta', molecules.CallToAction()),
+            ('related_links', molecules.RelatedLinks()),
+            ('table', Table(editable=False)),
+            ('table_block', AtomicTableBlock(
+                table_options={'renderer': 'html'})),
+            ('image_inset', molecules.ImageInset()),
+            ('reusable_text', ReusableTextChooserBlock(ReusableText)),
+
+        ], blank=True
+    )
 
     class Meta:
         icon = 'edit'
