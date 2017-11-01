@@ -194,7 +194,7 @@ describe( 'fwb-questions', () => {
   } );
 
   it( 'submit button should submit the form ' +
-       'if all the questions are completed before page load.', () => {
+      'if all the questions are completed before page load.', () => {
     fillOutForm();
     fwbQuestions.init();
     const formSubmissionStatus = triggerClickEvent( submitBtnDom );
@@ -203,7 +203,7 @@ describe( 'fwb-questions', () => {
   } );
 
   it( 'submit button should submit the form ' +
-       'if all the questions are completed after page load.', () => {
+      'if all the questions are completed after page load.', () => {
     fwbQuestions.init();
     fillOutForm();
     const formSubmissionStatus = triggerClickEvent( submitBtnDom );
@@ -219,7 +219,7 @@ describe( 'fwb-questions', () => {
   } );
 
   it( 'should send the correct analytics ' +
-       'when the submit button is clicked', () => {
+      'when the submit button is clicked', () => {
     fillOutForm();
     fwbQuestions.init();
     triggerClickEvent( submitBtnDom );
