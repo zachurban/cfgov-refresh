@@ -50,7 +50,7 @@ MIDDLEWARE_CLASSES += CSP_MIDDLEWARE_CLASSES
 # Disable caching when working locally.
 CACHES = {
     k: {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-        'TIMEOUT': 0,
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'TIMEOUT': 600,
     } for k in ('default', 'eregs_longterm_cache', 'api_cache')
 }
