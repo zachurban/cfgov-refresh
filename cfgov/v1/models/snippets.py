@@ -89,7 +89,7 @@ class TaggableSnippetManager(models.Manager):
 
 @python_2_unicode_compatible
 @register_snippet
-class Resource(ClusterableModel):
+class Resource(index.Indexed, ClusterableModel):
     title = models.CharField(max_length=255)
     desc = RichTextField(verbose_name='Description', blank=True)
 
@@ -143,6 +143,10 @@ class Resource(ClusterableModel):
         blank=True,
         help_text='Tags can be used to filter snippets in a Snippet List.'
     )
+    
+    search_fields = [
+        index.SearchField('title', partial_match=True),
+    ]
 
     objects = TaggableSnippetManager()
 
