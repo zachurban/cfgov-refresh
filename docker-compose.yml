@@ -21,6 +21,7 @@ services:
         build: .
         ports:
             - "8000:8000"
+            - "8443:8443"
         environment:
             MYSQL_ROOT_PW: root
             MYSQL_HOST: mysql
@@ -33,7 +34,7 @@ services:
                 - ./develop-apps:/src/develop-apps
         entrypoint: 
                 - sh
-                - /src/cfgov-refresh/cfgov/entrypoint.sh
+                - /bin/entrypoint.sh
         depends_on:
                 - mysql
                 - elasticsearch                
