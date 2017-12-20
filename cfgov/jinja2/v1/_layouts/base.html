@@ -253,7 +253,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   available. Check for that CSS class here and act accordingly.
 #}
 <script>
-    function loadScript(t){var n=document.createElement('script');n.type='text/javascript',n.src=t,document.getElementsByTagName('head')[0].appendChild(n)}
+    {# Minified dynamic JavaScript loader that injects a script tag in the head.
+       Setting of async=false is necessary to ensure common.js (and webpack)
+       load before other scripts. #}
+    function loadScript(t){var n=document.createElement('script');n.async=false,n.type='text/javascript',n.src=t,document.getElementsByTagName('head')[0].appendChild(n)}
 
     if (document.body.parentElement.className.indexOf('no-js')===-1){
       {# Include site-wide JavaScript. #}
