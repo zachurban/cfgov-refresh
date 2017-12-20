@@ -25,6 +25,8 @@ from wagtail.wagtailcore.models import (Orderable, Page, PageManager,
 from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 from wagtailinventory.helpers import get_page_blocks
 
+from flags.models import FlaggablePageMixin
+
 from v1 import get_protected_url
 from v1.atomic_elements import molecules, organisms
 from v1.models.snippets import ReusableText, ReusableTextChooserBlock
@@ -51,10 +53,11 @@ class BaseCFGOVPageManager(PageManager):
     def get_queryset(self):
         return PageQuerySet(self.model).order_by('path')
 
+
 CFGOVPageManager = BaseCFGOVPageManager.from_queryset(PageQuerySet)
 
 
-class CFGOVPage(Page):
+class CFGOVPage(Page, FlaggablePageMixin):
     authors = ClusterTaggableManager(through=CFGOVAuthoredPages, blank=True,
                                      verbose_name='Authors',
                                      help_text='A comma separated list of '
@@ -114,6 +117,7 @@ class CFGOVPage(Page):
         FieldPanel('authors', 'Authors'),
         MultiFieldPanel(Page.settings_panels, 'Scheduled Publishing'),
         FieldPanel('language', 'language'),
+        MultiFieldPanel(FlaggablePageMixin.flag_panels, 'Feature flag'),
     ]
 
     # Tab handler interface guide because it must be repeated for each subclass
@@ -249,6 +253,9 @@ class CFGOVPage(Page):
             hook(self, request, context, *args, **kwargs)
         return context
 
+    def route(self, request, path_components):
+        return self.route_flaggable(request, path_components)
+
     def serve(self, request, *args, **kwargs):
         """
         If request is ajax, then return the ajax request handler response, else
@@ -260,7 +267,7 @@ class CFGOVPage(Page):
         # Force the page's language on the request
         translation.activate(self.language)
         request.LANGUAGE_CODE = translation.get_language()
-        return super(CFGOVPage, self).serve(request, *args, **kwargs)
+        return self.serve_flaggable(request, *args, **kwargs)
 
     def _return_bad_post_response(self, request):
         if request.is_ajax():
