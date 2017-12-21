@@ -23,15 +23,19 @@ from compressor.contrib.jinja2ext import CompressorExtension
 from flags.template_functions import flag_disabled, flag_enabled
 from jinja2 import Markup, contextfunction
 
+import flags
 from core.utils import signed_redirect, unsigned_redirect
 from processors.processors_common import fix_link
 from sheerlike import environment as sheerlike_environment
+from v1.conditions import page_primary_key_condition
 from v1.fragment_cache_extension import FragmentCacheExtension
 from v1.routing import get_protected_url
 from v1.util.util import get_unique_id
 
 
 default_app_config = 'v1.apps.V1AppConfig'
+
+flags.conditions.register('page primary key', fn=page_primary_key_condition)
 
 
 class JinjaTranslations(object):
