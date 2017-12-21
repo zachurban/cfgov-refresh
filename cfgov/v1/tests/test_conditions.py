@@ -1,12 +1,10 @@
-from django.test import TestCase, RequestFactory
+from django.test import RequestFactory, TestCase
 
-from wagtail.wagtailcore.models import Site, Page
+from wagtail.wagtailcore.models import Page, Site
 
 from flags.conditions import RequiredForCondition
 
-from v1.conditions import (
-    page_primary_key_condition,
-)
+from v1.conditions import page_primary_key_condition
 
 
 class PrimaryKeyConditionTestCase(TestCase):

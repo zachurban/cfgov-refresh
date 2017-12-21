@@ -641,6 +641,12 @@ FLAGS = {
     'TDP_RELEASE': {},
 }
 
+if DEPLOY_ENVIRONMENT == 'beta':
+    # Serve the latest draft of pages that meet these conditions on beta
+    FLAGS['SERVE_DRAFT_PAGE'] = {
+        'page primary key': '1288',
+    }
+
 
 # Watchman tokens, used to authenticate global status endpoint
 WATCHMAN_TOKENS = os.environ.get('WATCHMAN_TOKENS', os.urandom(32))

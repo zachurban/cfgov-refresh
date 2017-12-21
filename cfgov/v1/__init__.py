@@ -18,12 +18,12 @@ from django.utils.translation import ugettext, ungettext
 
 from wagtail.wagtailcore.rich_text import RichText, expand_db_html
 
+import flags
 from bs4 import BeautifulSoup, NavigableString
 from compressor.contrib.jinja2ext import CompressorExtension
 from flags.template_functions import flag_disabled, flag_enabled
 from jinja2 import Markup, contextfunction
 
-import flags
 from core.utils import signed_redirect, unsigned_redirect
 from processors.processors_common import fix_link
 from sheerlike import environment as sheerlike_environment
