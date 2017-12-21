@@ -23,6 +23,7 @@ from wagtail.wagtailcore.models import (
 from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 
 from flags.state import flag_enabled
+
 from modelcluster.fields import ParentalKey
 from modelcluster.tags import ClusterTaggableManager
 from taggit.models import TaggedItemBase
@@ -265,7 +266,6 @@ class CFGOVPage(Page):
         request.LANGUAGE_CODE = translation.get_language()
 
         if flag_enabled('SERVE_DRAFT_PAGE', request=request):
-            print "DRAFT SERVING"
             latest_revision = self.get_latest_revision_as_page()
             return super(CFGOVPage, latest_revision).serve(
                 request, *args, **kwargs
