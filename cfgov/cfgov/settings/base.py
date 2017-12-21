@@ -644,7 +644,7 @@ FLAGS = {
 if DEPLOY_ENVIRONMENT == 'beta':
     # Serve the latest draft of pages that meet these conditions on beta
     FLAGS['SERVE_DRAFT_PAGE'] = {
-        'page primary key': '1288',
+        'page primary key': 1288,
     }
 
 

@@ -3,7 +3,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.staticfiles import storage
 from django.db.models.signals import post_save
 
-from .signals import user_save_callback
+import flags
+from v1.signals import user_save_callback
+from v1.conditions import page_primary_key_condition
 
 
 class V1AppConfig(AppConfig):
@@ -24,4 +26,8 @@ class V1AppConfig(AppConfig):
                 r"""(url\((?!null)['"]{0,1}\s*(.*?)["']{0,1}\))""",
                 (r"""(@import\s*["']\s*(.*?)["'])""", """@import url("%s")"""),
             )),
+        )
+
+        flags.conditions.register(
+            'page primary key', fn=page_primary_key_condition
         )
