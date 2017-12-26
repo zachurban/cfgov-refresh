@@ -38,7 +38,9 @@ class Command(BaseCommand):
             issuer = update_issuer(dir_name)
 
             # removes hidden files
-            files = [f for f in fileList if not f[0] == '.']
+            files = [f for f in fileList
+                     if not f[0] == '.'
+                     and f not in ['Thumbs.db', 'Libraries - Shortcut.lnk']]
             for fname in files:
                 # Make the filename S3-safe by urlencoding it
                 unique_fname = suffix + urllib.quote(fname, ' -')
