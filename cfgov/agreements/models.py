@@ -77,7 +77,9 @@ class AgreementBase(models.Model):
 
     @property
     def payload(self):
-        return {'issuer': "{}".format(self.issuer),
+        return {'issuer': self.issuer.name,
+                'issuer_slug': self.issuer.slug,
+                'issuer_pk': self.issuer.pk,
                 'size': self.size,
                 'uri': self.uri,
                 'offered': '{}'.format(self.offered),

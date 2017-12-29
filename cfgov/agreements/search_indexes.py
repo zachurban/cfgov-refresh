@@ -32,6 +32,9 @@ class AgreementIndex(indexes.SearchIndex, indexes.Indexable):
     issuer_name = indexes.CharField(
         model_attr='issuer__name',
         indexed=True)
+    issuer_slug = indexes.CharField(
+        model_attr='issuer__slug',
+        indexed=True)
     issuer_pk = indexes.IntegerField(
         model_attr='issuer__pk',
         indexed=True)
@@ -64,8 +67,14 @@ class PrepayAgreementIndex(indexes.SearchIndex, indexes.Indexable):
     uri = indexes.CharField(
         model_attr='uri',
         indexed=False)
+    plan_type = indexes.CharField(
+        model_attr='plan__plan_type',
+        indexed=True)
     issuer_name = indexes.CharField(
         model_attr='issuer__name',
+        indexed=True)
+    issuer_slug = indexes.CharField(
+        model_attr='issuer__slug',
         indexed=True)
     issuer_pk = indexes.IntegerField(
         model_attr='issuer__pk',
