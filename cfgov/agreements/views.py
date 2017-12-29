@@ -74,7 +74,8 @@ def agreement_search(request, model):
                     'pk': int(result.pk),
                     'issuer_name': result.issuer_name,
                     'issuer_pk': result.issuer_pk,
-                    'issuer_slug': result.issuer_slug}
+                    'issuer_slug': result.issuer_slug,
+                    'uri': result.uri}
                    for result in sqs[:20]]
     else:
         results = [{'name': result.autocomplete,
@@ -96,7 +97,8 @@ def agreement_autocomplete(request, model):
                     'pk': int(result.pk),
                     'issuer_name': result.issuer_name,
                     'issuer_pk': result.issuer_pk,
-                    'issuer_slug': result.issuer_slug}
+                    'issuer_slug': result.issuer_slug,
+                    'uri': result.uri}
                    for result in sqs[:20]]
     else:
         results = [{'name': result.autocomplete,
