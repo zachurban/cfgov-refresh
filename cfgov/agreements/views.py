@@ -75,6 +75,7 @@ def agreement_search(request, model):
                     'issuer_name': result.issuer_name,
                     'issuer_pk': result.issuer_pk,
                     'issuer_slug': result.issuer_slug,
+                    'effective_date': result.effective,
                     'uri': result.uri}
                    for result in sqs[:20]]
     else:
@@ -98,6 +99,7 @@ def agreement_autocomplete(request, model):
                     'issuer_name': result.issuer_name,
                     'issuer_pk': result.issuer_pk,
                     'issuer_slug': result.issuer_slug,
+                    'effective_date': result.effective,
                     'uri': result.uri}
                    for result in sqs[:20]]
     else:

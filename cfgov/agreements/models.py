@@ -20,7 +20,14 @@ class Issuer(CreditBase):
 
     @property
     def payload(self):
-        return {'name': self.name, 'slug': self.slug, 'pk': self.pk}
+        return {
+            'name': self.name,
+            'slug': self.slug,
+            'pk': self.pk,
+            'credit-agreements': [a.uri for a
+                                  in self.agreement_set.all()],
+            'prepay_agreements': [a.uri for a
+                                  in self.prepayagreement_set.all()]}
 
 
 class CreditPlan(CreditBase):
