@@ -78,7 +78,8 @@ def agreement_search(request, model):
                    for result in sqs[:20]]
     else:
         results = [{'name': result.autocomplete,
-                    'pk': int(result.pk)}
+                    'pk': int(result.pk),
+                    'slug': result.slug}
                    for result in sqs[:20]]
     return JsonResponse(results, safe=False)
 
@@ -99,7 +100,8 @@ def agreement_autocomplete(request, model):
                    for result in sqs[:20]]
     else:
         results = [{'name': result.autocomplete,
-                    'pk': int(result.pk)}
+                    'pk': int(result.pk),
+                    'slug': result.slug}
                    for result in sqs[:20]]
 
     return JsonResponse(results, safe=False)
