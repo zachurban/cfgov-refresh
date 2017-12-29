@@ -90,7 +90,7 @@ def agreement_autocomplete(request, model):
     sqs = SearchQuerySet().models(search_model).autocomplete(autocomplete=term)
     results = [{'name': result.autocomplete,
                 'pk': result.pk}
-               for result in search[:20]]
+               for result in sqs[:20]]
 
     return JsonResponse(results, safe=False)
 

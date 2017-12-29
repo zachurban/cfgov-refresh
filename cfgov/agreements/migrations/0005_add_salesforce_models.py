@@ -29,10 +29,10 @@ class Migration(migrations.Migration):
             name='PrepayAgreement',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('file_name', models.TextField(max_length=500)),
+                ('file_name', models.TextField(help_text='To support legacy processing', max_length=500)),
                 ('size', models.IntegerField()),
                 ('uri', models.URLField(max_length=500)),
-                ('description', models.TextField()),
+                ('description', models.TextField(help_text='To support legacy processing', blank=True)),
                 ('offered', models.DateField(null=True, blank=True)),
                 ('withdrawn', models.DateField(null=True, blank=True)),
                 ('posted', models.DateField(help_text='For legacy PDFs, this is the S3 posting date; for SalesForce PDFs, this is the uploaded date', null=True)),
@@ -89,6 +89,16 @@ class Migration(migrations.Migration):
             model_name='issuer',
             name='med_id',
             field=models.IntegerField(null=True, blank=True),
+        ),
+        migrations.AlterField(
+            model_name='agreement',
+            name='description',
+            field=models.TextField(help_text='To support legacy processing', blank=True),
+        ),
+        migrations.AlterField(
+            model_name='agreement',
+            name='file_name',
+            field=models.TextField(help_text='To support legacy processing', max_length=500),
         ),
         migrations.AlterField(
             model_name='agreement',
