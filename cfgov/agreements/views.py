@@ -14,13 +14,12 @@ from agreements.models import (
     Agreement, CreditPlan, Issuer, PrepayAgreement, PrepayPlan
 )
 
-
 MODEL_MAP = {
     'credit-agreement': Agreement,
-    'credit-plan': CreditPlan,
-    'issuer': Issuer,
     'prepay-agreement': PrepayAgreement,
-    'prepay-plan': PrepayPlan,
+    'issuer': Issuer,
+    'credit-plan': CreditPlan,
+    'prepay-plan': PrepayPlan
 }
 
 
@@ -63,21 +62,24 @@ def legacy_issuer_search(request, issuer_slug):
 
 
 def agreement_search(request, model):
+    """Search is implemented for issuers and agreements (not yet for plans)"""
     search_model = MODEL_MAP.get(model)
     clean_query = Clean(request.GET.get('q', ''))
     qstring = clean_query.query_string.strip()
     if not qstring or not search_model:
         raise Http404
-    sqs = SearchQuerySet().models(search_model)
-    search = sqs.filter(content=clean_query)
-
-    results = [{'agreement': result.autocomplete,
-                'pk': result.pk,
-                'uri': result.uri,
-                'issuer': "{}".format(result.issuer),
-                'issuer_slug': result.issuer.slug if result.issuer else None,
-                'posted': result.posted}
-               for result in search]
+    sqs = SearchQuerySet().models(search_model).filter(content=clean_query)
+    if 'agreement' in model:
+        results = [{'name': result.autocomplete,
+                    'pk': int(result.pk),
+                    'issuer_name': result.issuer_name,
+                    'issuer_pk': result.issuer_pk,
+                    'issuer_slug': result.issuer_slug}
+                   for result in sqs[:20]]
+    else:
+        results = [{'name': result.autocomplete,
+                    'pk': int(result.pk)}
+                   for result in sqs[:20]]
     return JsonResponse(results, safe=False)
 
 
@@ -88,9 +90,17 @@ def agreement_autocomplete(request, model):
     if not term or not search_model:
         return JsonResponse([], safe=False)
     sqs = SearchQuerySet().models(search_model).autocomplete(autocomplete=term)
-    results = [{'name': result.autocomplete,
-                'pk': result.pk}
-               for result in sqs[:20]]
+    if 'agreement' in model:
+        results = [{'name': result.autocomplete,
+                    'pk': int(result.pk),
+                    'issuer_name': result.issuer_name,
+                    'issuer_pk': result.issuer_pk,
+                    'issuer_slug': result.issuer_slug}
+                   for result in sqs[:20]]
+    else:
+        results = [{'name': result.autocomplete,
+                    'pk': int(result.pk)}
+                   for result in sqs[:20]]
 
     return JsonResponse(results, safe=False)
 
