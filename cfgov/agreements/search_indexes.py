@@ -9,6 +9,8 @@ class IssuerIndex(indexes.SearchIndex, indexes.Indexable):
         model_attr='name')
     autocomplete = indexes.EdgeNgramField(
         model_attr='name')
+    slug = indexes.CharField(
+        model_attr='slug')
 
     def get_model(self):
         return Issuer
