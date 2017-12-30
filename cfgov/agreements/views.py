@@ -67,7 +67,7 @@ def agreement_search(request, model):
     clean_query = Clean(request.GET.get('q', ''))
     qstring = clean_query.query_string.strip()
     if not qstring or not search_model:
-        raise Http404
+        raise Http404('Agreement not found')
     sqs = SearchQuerySet().models(search_model).filter(content=clean_query)
     if 'agreement' in model:
         results = [{'name': result.autocomplete,
