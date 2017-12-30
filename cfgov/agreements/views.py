@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.http import Http404, JsonResponse
+from django.http import Http404, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from haystack.inputs import Clean
 from haystack.query import SearchQuerySet
@@ -120,7 +120,7 @@ class CreditDataView(APIView):
     def get(self, request, model, pk):
         search_model = MODEL_MAP.get(model)
         if not search_model or not pk:
-            raise Http404("Invalid model")
+            raise HttpResponseBadRequest("Invalid model or key")
         try:
             result = search_model.objects.get(pk=pk)
         except search_model.DoesNotExist:
