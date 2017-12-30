@@ -1,0 +1,126 @@
+swagger: '2.0'
+info:
+  description: Demo API docs for the credit card agreements database.
+  version: 1.0.0
+  title: Demo agreements API
+  license:
+    name: CC0
+    url: 'https://github.com/cfpb/cfgov-refresh/blob/master/LICENSE'
+host: 'localhost:8000'
+basePath: /credit-cards/agreements/api
+schemes:
+  - https
+  - http
+paths:
+  '/issuer/{issuerID}':
+    get:
+      summary: Returns data for individual issuer by pk
+      description: 'Issuer data, including related agreement URIs'
+      operationId: getIssuerByID
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: issuerID
+          description: Status values that need to be considered for filter
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Issuer'
+        '400':
+          description: Invalid model or primary key
+  '/credit-agreement/{agreementID}':
+    get:
+      summary: Returns data for individual credit agreement by pk
+      description: Data include PDF URI.
+      operationId: getAgreementByID
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: agreementID
+          description: Agreement primary key
+          required: true
+          type: integer
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/CreditAgreement'
+        '400':
+          description: Invalid model or primary key
+  /issuer/search/:
+    get:
+      tags:
+        - issuer_search
+      summary: Find issuers by name
+      description: Returns a list of issuer data
+      operationId: findIssuerByName
+      produces:
+        - application/json
+      parameters:
+        - name: q
+          in: query
+          description: Term or terms to search by
+          required: true
+          type: array
+          items:
+            type: string
+          collectionFormat: multi
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            $ref: '#/definitions/Issuer'
+        '400':
+          description: Invalid request
+        '404':
+          description: Agreement not found
+definitions:
+  Issuer:
+    type: object
+    properties:
+      name:
+        type: string
+      pk:
+        type: integer
+        format: int64
+      slug:
+        type: string
+      credit-agreements:
+        type: array
+        items:
+          type: string
+  CreditAgreement:
+    type: object
+    properties:
+      name:
+        type: string
+      pk:
+        type: integer
+        format: int64
+      issuer:
+        type: string
+      issuer_pk:
+        type: integer
+        format: int64
+      issuer_slug:
+        type: string
+      uri:
+        type: string
+      posted:
+        type: string
+        format: date
+      offered:
+        type: string
+        format: date
+      withdrawn:
+        type: string
+        format: date

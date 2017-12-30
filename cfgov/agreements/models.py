@@ -87,6 +87,7 @@ class AgreementBase(models.Model):
         return {'issuer': self.issuer.name,
                 'issuer_slug': self.issuer.slug,
                 'issuer_pk': self.issuer.pk,
+                'name': self.file_name,
                 'size': self.size,
                 'uri': self.uri,
                 'offered': '{}'.format(self.offered),
@@ -112,12 +113,19 @@ class Agreement(AgreementBase):
 
 class PrepayAgreement(AgreementBase):
     plan = models.ForeignKey(PrepayPlan, null=True)
+    name = models.CharField(blank=True, max_length=500)
 
     @property
     def payload(self):
         data = super(PrepayAgreement, self).payload
         if self.plan:
-            data.update({'plan': self.plan.name, 'pk': self.pk})
+            data.update({
+                'name': self.name,
+                'plan': self.plan.name,
+                'pk': self.pk})
         else:
-            data.update({'plan': None, 'pk': self.pk})
+            data.update({
+                'name': self.name,
+                'plan': None,
+                'pk': self.pk})
         return data
