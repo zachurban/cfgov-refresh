@@ -90,7 +90,7 @@ def plan_search(request, model):
             plan_ids += json.loads(result.plan_ids)
     plans = search_model.objects.filter(pk__in=plan_ids)
     results = [plan.payload for plan in plans]
-    return JsonResponse(results, safe=False)
+    return JsonResponse({'data': results})
 
 
 def autocomplete(request, model):
@@ -113,7 +113,7 @@ def autocomplete(request, model):
                            'plan_id': result.pk}
                           for result in sqs[:20]], key=lambda k: k['name'])
 
-    return JsonResponse(results, safe=False)
+    return JsonResponse({'data': results})
 
 
 class CreditDataView(APIView):
