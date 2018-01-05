@@ -81,7 +81,6 @@ def plan_search(request, model):
     issuer_query = (request.GET.get('q', '')).replace('>', '')[:50]
     plan_id_string = (request.GET.get('plan_ids', ''))
     plan_ids = clean_ids(plan_id_string)
-    # import pdb; pdb.set_trace()
     if not plan_ids and not issuer_query:
         return JsonResponse({})
     if issuer_query:
