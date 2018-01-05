@@ -1,11 +1,13 @@
 from __future__ import unicode_literals
+
+from core.utils import format_file_size
 from django.db import models
 
 
 class CreditBase(models.Model):
     """An abstract base class for all credit-card and prepay models."""
-    name = models.TextField(max_length=500)
-    slug = models.SlugField(max_length=100)
+    name = models.TextField(max_length=500, blank=True)
+    slug = models.SlugField(max_length=100, db_index=True)
 
     def __str__(self):
         return self.name
@@ -19,12 +21,17 @@ class Issuer(CreditBase):
     med_id = models.IntegerField(blank=True, null=True)
 
     @property
+    def plan_ids(self):
+        return [plan.pk for plan in self.creditplan_set.all()]
+
+    @property
     def payload(self):
         return {
             'name': self.name,
             'slug': self.slug,
             'pk': self.pk,
-            'credit-agreements': [a.uri for a
+            'plan_ids': self.plan_ids,
+            'credit_agreements': [a.uri for a
                                   in self.agreement_set.all()],
             'prepay_agreements': [a.uri for a
                                   in self.prepayagreement_set.all()]}
@@ -37,11 +44,22 @@ class CreditPlan(CreditBase):
 
     @property
     def payload(self):
+        if self.withdrawn:
+            self.withdrawn = self.withdrawn.strftime("%m/%d/%Y")
+
         return {'name': self.name,
                 'pk': self.pk,
-                'issuer': "{}".format(self.issuer),
-                'offered': '{}'.format(self.offered),
-                'withdrawn': '{}'.format(self.withdrawn)}
+                'slug': self.slug,
+                'issuer': self.issuer.name,
+                'offered': self.offered.strftime("%m/%d/%Y"),
+                'withdrawn': self.withdrawn,
+                'agreements': [
+                    {'posted': "{}".format(a.posted),
+                     'id': a.pk,
+                     'size': format_file_size(a.size),
+                     'effective_string': a.effective_string,
+                     'uri': a.uri} for a
+                    in self.agreement_set.all()]}
 
 
 class PrepayPlan(CreditBase):
@@ -52,12 +70,23 @@ class PrepayPlan(CreditBase):
 
     @property
     def payload(self):
+        if self.withdrawn:
+            self.withdrawn = '{}'.format(self.withdrawn)
         return {'name': self.name,
                 'pk': self.pk,
-                'issuer': "{}".format(self.issuer),
-                'offered': '{}'.format(self.offered),
-                'withdrawn': '{}'.format(self.withdrawn),
-                'plan_type': self.plan_type}
+                'slug': self.slug,
+                'plan_type': self.plan_type,
+                'issuer': self.issuer.name,
+                'offered': self.offered.strftime("%m/%d/%Y"),
+                'withdrawn': self.withdrawn,
+                'agreements': [
+                    {'posted': "{}".format(a.posted),
+                     'id': a.pk,
+                     'size': format_file_size(a.size),
+                     'effective_string': a.effective_string,
+                     'withdrawn': "{}".format(a.withdrawn),
+                     'uri': a.uri} for a
+                    in self.prepayagreement_set.all()]}
 
 
 class AgreementBase(models.Model):
@@ -83,15 +112,25 @@ class AgreementBase(models.Model):
         ordering = ['-posted']
 
     @property
+    def effective_string(self):
+        if not self.withdrawn:
+            return "Effective {}".format(self.posted.strftime("%m/%d/%Y"))
+        else:
+            return "Effective {}-{}".format(
+                self.posted.strftime("%m/%d/%Y"),
+                self.withdrawn.strftime("%m/%d/%Y"))
+
+    @property
     def payload(self):
         return {'issuer': self.issuer.name,
                 'issuer_slug': self.issuer.slug,
                 'issuer_pk': self.issuer.pk,
                 'name': self.file_name,
-                'size': self.size,
+                'size': format_file_size(self.size),
                 'uri': self.uri,
                 'offered': '{}'.format(self.offered),
                 'withdrawn': '{}'.format(self.withdrawn),
+                'effective_string': self.effective_string,
                 'posted': '{}'.format(self.posted)}
 
 

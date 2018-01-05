@@ -1,9 +1,9 @@
 from __future__ import unicode_literals
+import json
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.http import Http404, JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
-from haystack.inputs import Clean
 from haystack.query import SearchQuerySet
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
@@ -11,15 +11,13 @@ from rest_framework.views import APIView
 
 from agreements import RESULTS_PER_PAGE
 from agreements.models import (
-    Agreement, CreditPlan, Issuer, PrepayAgreement, PrepayPlan
+    Agreement, CreditPlan, Issuer, PrepayPlan
 )
 
 MODEL_MAP = {
-    'credit-agreement': Agreement,
-    'prepay-agreement': PrepayAgreement,
     'issuer': Issuer,
-    'credit-plan': CreditPlan,
-    'prepay-plan': PrepayPlan
+    'credit': CreditPlan,
+    'prepay': PrepayPlan
 }
 
 
@@ -61,52 +59,59 @@ def legacy_issuer_search(request, issuer_slug):
     })
 
 
-def agreement_search(request, model):
-    """Search is implemented for issuers and agreements (not yet for plans)"""
+def clean_ids(id_string):
+    pks = []
+    if not id_string:
+        return pks
+    for bit in id_string.split(','):
+        try:
+            pk = int(bit)
+        except:
+            pass
+        else:
+            pks.append(pk)
+    return pks
+
+
+def plan_search(request, model):
+    """Search collects credit or prepay plans by id and/or issuer query)"""
     search_model = MODEL_MAP.get(model)
-    clean_query = Clean(request.GET.get('q', ''))
-    qstring = clean_query.query_string.strip()
-    if not qstring or not search_model:
-        raise Http404('Agreement not found')
-    sqs = SearchQuerySet().models(search_model).filter(content=clean_query)
-    if 'agreement' in model:
-        results = [{'name': result.autocomplete,
-                    'pk': int(result.pk),
-                    'issuer_name': result.issuer_name,
-                    'issuer_pk': result.issuer_pk,
-                    'issuer_slug': result.issuer_slug,
-                    'effective_date': result.effective,
-                    'uri': result.uri}
-                   for result in sqs[:20]]
-    else:
-        results = [{'name': result.autocomplete,
-                    'pk': int(result.pk),
-                    'slug': result.slug}
-                   for result in sqs[:20]]
+    if not search_model:
+        raise HttpResponseBadRequest("Invalid model")
+    issuer_query = (request.GET.get('q', '')).replace('>', '')[:50]
+    plan_id_string = (request.GET.get('plan_ids', ''))
+    plan_ids = clean_ids(plan_id_string)
+    # import pdb; pdb.set_trace()
+    if not plan_ids and not issuer_query:
+        return JsonResponse({})
+    if issuer_query:
+        for result in SearchQuerySet().models(Issuer).filter(
+                content=issuer_query):
+            plan_ids += json.loads(result.plan_ids)
+    plans = search_model.objects.filter(pk__in=plan_ids)
+    results = [plan.payload for plan in plans]
     return JsonResponse(results, safe=False)
 
 
-def agreement_autocomplete(request, model):
+def autocomplete(request, model):
+    """Return issuer or plan suggestions based on word fragments"""
     search_model = MODEL_MAP.get(model)
-    term = request.GET.get(
-        'term', '').strip().replace('<', '')
-    if not term or not search_model:
+    if not search_model:
+        raise HttpResponseBadRequest("Invalid model")
+    term = request.GET.get('term', '').strip().replace('>', '')[:50]
+    if not term:
         return JsonResponse([], safe=False)
-    sqs = SearchQuerySet().models(search_model).autocomplete(autocomplete=term)
-    if 'agreement' in model:
-        results = [{'name': result.autocomplete,
-                    'pk': int(result.pk),
-                    'issuer_name': result.issuer_name,
-                    'issuer_pk': result.issuer_pk,
-                    'issuer_slug': result.issuer_slug,
-                    'effective_date': result.effective,
-                    'uri': result.uri}
-                   for result in sqs[:20]]
+    sqs = SearchQuerySet().models(
+        search_model).autocomplete(autocomplete=term)
+    if model == 'issuer':
+        results = sorted([{'name': result.autocomplete,
+                           'pk': result.pk,
+                           'plan_ids': json.loads(result.plan_ids)}
+                         for result in sqs[:20]], key=lambda k: k['name'])
     else:
-        results = [{'name': result.autocomplete,
-                    'pk': int(result.pk),
-                    'slug': result.slug}
-                   for result in sqs[:20]]
+        results = sorted([{'name': result.autocomplete,
+                           'plan_id': result.pk}
+                          for result in sqs[:20]], key=lambda k: k['name'])
 
     return JsonResponse(results, safe=False)
 

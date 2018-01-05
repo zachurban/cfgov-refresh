@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name='CreditPlan',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.TextField(max_length=500)),
+                ('name', models.TextField(max_length=500, blank=True)),
                 ('slug', models.SlugField(max_length=100)),
                 ('offered', models.DateField(null=True, blank=True)),
                 ('withdrawn', models.DateField(null=True, blank=True)),
@@ -36,6 +36,7 @@ class Migration(migrations.Migration):
                 ('offered', models.DateField(null=True, blank=True)),
                 ('withdrawn', models.DateField(null=True, blank=True)),
                 ('posted', models.DateField(help_text='For legacy PDFs, this is the S3 posting date; for SalesForce PDFs, this is the uploaded date', null=True)),
+                ('name', models.CharField(max_length=500, blank=True)),
             ],
             options={
                 'ordering': ['-posted'],
@@ -46,7 +47,7 @@ class Migration(migrations.Migration):
             name='PrepayPlan',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.TextField(max_length=500)),
+                ('name', models.TextField(max_length=500, blank=True)),
                 ('slug', models.SlugField(max_length=100)),
                 ('offered', models.DateField(null=True, blank=True)),
                 ('withdrawn', models.DateField(null=True, blank=True)),
@@ -104,6 +105,11 @@ class Migration(migrations.Migration):
             model_name='agreement',
             name='issuer',
             field=models.ForeignKey(to='agreements.Issuer', null=True),
+        ),
+        migrations.AlterField(
+            model_name='issuer',
+            name='name',
+            field=models.TextField(max_length=500, blank=True),
         ),
         migrations.AlterField(
             model_name='issuer',
