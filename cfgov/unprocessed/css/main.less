@@ -29,6 +29,37 @@
 // Whether or not to override the local path and retrieve fonts from fonts.net.
 @use-font-cdn: false;
 
+.u-webfont-regular() {
+   font-family: 'Avenir Next', Arial, sans-serif;
+   font-style: normal;
+   font-weight: normal;
+}
+
+.u-webfont-italic() {
+   font-style: italic;
+   font-weight: normal;
+}
+
+.u-webfont-medium() {
+   font-style: normal;
+   font-weight: 500;
+}
+
+.u-webfont-demi() {
+   font-style: normal;
+   font-weight: 600;
+}
+
+body {
+   font-family: 'Avenir Next', Arial, sans-serif;
+}
+
+// // Font variables
+@webfont-regular: 'Avenir Next';
+@webfont-italic: 'Avenir Next';
+@webfont-medium: 'Avenir Next';
+@webfont-demi: 'Avenir Next';
+
 // Enhancements that are on a migration path to being added to CF.
 // CF Core
 @import (less) "enhancements/vars.less";
