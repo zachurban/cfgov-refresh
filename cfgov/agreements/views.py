@@ -59,13 +59,14 @@ def legacy_issuer_search(request, issuer_slug):
     })
 
 
-def clean_ids(id_string):
+def clean_ids(id_strings):
+    """Convert a list of id strings to ints"""
     pks = []
-    if not id_string:
+    if not id_strings:
         return pks
-    for bit in id_string.split(','):
+    for id_string in id_strings:
         try:
-            pk = int(bit)
+            pk = int(id_string)
         except:
             pass
         else:
@@ -73,21 +74,34 @@ def clean_ids(id_string):
     return pks
 
 
+def clean_queries(query_strings):
+    """Disable brackets and disallow excessively long queries in list"""
+    q_strings = []
+    if not query_strings:
+        return q_strings
+    for q_string in query_strings:
+        q_strings.append(q_string.replace('>', '')[:50])
+    return q_strings
+
+
 def plan_search(request, model):
     """Search collects credit or prepay plans by id and/or issuer query)"""
     search_model = MODEL_MAP.get(model)
     if not search_model:
         raise HttpResponseBadRequest("Invalid model")
-    issuer_query = (request.GET.get('q', '')).replace('>', '')[:50]
-    plan_id_string = (request.GET.get('plan_ids', ''))
-    plan_ids = clean_ids(plan_id_string)
-    if not plan_ids and not issuer_query:
+    issuer_query_strings = (request.GET.getlist('q', ''))
+    issuer_queries = clean_queries(issuer_query_strings)
+    plan_id_strings = (request.GET.getlist('plan_id', ''))
+    plan_ids = clean_ids(plan_id_strings)
+    if not plan_ids and not issuer_queries:
         return JsonResponse({})
-    if issuer_query:
-        for result in SearchQuerySet().models(Issuer).filter(
-                content=issuer_query):
-            plan_ids += json.loads(result.plan_ids)
-    plans = search_model.objects.filter(pk__in=plan_ids)
+    if issuer_queries:
+        for query in issuer_queries:
+            for result in SearchQuerySet().models(Issuer).filter(
+                    content=query):
+                plan_ids += json.loads(result.plan_ids)
+
+    plans = search_model.objects.filter(pk__in=set(plan_ids))
     results = [plan.payload for plan in plans]
     return JsonResponse({'data': results})
 
