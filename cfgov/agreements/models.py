@@ -72,7 +72,7 @@ class CreditPlan(CreditBase):
                 'offered': ap_date(self.offered),
                 'withdrawn': ap_date(self.withdrawn),
                 'agreements': [
-                    {'posted': "{}".format(a.posted),
+                    {'posted': ap_date(a.posted),
                      'id': a.pk,
                      'size': format_file_size(a.size),
                      'effective_string': a.effective_string,
