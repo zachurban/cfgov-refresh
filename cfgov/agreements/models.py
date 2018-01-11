@@ -1,7 +1,25 @@
 from __future__ import unicode_literals
+import datetime
+from dateutil import parser
 
 from core.utils import format_file_size
 from django.db import models
+
+
+def ap_date(date):
+    """Convert a date object or date string into an AP-styled date string."""
+    if date is None:
+        return None
+    if type(date) != datetime.date:
+        try:
+            date = parser.parse(date).date()
+        except ValueError:
+            print("Must provide a datetime object or a valid date string")
+            return
+    if date.month in [3, 4, 5, 6, 7]:
+        return date.strftime("%B {}, %Y").format(date.day)
+    else:
+        return date.strftime("%b. {}, %Y").format(date.day)
 
 
 class CreditBase(models.Model):
@@ -51,8 +69,8 @@ class CreditPlan(CreditBase):
                 'pk': self.pk,
                 'slug': self.slug,
                 'issuer': self.issuer.name,
-                'offered': self.offered.strftime("%m/%d/%Y"),
-                'withdrawn': self.withdrawn,
+                'offered': ap_date(self.offered),
+                'withdrawn': ap_date(self.withdrawn),
                 'agreements': [
                     {'posted': "{}".format(a.posted),
                      'id': a.pk,
@@ -114,11 +132,12 @@ class AgreementBase(models.Model):
     @property
     def effective_string(self):
         if not self.withdrawn:
-            return "Effective {}".format(self.posted.strftime("%m/%d/%Y"))
+            return "Effective {}".format(
+                ap_date(self.posted))
         else:
             return "Effective {}-{}".format(
-                self.posted.strftime("%m/%d/%Y"),
-                self.withdrawn.strftime("%m/%d/%Y"))
+                ap_date(self.posted),
+                ap_date(self.withdrawn))
 
     @property
     def payload(self):
@@ -128,10 +147,11 @@ class AgreementBase(models.Model):
                 'name': self.file_name,
                 'size': format_file_size(self.size),
                 'uri': self.uri,
-                'offered': '{}'.format(self.offered),
-                'withdrawn': '{}'.format(self.withdrawn),
+                'offered': '{}'.format(ap_date(self.offered)),
+                'withdrawn': '{}'.format(ap_date(self.withdrawn)),
                 'effective_string': self.effective_string,
-                'posted': '{}'.format(self.posted)}
+                'posted': '{}'.format(ap_date(self.posted)),
+                }
 
 
 class Agreement(AgreementBase):
