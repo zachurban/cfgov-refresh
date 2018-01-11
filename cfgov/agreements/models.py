@@ -18,6 +18,8 @@ def ap_date(date):
             return
     if date.month in [3, 4, 5, 6, 7]:
         return date.strftime("%B {}, %Y").format(date.day)
+    elif date.month == 9:
+        return date.strftime("Sept. {}, %Y").format(date.day)
     else:
         return date.strftime("%b. {}, %Y").format(date.day)
 
