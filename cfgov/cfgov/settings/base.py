@@ -99,6 +99,7 @@ OPTIONAL_APPS = [
     {'import': 'regulations', 'apps': ('regulations',)},
     {'import': 'complaint_search', 'apps': ('complaint_search', 'rest_framework')},
     {'import': 'ccdb5_ui', 'apps': ('ccdb5_ui', )},
+    {'import': 'ccadb2_ui', 'apps': ('ccadb2_ui', )},
     {'import': 'teachers_digital_platform', 'apps': ('teachers_digital_platform', )},
 ]
 
