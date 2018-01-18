@@ -1,7 +1,6 @@
 from django.conf.urls import url
 
 from agreements.views import (
-    api_root,
     autocomplete,
     CreditDataView,
     index,
@@ -14,9 +13,6 @@ urlpatterns = [
     url(r'^issuer/(?P<issuer_slug>.*)/$',
         legacy_issuer_search,
         name='legacy_issuer_search'),
-    url(r'^api/?$',
-        api_root,
-        name='api-root'),
     url(r'^api/(?P<model>credit)/search/?$',
         plan_search,
         name='credit-search'),
