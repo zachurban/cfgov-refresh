@@ -84,6 +84,12 @@ def clean_queries(query_strings):
     return q_strings
 
 
+def api_root(request):
+    qset = CreditPlan.objects.order_by('name')[:20]
+    results = [plan.payload for plan in qset]
+    return JsonResponse({'data': results})
+
+
 def plan_search(request, model):
     """Search collects credit or prepay plans by id and/or issuer query)"""
     search_model = MODEL_MAP.get(model)
