@@ -62,6 +62,7 @@ INSTALLED_APPS = (
     'haystack',
     'ask_cfpb',
     'agreements',
+    'ccadb2_ui',
     'overextends',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -99,7 +100,6 @@ OPTIONAL_APPS = [
     {'import': 'regulations', 'apps': ('regulations',)},
     {'import': 'complaint_search', 'apps': ('complaint_search', 'rest_framework')},
     {'import': 'ccdb5_ui', 'apps': ('ccdb5_ui', )},
-    {'import': 'ccadb2_ui', 'apps': ('ccadb2_ui', )},
     {'import': 'teachers_digital_platform', 'apps': ('teachers_digital_platform', )},
 ]
 
@@ -580,7 +580,7 @@ FLAGS = {
     # Ask CFPB search spelling correction support
     # When enabled, spelling suggestions will appear in Ask CFPB search and
     # will be used when the given search term provides no results.
-	'ASK_SEARCH_TYPOS': {},
+    'ASK_SEARCH_TYPOS': {},
 
     # Beta banner, seen on beta.consumerfinance.gov
     # When enabled, a banner appears across the top of the site proclaiming
