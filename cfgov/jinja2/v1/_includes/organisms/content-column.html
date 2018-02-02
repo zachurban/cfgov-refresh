@@ -1,0 +1,33 @@
+{# ==========================================================================
+
+   column.render()
+
+   ==========================================================================
+
+   Description:
+
+   Create a Column organism that contains content blocks.
+
+   value:                    An object with column details.
+
+   value.column_width:       Width of column.
+
+   value.column_content:     Content blocks
+
+   ========================================================================== #}
+
+
+{% macro render( value ) %}
+    <div class="content-l_col 
+                content-l_col-{{ value.column_width if value.column_width else 1 }}
+                {% if value.border_before %}
+                content-l_col__before-divider
+                {% endif %}">
+
+      {% for block in value.column_content %}
+          {{block.block_type}}
+          {{ render_stream_child(block) | safe }}
+      {% endfor %}
+      
+    </div>
+{% endmacro %}

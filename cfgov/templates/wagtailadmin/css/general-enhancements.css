@@ -78,3 +78,52 @@ li.sequence-member .sequence-member-inner .sequence-type-list .sequence-member-i
 .sequence-member:first-child > .sequence-member-inner > .field > .field-content {
     padding-top: 1em;
 }
+
+
+.content-block .sequence-member {
+        margin-left: 100px;
+        border-top: 0px solid black;
+    }
+
+    .content-layout .sequence-member {
+        margin-bottom: 20px;
+        margin-left: 100px;
+    }
+
+    .content-layout .sequence-member-inner {
+        border: 1px solid #C1EEEE !important;
+        border-radius: 4px;
+        padding: 20px !important;
+    }
+
+    .content-layout .struct-block .fields {
+        width: 100%;
+    }
+        
+        .content-layout .struct-block .fields .sequence-container {
+            width: 83.3333333%;
+        }
+
+
+.content-column  .sequence-member {
+        margin: 45px 0;
+    }
+
+    .content-column  .sequence-controls {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+.banner {
+    .content-layout li:first-child {
+        label {
+            display: none;
+        }
+
+        .sequence-container label {
+            display: block;
+        }
+    }
+}
+
+

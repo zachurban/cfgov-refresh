@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% import 'form_block.html' as form_block with context %}
+{% import 'templates/render_block.html' as render_block with context %}
+
+{% import 'templates/streamfield-sidefoot.html' as streamfield_sidefoot with context %}
+
+{% block content_modifiers -%}
+    {{ super() }} content__flush-bottom
+{%- endblock %}
+
+{% block content %}
+
+    {% for block in page.header -%}
+        {% if 'hero' in block.block_type %}
+            {{ render_stream_child(block) }}
+        {% endif %}
+    {%- endfor %}
+
+    
+
+    <main class="content_main page__full-width" id="main" role="main">
+        <div class="wrapper content_wrapper">
+        {% for block in page.header -%}
+        {% if block.block_type != 'hero' %}
+            {{ render_block.render(block, loop.index) }}
+        {% endif %}
+    {%- endfor %}
+            {% for block in page.content -%}
+
+                {% if block.block_type == 'feedback' %}
+                    {{- form_block.render(block, 'content', loop.index0) -}}
+                {% elif block.block_type == 'content_block' %}
+                    {{ render_stream_child(block) | safe }}
+
+                {% else %}
+                    {{ render_block.render(block, loop.index) }}
+                {% endif %}
+            {%- endfor %}
+        </div>
+
+
+       
+    </main>
+     {% if page.sidefoot %}
+        <div class="block block__bg block__flush-top block__flush-bottom" style="background-color: #f7f8f9">
+        <div class="wrapper content_wrapper content_footer">
+            <div class="content-l">
+            {% for block in page.sidefoot recursive %}
+        
+            {% import 'templates/render_block.html' as render_block with context %}
+            <div class="content-l_col content-l_col-1-2 {{ '' if loop.last else ' u-mb45'}}">
+            {{ render_stream_child(block) | safe }}
+            </div>
+            {% endfor %}
+            </div>
+        </div>
+        </div>
+
+        {% endif %}
+
+{% endblock %}

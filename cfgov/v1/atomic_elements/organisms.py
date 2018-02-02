@@ -1069,3 +1069,57 @@ class DataSnapshot(blocks.StructBlock):
         icon = 'image'
         label = 'CCT Data Snapshot'
         template = '_includes/organisms/data_snapshot.html'
+
+class ContentColumn(blocks.StructBlock):
+    column_width = blocks.ChoiceBlock(choices=[
+            ('1-4', '1/4'),
+            ('1-3', '1/3'),
+            ('1-2', '1/2'),
+            ('2-3', '2/3'),
+            ('3-4', '3/4'),
+            ('1', '1'),
+        ], default="1", required=False, 
+           help_text='Width of column. Defaults to 1.')
+    column_content = blocks.StreamBlock([
+            ('text', blocks.RichTextBlock()),
+            ('snippet', v1_blocks.ReusableTextChooserBlock('v1.ReusableText')),
+            ('image', atoms.ImageBasic()),
+            ('heading', molecules.HeadingBlock())
+        ], icon='cogs')
+
+    class Meta:
+        icon = 'cogs'
+        form_classname = 'content-column'
+
+
+class ContentRow(blocks.StructBlock):
+    columns = blocks.ListBlock(ContentColumn())
+
+    class Meta:
+        icon = 'cogs'
+        form_classname = 'content-layout'
+        template = '_includes/organisms/content-row.html'
+
+
+class ContentBlock(blocks.StructBlock):
+    has_background = blocks.BooleanBlock(required=False, 
+        default=False, help_text='Add gray background to block.', classname="background-input")
+    has_border_top = blocks.BooleanBlock(required=False, 
+        default=False, label="Top border")
+    has_border_bottom = blocks.BooleanBlock(required=False, 
+        default=False, label="Bottom border")
+
+    has_border_left = blocks.BooleanBlock(required=False, 
+        default=False, label="Left border")
+    has_border_right = blocks.BooleanBlock(required=False, 
+        default=False, label="Right border")
+    rows = blocks.ListBlock(ContentRow())
+
+    #block_content = blocks.StreamBlock([
+    #    ('row', ContentRow()),
+    #], icon='cogs')
+
+    class Meta:
+        icon = 'cogs'
+        form_classname = 'content-block'
+        template = '_includes/organisms/content-block.html'

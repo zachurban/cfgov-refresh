@@ -1,0 +1,27 @@
+{# ==========================================================================
+
+
+   content_block
+   ==========================================================================
+
+   Description:
+
+
+   Create a layout block organism that contains content.
+
+   value:        An object with column details.
+
+   ========================================================================== #}
+
+    <div class="block
+                {{ ' block__border' if value.has_border else ''}}
+                {{ ' block__border-top' if value.has_top_border else ''}}
+                {{ ' block__border-bottom' if value.has_bottom_border else ''}}
+                {{ ' block__padded-top' if value.has_padded_top else ''}}
+                {{ ' block__padded-bottom' if value.has_padded_bottom else ''}}
+
+                {{ ' block__bg' if value.has_background else ''}}">
+      {% for block in value.rows %}
+          {{ render_stream_child(block) | safe }}
+      {% endfor %}
+    </div>

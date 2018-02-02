@@ -1,0 +1,22 @@
+{# ==========================================================================
+
+   Content row organism
+
+   ==========================================================================
+
+   Description:
+
+   Create a Content layout organism that contains columns.
+
+   value:                    An object with content layout details.
+
+   value.columns:            columns
+
+   ========================================================================== #}
+    
+{% import 'organisms/content-column.html' as column_template %}
+<div class="content-l">
+  {% for column in value.columns %}
+      {{ column_template.render( column ) }}
+  {% endfor %}
+</div>
