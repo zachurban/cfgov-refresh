@@ -25,7 +25,6 @@
                 {% endif %}">
 
       {% for block in value.column_content %}
-          {{block.block_type}}
           {{ render_stream_child(block) | safe }}
       {% endfor %}
       

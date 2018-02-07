@@ -9,19 +9,23 @@
 
    Create a layout block organism that contains content.
 
-   value:        An object with column details.
+   value:        A container object.
 
    ========================================================================== #}
 
     <div class="block
                 {{ ' block__border' if value.has_border else ''}}
-                {{ ' block__border-top' if value.has_top_border else ''}}
-                {{ ' block__border-bottom' if value.has_bottom_border else ''}}
+                {{ ' block__border-top' if value.has_border_top else ''}}
+                {{ ' block__border-bottom' if value.has_border_bottom else ''}}
+                {{ ' block__border-left' if value.has_border_left else ''}}
+                {{ ' block__border-right' if value.has_border_right else ''}}
+
                 {{ ' block__padded-top' if value.has_padded_top else ''}}
                 {{ ' block__padded-bottom' if value.has_padded_bottom else ''}}
-
+                {{ value.margin_top if value.margin_top != 'default' else '' }}
+                {{ value.margin_bottom if value.margin_bottom != 'default' else '' }}
                 {{ ' block__bg' if value.has_background else ''}}">
-      {% for block in value.rows %}
+      {% for block in value.block_content %}
           {{ render_stream_child(block) | safe }}
       {% endfor %}
     </div>
