@@ -38,7 +38,7 @@ class CreditBase(models.Model):
 
 
 class Issuer(CreditBase):
-    med_id = models.IntegerField(blank=True, null=True)
+    med_id = models.BigIntegerField(blank=True, null=True)
 
     @property
     def plan_ids(self):
@@ -50,63 +50,62 @@ class Issuer(CreditBase):
             'name': self.name,
             'slug': self.slug,
             'pk': self.pk,
-            'plan_ids': self.plan_ids,
-            'credit_agreements': [a.uri for a
-                                  in self.agreement_set.all()],
-            'prepay_agreements': [a.uri for a
-                                  in self.prepayagreement_set.all()]}
+            'plan_ids': self.plan_ids}
 
 
-class CreditPlan(CreditBase):
+class PlanBase(CreditBase):
     issuer = models.ForeignKey(Issuer)
     offered = models.DateField(blank=True, null=True)
     withdrawn = models.DateField(blank=True, null=True)
 
     @property
-    def payload(self):
-        if self.withdrawn:
-            self.withdrawn = self.withdrawn.strftime("%m/%d/%Y")
+    def active_intake_date(self):
+        if not self.agreement_set.all():
+            return None
+        intake_dates = sorted(
+            set([a.offered for a in self.agreement_set.all()]), reverse=True)
+        return intake_dates[0]
 
+    @property
+    def payload(self):
+        active_date = self.active_intake_date
         return {'name': self.name,
                 'pk': self.pk,
                 'slug': self.slug,
                 'issuer': self.issuer.name,
                 'offered': ap_date(self.offered),
                 'withdrawn': ap_date(self.withdrawn),
-                'agreements': [
+                'active_agreement_date': ap_date(active_date),
+                'active_agreements': [
                     {'posted': ap_date(a.posted),
                      'id': a.pk,
                      'size': format_file_size(a.size),
                      'effective_string': a.effective_string,
                      'uri': a.uri} for a
-                    in self.agreement_set.all()]}
-
-
-class PrepayPlan(CreditBase):
-    issuer = models.ForeignKey(Issuer)
-    offered = models.DateField(blank=True, null=True)
-    withdrawn = models.DateField(blank=True, null=True)
-    plan_type = models.CharField(max_length=255, blank=True)
-
-    @property
-    def payload(self):
-        if self.withdrawn:
-            self.withdrawn = '{}'.format(self.withdrawn)
-        return {'name': self.name,
-                'pk': self.pk,
-                'slug': self.slug,
-                'plan_type': self.plan_type,
-                'issuer': self.issuer.name,
-                'offered': self.offered.strftime("%m/%d/%Y"),
-                'withdrawn': self.withdrawn,
-                'agreements': [
-                    {'posted': "{}".format(a.posted),
+                    in self.agreement_set.filter(posted=active_date)],
+                'inactive_agreements': [
+                    {'posted': ap_date(a.posted),
                      'id': a.pk,
                      'size': format_file_size(a.size),
                      'effective_string': a.effective_string,
-                     'withdrawn': "{}".format(a.withdrawn),
                      'uri': a.uri} for a
-                    in self.prepayagreement_set.all()]}
+                    in self.agreement_set.exclude(posted=active_date)]}
+
+    class Meta:
+        abstract = True
+
+
+class CreditPlan(PlanBase):
+
+    class Meta:
+        ordering = ['offered', 'name']
+
+
+class PrepayPlan(PlanBase):
+    plan_type = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ['offered', 'name']
 
 
 class AgreementBase(models.Model):

@@ -21,8 +21,7 @@ class Migration(migrations.Migration):
                 ('withdrawn', models.DateField(null=True, blank=True)),
             ],
             options={
-                'ordering': ['name'],
-                'abstract': False,
+                'ordering': ['offered', 'name'],
             },
         ),
         migrations.CreateModel(
@@ -54,8 +53,7 @@ class Migration(migrations.Migration):
                 ('plan_type', models.CharField(max_length=255, blank=True)),
             ],
             options={
-                'ordering': ['name'],
-                'abstract': False,
+                'ordering': ['offered', 'name'],
             },
         ),
         migrations.AlterModelOptions(
@@ -89,7 +87,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='issuer',
             name='med_id',
-            field=models.IntegerField(null=True, blank=True),
+            field=models.BigIntegerField(null=True, blank=True),
         ),
         migrations.AlterField(
             model_name='agreement',

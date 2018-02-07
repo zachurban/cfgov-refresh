@@ -18,7 +18,7 @@ class IssuerIndex(indexes.SearchIndex, indexes.Indexable):
         return Issuer
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.exclude(agreement=None)
+        return self.get_model().objects.exclude(creditplan=None)
 
     def prepare_plan_ids(self, obj):
         return json.dumps(obj.plan_ids)
@@ -51,7 +51,7 @@ class CreditPlanIndex(indexes.SearchIndex, indexes.Indexable):
         return CreditPlan
 
     def index_queryset(self, using=None):
-        return self.get_model().objects.all()
+        return self.get_model().objects.exclude(agreement=None)
 
 
 class PrepayPlanIndex(indexes.SearchIndex, indexes.Indexable):
