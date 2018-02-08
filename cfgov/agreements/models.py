@@ -50,6 +50,8 @@ class Issuer(CreditBase):
             'name': self.name,
             'slug': self.slug,
             'pk': self.pk,
+            'credit_agreements': [a.uri for a
+                                  in self.agreement_set.all()],
             'plan_ids': self.plan_ids}
 
 
@@ -76,20 +78,30 @@ class PlanBase(CreditBase):
                 'offered': ap_date(self.offered),
                 'withdrawn': ap_date(self.withdrawn),
                 'active_agreement_date': ap_date(active_date),
+                'agreements': [
+                    {'posted': ap_date(a.posted),
+                     'id': a.pk,
+                     'size': format_file_size(a.size),
+                     'effective_string': a.effective_string,
+                     'uri': a.uri} for a
+                    in self.agreement_set.all()
+                ],
                 'active_agreements': [
                     {'posted': ap_date(a.posted),
                      'id': a.pk,
                      'size': format_file_size(a.size),
                      'effective_string': a.effective_string,
                      'uri': a.uri} for a
-                    in self.agreement_set.filter(posted=active_date)],
+                    in self.agreement_set.filter(posted=active_date)
+                ],
                 'inactive_agreements': [
                     {'posted': ap_date(a.posted),
                      'id': a.pk,
                      'size': format_file_size(a.size),
                      'effective_string': a.effective_string,
                      'uri': a.uri} for a
-                    in self.agreement_set.exclude(posted=active_date)]}
+                    in self.agreement_set.exclude(posted=active_date)
+                ]}
 
     class Meta:
         abstract = True
