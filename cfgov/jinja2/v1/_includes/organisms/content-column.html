@@ -17,16 +17,22 @@
    ========================================================================== #}
 
 
-{% macro render( value ) %}
+{% macro render( value, equal_height=False ) %}
     <div class="content-l_col 
                 content-l_col-{{ value.column_width if value.column_width else 1 }}
                 {% if value.border_before %}
                 content-l_col__before-divider
-                {% endif %}">
-
+                {% endif %}
+                {{ ' content-l_col__equal-height' if equal_height else '' }}">
+      {% if value.has_border or value.has_background %}
+      <div class="block sub_block u-mt0 u-mb0 {{' block__bg' if value.has_background else ''}} {{' block__border-top block__border-bottom block__border-left block__border-right' if value.has_background else ''}}">
+        {% endif %}
       {% for block in value.column_content %}
           {{ render_stream_child(block) | safe }}
       {% endfor %}
-      
+      {% if value.has_border or value.has_background %}
+
+      </div>
+      {% endif %}
     </div>
 {% endmacro %}

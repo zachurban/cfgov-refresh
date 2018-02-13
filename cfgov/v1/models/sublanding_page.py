@@ -37,6 +37,8 @@ class SublandingPage(CFGOVPage):
         ('reg_comment', organisms.RegComment()),
         ('feedback', v1_blocks.Feedback()),
         ('snippet_list', organisms.SnippetList()),
+        ('content_block', organisms.ContentBlock()),
+
     ], blank=True)
     sidebar_breakout = StreamField([
         ('slug', blocks.CharBlock(icon='title')),

@@ -1070,78 +1070,13 @@ class DataSnapshot(blocks.StructBlock):
         label = 'CCT Data Snapshot'
         template = '_includes/organisms/data_snapshot.html'
 
-class ContentColumn2(blocks.StructBlock):
-    column_width = blocks.ChoiceBlock(choices=[
-            ('1-4', '1/4'),
-            ('1-3', '1/3'),
-            ('1-2', '1/2'),
-            ('2-3', '2/3'),
-            ('3-4', '3/4'),
-            ('1', '1'),
-        ], default="1", required=False, 
-           help_text='Width of column. Defaults to 1.')
-    column_content = blocks.StreamBlock([
-            ('text', blocks.RichTextBlock()),
-            ('snippet', v1_blocks.ReusableTextChooserBlock('v1.ReusableText')),
-            ('image', atoms.ImageBasic()),
-            ('heading', molecules.HeadingBlock())
-        ], icon='cogs')
 
+class Card(blocks.StructBlock):
+    heading = blocks.CharBlock(required=True)
+    body = blocks.CharBlock(required=True)
     class Meta:
-        icon = 'cogs'
-        form_classname = 'content-column'
-
-
-class ContentRow2(blocks.StructBlock):
-    columns = blocks.ListBlock(ContentColumn2())
-
-    class Meta:
-        icon = 'cogs'
-        form_classname = 'content-layout'
-        template = '_includes/organisms/content-row.html'
-
-
-class ContentBlock2(blocks.StructBlock):
-    margin_top = blocks.ChoiceBlock(choices=[
-        ('default', 'Default'),
-        ('u-mt45', '45px'),
-        ('u-mt30', '30px'),
-        ('u-mt15', '15px'),
-        ('u-mt15', '15px'),
-        ('u-mt0', '0px'),
-
-    ], default="default", required=True, 
-       help_text='Margin top. Defaults to 60px.')
-    margin_bottom = blocks.ChoiceBlock(choices=[
-            ('default', 'Default'),
-            ('u-mb45', '45px'),
-            ('u-mb30', '30px'),
-            ('u-mb15', '15px'),
-            ('u-mb0', '0px'),
-        ], default="default", required=True, 
-           help_text='Margin bottom. Defaults to 60px.')
-    has_background = blocks.BooleanBlock(required=False, 
-        default=False, help_text='Add gray background to block.', classname="background-input")
-    has_border_top = blocks.BooleanBlock(required=False, 
-        default=False, label="Top border")
-    has_border_bottom = blocks.BooleanBlock(required=False, 
-        default=False, label="Bottom border")
-
-    has_border_left = blocks.BooleanBlock(required=False, 
-        default=False, label="Left border")
-    has_border_right = blocks.BooleanBlock(required=False, 
-        default=False, label="Right border")
-
-    block_content = blocks.StreamBlock([
-        ('row', ContentRow2()),
-    ], icon='cogs')
-
-    class Meta:
-        icon = 'cogs'
-        form_classname = 'content-block'
-        template = '_includes/organisms/content-block.html'
-
-
+        icon = 'image'
+        template = '_includes/organisms/card.html'
 
 class ContentColumn(blocks.StructBlock):
     column_width = blocks.ChoiceBlock(choices=[
@@ -1153,15 +1088,16 @@ class ContentColumn(blocks.StructBlock):
             ('1', '1'),
         ], default="1", required=False, 
            help_text='Width of column. Defaults to 1.')
+    has_background = blocks.BooleanBlock(required=False, 
+        default=False, help_text='Add gray background to block.', classname="background-input")
+    has_border = blocks.BooleanBlock(required=False, 
+        default=False, label="Border")
     column_content = blocks.StreamBlock([
             ('text', blocks.RichTextBlock()),
             ('snippet', v1_blocks.ReusableTextChooserBlock('v1.ReusableText')),
             ('image', atoms.ImageBasic()),
-            ('heading', molecules.HeadingBlock()),
-            ('content_block', ContentBlock2()),
-            ('content_row', ContentRow2()),
-
-
+            ('card', Card()),
+            ('email_signup', EmailSignUp())
         ], icon='cogs')
 
     class Meta:
@@ -1170,6 +1106,7 @@ class ContentColumn(blocks.StructBlock):
 
 
 class ContentRow(blocks.StructBlock):
+    equal_height_columns = blocks.BooleanBlock(required=False, default=False)
     columns = blocks.ListBlock(ContentColumn())
 
     class Meta:

@@ -49,6 +49,8 @@ class BrowsePage(CFGOVPage):
         ('mortgage_downloads_block', MortgageDataDownloads()),
         ('snippet_list', organisms.SnippetList()),
         ('data_snapshot', organisms.DataSnapshot()),
+        ('content_block', organisms.ContentBlock()),
+
     ], blank=True)
 
     secondary_nav_exclude_sibling_pages = models.BooleanField(default=False)
