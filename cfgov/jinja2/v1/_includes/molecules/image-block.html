@@ -1,0 +1,22 @@
+HELLO
+{% set image_url = image(value.image.upload, 'original') %}
+	{% if value.link_image %}
+        <a href="{{ value.url }}">
+    {% endif %}
+    {% if value.image.alt %}
+    
+    <img src="{{ image_url }}"
+         alt="{{ value.image.alt if value.image.alt else '' }}"
+         class="m-info-unit_image
+                {{ 'm-info-unit_image__square' if value.is_square else '' }}">
+
+    {% else %}
+
+    <div class="m-info-unit_image
+                {{ 'm-info-unit_image__square' if value.is_square else '' }}"
+         style="background-image: url( {{ image_url.url }} );">
+    </div>
+    {% endif %}
+    {% if value.link_image %}
+        </a>
+    {% endif %}

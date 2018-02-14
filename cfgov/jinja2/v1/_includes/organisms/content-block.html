@@ -12,20 +12,27 @@
    value:        A container object.
 
    ========================================================================== #}
-
+{% import 'organisms/content-row.html' as row %}
     <div class="block
-                {{ ' block__border' if value.has_border else ''}}
-                {{ ' block__border-top' if value.has_border_top else ''}}
-                {{ ' block__border-bottom' if value.has_border_bottom else ''}}
-                {{ ' block__border-left' if value.has_border_left else ''}}
-                {{ ' block__border-right' if value.has_border_right else ''}}
-
+                o-info-unit-group
+                {{ ' block__border-top' if value.borders.top else ''}}
+                {{ ' block__border-bottom' if value.borders.bottom else ''}}
+                {{ ' block__border-left' if value.borders.left else ''}}
+                {{ ' block__border-right' if value.borders.right else ''}}
+                {{ ' block__padded-top' if value.borders.top else ''}}
+                {{ ' block__padded-bottom' if value.borders.bottom else ''}}
                 {{ ' block__padded-top' if value.has_padded_top else ''}}
                 {{ ' block__padded-bottom' if value.has_padded_bottom else ''}}
-                {{ value.margin_top if value.margin_top != 'default' else '' }}
-                {{ value.margin_bottom if value.margin_bottom != 'default' else '' }}
+                {{ value.margins.top if value.margins.top != 'default' else '' }}
+                {{ value.margins.bottom if value.margins.bottom != 'default' else '' }}
                 {{ ' block__bg' if value.has_background else ''}}">
       {% for block in value.block_content %}
+          {% if block.block_type == 'row' %}
+            {{row.render(block.value, row_borders=value.lines_between_rows)}}
+            
+          {% else %}
           {{ render_stream_child(block) | safe }}
+          {% endif %}
       {% endfor %}
     </div>
+

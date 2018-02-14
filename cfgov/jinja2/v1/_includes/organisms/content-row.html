@@ -13,10 +13,13 @@
    value.columns:            columns
 
    ========================================================================== #}
-    
+{% macro render( value, row_borders=False ) %}
 {% import 'organisms/content-column.html' as column_template %}
-<div class="content-l {{ 'content-l__equal-height' if value.equal_height_columns else ''}}">
+<div class="content-l
+            {{ 'content-l__top-divider' if row_borders else ''}}
+            {{ 'content-l__equal-height' if value.equal_height_columns else ''}}">
   {% for column in value.columns %}
       {{ column_template.render( column, equal_height=value.equal_height_columns) }}
   {% endfor %}
 </div>
+{% endmacro %}

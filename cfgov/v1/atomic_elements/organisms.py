@@ -217,7 +217,6 @@ class EmailSignUp(blocks.StructBlock):
     heading = blocks.CharBlock(required=False)
     text = blocks.CharBlock(required=False)
     gd_code = blocks.CharBlock(required=False)
-
     form_field = blocks.ListBlock(molecules.FormFieldWithButton(),
                                   icon='mail',
                                   required=False)
@@ -228,6 +227,13 @@ class EmailSignUp(blocks.StructBlock):
 
     class Media:
         js = ['email-signup.js']
+
+
+class BodyEmailSignUp(EmailSignUp):
+    h3_heading = blocks.BooleanBlock(
+        required=True,
+        default=True,
+    )
 
 
 class RegComment(blocks.StructBlock):
@@ -1078,6 +1084,28 @@ class Card(blocks.StructBlock):
         icon = 'image'
         template = '_includes/organisms/card.html'
 
+
+class ImageBlock(blocks.StructBlock):
+
+    link_image = blocks.BooleanBlock(
+        default=True,
+        required=False,
+    )
+
+    url =  blocks.CharBlock(required=True)
+
+
+    image = atoms.ImageBasic(
+        required=False,
+    )
+
+    class Meta:
+        icon = 'cogs'
+        template = '_includes/molecules/image-block.html'
+
+
+    
+
 class ContentColumn(blocks.StructBlock):
     column_width = blocks.ChoiceBlock(choices=[
             ('1-4', '1/4'),
@@ -1095,9 +1123,9 @@ class ContentColumn(blocks.StructBlock):
     column_content = blocks.StreamBlock([
             ('text', blocks.RichTextBlock()),
             ('snippet', v1_blocks.ReusableTextChooserBlock('v1.ReusableText')),
-            ('image', atoms.ImageBasic()),
             ('card', Card()),
-            ('email_signup', EmailSignUp())
+            ('email_signup', BodyEmailSignUp()),
+            ('link_blob', LinkBlobGroup())
         ], icon='cogs')
 
     class Meta:
@@ -1114,19 +1142,28 @@ class ContentRow(blocks.StructBlock):
         form_classname = 'content-layout'
         template = '_includes/organisms/content-row.html'
 
+class BorderBlock(blocks.StructBlock):
+    top = blocks.BooleanBlock(required=False, 
+        default=False)
+    bottom = blocks.BooleanBlock(required=False, 
+        default=False)
+    left = blocks.BooleanBlock(required=False, 
+        default=False)
+    right = blocks.BooleanBlock(required=False, 
+        default=False)
+    class Meta:
+        form_classname = 'border-input'
 
-class ContentBlock(blocks.StructBlock):
-    margin_top = blocks.ChoiceBlock(choices=[
+class MarginBlock(blocks.StructBlock):
+    top = blocks.ChoiceBlock(choices=[
             ('default', 'Default'),
             ('u-mt45', '45px'),
             ('u-mt30', '30px'),
             ('u-mt15', '15px'),
-            ('u-mt15', '15px'),
             ('u-mt0', '0px'),
-
         ], default="default", required=True, 
            help_text='Margin top. Defaults to 60px.')
-    margin_bottom = blocks.ChoiceBlock(choices=[
+    bottom = blocks.ChoiceBlock(choices=[
             ('default', 'Default'),
             ('u-mb45', '45px'),
             ('u-mb30', '30px'),
@@ -1134,16 +1171,20 @@ class ContentBlock(blocks.StructBlock):
             ('u-mb0', '0px'),
         ], default="default", required=True, 
            help_text='Margin bottom. Defaults to 60px.')
+    class Meta:
+        form_classname = 'margin-input'
+
+class ContentBlock(blocks.StructBlock):
     has_background = blocks.BooleanBlock(required=False, 
         default=False, help_text='Add gray background to block.', classname="background-input")
-    has_border_top = blocks.BooleanBlock(required=False, 
-        default=False, label="Top border")
-    has_border_bottom = blocks.BooleanBlock(required=False, 
-        default=False, label="Bottom border")
-    has_border_left = blocks.BooleanBlock(required=False, 
-        default=False, label="Left border")
-    has_border_right = blocks.BooleanBlock(required=False, 
-        default=False, label="Right border")
+    #lines_between_rows = blocks.BooleanBlock(
+    #    default=False,
+    #    required=False,
+    #    label='Show rule lines between rows',
+    #)
+    margins = MarginBlock()
+    borders = BorderBlock()
+
 
     block_content = blocks.StreamBlock([
         ('row', ContentRow()),

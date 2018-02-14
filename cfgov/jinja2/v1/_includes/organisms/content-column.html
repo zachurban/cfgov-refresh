@@ -25,7 +25,13 @@
                 {% endif %}
                 {{ ' content-l_col__equal-height' if equal_height else '' }}">
       {% if value.has_border or value.has_background %}
-      <div class="block sub_block u-mt0 u-mb0 {{' block__bg' if value.has_background else ''}} {{' block__border-top block__border-bottom block__border-left block__border-right' if value.has_background else ''}}">
+      <div class="block 
+                  sub_block
+                  u-mt0
+                  u-mb0
+                  {{' block__bg' if value.has_background else ''}}
+                  {{' block__border' if value.has_background else ''}}"
+           style="padding:30px 15px;">
         {% endif %}
       {% for block in value.column_content %}
           {{ render_stream_child(block) | safe }}
