@@ -1,26 +1,25 @@
 
-    <div class="m-info-unit">
-
-{%- if value.image.upload %}
-    {%- set img = image(value.image.upload, 'original') %}
-    {% if value.link_image and value.url %}
-        <a href="{{ parse_links( value.url ) | safe }}">
-    {% endif %}
-        {%- if value.image.alt %}
-            <img class="m-info-unit_image
-                        {{- ' m-info-unit_image__square' if img.is_square else '' }}"
-                 src="{{ img.url }}"
-                 alt="{{ value.image.alt }}">
-        {%- else %}
-            <div class="m-info-unit_image
-                        {{- ' m-info-unit_image__square' if img.is_square else '' }}"
-                 style="background-image: url( '{{ img.url }}' );
-                        {{- ' padding-bottom: ' ~ ( img.height / img.width * 100 ) ~ '%;'
-                            if not img.is_square else '' }}">
-            </div>
+<div class="m-info-unit">
+    {%- if value.image.upload %}
+        {%- set img = image(value.image.upload, 'original') %}
+        {% if value.link_image and value.url %}
+            <a href="{{ parse_links( value.url ) | safe }}">
         {% endif %}
-    {%- if link_image and value.url %}
-        </a>
-    {%- endif -%}
-{%- endif %}
+            {%- if value.image.alt %}
+                <img class="m-info-unit_image
+                            {{- ' m-info-unit_image__square' if img.is_square else '' }}"
+                     src="{{ img.url }}"
+                     alt="{{ value.image.alt }}">
+            {%- else %}
+                <div class="m-info-unit_image
+                            {{- ' m-info-unit_image__square' if img.is_square else '' }}"
+                     style="background-image: url( '{{ img.url }}' );
+                            {{- ' padding-bottom: ' ~ ( img.height / img.width * 100 ) ~ '%;'
+                                if not img.is_square else '' }}">
+                </div>
+            {% endif %}
+        {%- if value.link_image and value.url %}
+            </a>
+        {%- endif -%}
+    {%- endif %}
 </div>
