@@ -127,3 +127,37 @@ li.sequence-member .sequence-member-inner .sequence-type-list .sequence-member-i
 }
 
 
+.border-input li {
+  display: inline-block;
+  width: 15%;
+}
+
+.border-input li label {
+  width: 35%;
+}
+
+.border-input li .field-content {
+  width: 50%;
+}
+
+.margin-input li {
+  display: inline-block;
+  width: 40%;
+}
+
+.margin-input li .field-content {
+  width: 75%;
+}
+.content-block .sequence-member-inner {
+  border: 1px solid #ccf1f1 !important;
+
+}
+
+.content-block .sequence-container-inner .sequence-controls {
+  opacity: 1;
+  visibility: visible;
+}
+
+.fieldname-equal_height_columns {
+  display: inline-block;
+}

@@ -1088,16 +1088,17 @@ class Card(blocks.StructBlock):
 class ImageBlock(blocks.StructBlock):
 
     link_image = blocks.BooleanBlock(
-        default=True,
+        default=False,
         required=False,
     )
 
-    url =  blocks.CharBlock(required=True)
+    url =  blocks.CharBlock(required=False)
 
 
     image = atoms.ImageBasic(
         required=False,
     )
+
 
     class Meta:
         icon = 'cogs'
@@ -1125,7 +1126,9 @@ class ContentColumn(blocks.StructBlock):
             ('snippet', v1_blocks.ReusableTextChooserBlock('v1.ReusableText')),
             ('card', Card()),
             ('email_signup', BodyEmailSignUp()),
-            ('link_blob', LinkBlobGroup())
+            ('link_blob', LinkBlobGroup()),
+            ('image_block', ImageBlock())
+
         ], icon='cogs')
 
     class Meta:
