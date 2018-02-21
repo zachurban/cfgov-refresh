@@ -8,9 +8,9 @@ from wagtail.wagtailcore.models import PageManager
 
 
 from wagtail.wagtailcore import blocks
-from .. import blocks as v1_blocks
 from ..atomic_elements import molecules, organisms
 from .base import CFGOVPage
+
 
 class FullWidthPage(CFGOVPage):
     header = StreamField([

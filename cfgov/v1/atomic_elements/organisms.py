@@ -1081,55 +1081,61 @@ class DataSnapshot(blocks.StructBlock):
 class Card(blocks.StructBlock):
     heading = blocks.CharBlock(required=True)
     body = blocks.CharBlock(required=True)
+
     class Meta:
         icon = 'image'
         template = '_includes/organisms/card.html'
 
 
 class ImageBlock(blocks.StructBlock):
-
     link_image = blocks.BooleanBlock(
         default=False,
         required=False,
     )
 
-    url =  blocks.CharBlock(required=False)
-
+    url = blocks.CharBlock(required=False)
 
     image = atoms.ImageBasic(
         required=False,
     )
-
 
     class Meta:
         icon = 'cogs'
         template = '_includes/molecules/image-block.html'
 
 
-    
-
 class ContentColumn(blocks.StructBlock):
-    column_width = blocks.ChoiceBlock(choices=[
+    column_width = blocks.ChoiceBlock(
+        choices=[
             ('1-4', '1/4'),
             ('1-3', '1/3'),
             ('1-2', '1/2'),
             ('2-3', '2/3'),
             ('3-4', '3/4'),
             ('1', '1'),
-        ], default="1", required=False, 
-           help_text='Width of column. Defaults to 1.')
-    has_background = blocks.BooleanBlock(required=False, 
-        default=False, help_text='Add gray background to block.', classname="background-input")
-    has_border = blocks.BooleanBlock(required=False, 
-        default=False, label="Border")
+        ],
+        default="1",
+        required=False,
+        help_text='Width of column. Defaults to 1.'
+    )
+    has_background = blocks.BooleanBlock(
+        required=False,
+        default=False,
+        help_text='Add gray background to block.',
+        classname="background-input"
+    )
+    has_border = blocks.BooleanBlock(
+        required=False,
+        default=False,
+        label="Border"
+    )
     column_content = blocks.StreamBlock([
-            ('text', blocks.RichTextBlock()),
-            ('snippet', v1_blocks.ReusableTextChooserBlock('v1.ReusableText')),
-            ('card', Card()),
-            ('email_signup', BodyEmailSignUp()),
-            ('image_block', ImageBlock())
-
-        ], icon='cogs')
+        ('text', blocks.RichTextBlock()),
+        ('snippet', v1_blocks.ReusableTextChooserBlock('v1.ReusableText')),
+        ('card', Card()),
+        ('email_signup', BodyEmailSignUp()),
+        ('image_block', ImageBlock())
+    ], icon='cogs')
 
     class Meta:
         icon = 'cogs'
@@ -1137,7 +1143,10 @@ class ContentColumn(blocks.StructBlock):
 
 
 class ContentRow(blocks.StructBlock):
-    equal_height_columns = blocks.BooleanBlock(required=False, default=False)
+    equal_height_columns = blocks.BooleanBlock(
+        required=False,
+        default=False
+    )
     columns = blocks.ListBlock(ContentColumn())
 
     class Meta:
@@ -1145,49 +1154,73 @@ class ContentRow(blocks.StructBlock):
         form_classname = 'content-layout'
         template = '_includes/organisms/content-row.html'
 
+
 class BorderBlock(blocks.StructBlock):
-    top = blocks.BooleanBlock(required=False, 
-        default=False)
-    bottom = blocks.BooleanBlock(required=False, 
-        default=False)
-    left = blocks.BooleanBlock(required=False, 
-        default=False)
-    right = blocks.BooleanBlock(required=False, 
-        default=False)
+    top = blocks.BooleanBlock(
+        required=False,
+        default=False
+    )
+    bottom = blocks.BooleanBlock(
+        required=False,
+        default=False
+    )
+    left = blocks.BooleanBlock(
+        required=False,
+        default=False
+    )
+    right = blocks.BooleanBlock(
+        required=False,
+        default=False
+    )
+
     class Meta:
         form_classname = 'border-input'
 
+
 class MarginBlock(blocks.StructBlock):
-    top = blocks.ChoiceBlock(choices=[
+    top = blocks.ChoiceBlock(
+        choices=[
             ('default', 'Default'),
             ('u-mt45', '45px'),
             ('u-mt30', '30px'),
             ('u-mt15', '15px'),
             ('u-mt0', '0px'),
-        ], default="default", required=True, 
-           help_text='Margin top. Defaults to 60px.')
-    bottom = blocks.ChoiceBlock(choices=[
+        ],
+        default='default',
+        required=True,
+        help_text='Margin top. Defaults to 60px.'
+    )
+    bottom = blocks.ChoiceBlock(
+        choices=[
             ('default', 'Default'),
             ('u-mb45', '45px'),
             ('u-mb30', '30px'),
             ('u-mb15', '15px'),
             ('u-mb0', '0px'),
-        ], default="default", required=True, 
-           help_text='Margin bottom. Defaults to 60px.')
+        ],
+        default='default',
+        required=True,
+        help_text='Margin bottom. Defaults to 60px.'
+    )
+
     class Meta:
         form_classname = 'margin-input'
 
+
 class ContentBlock(blocks.StructBlock):
-    has_background = blocks.BooleanBlock(required=False, 
-        default=False, help_text='Add gray background to block.', classname="background-input")
-    #lines_between_rows = blocks.BooleanBlock(
+    has_background = blocks.BooleanBlock(
+        required=False,
+        default=False,
+        help_text='Add gray background to block.',
+        classname="background-input"
+    )
+    # lines_between_rows = blocks.BooleanBlock(
     #    default=False,
     #    required=False,
     #    label='Show rule lines between rows',
-    #)
+    # )
     margins = MarginBlock()
     borders = BorderBlock()
-
 
     block_content = blocks.StreamBlock([
         ('row', ContentRow()),
