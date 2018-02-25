@@ -10,13 +10,15 @@ from wagtail.wagtailcore.fields import RichTextField
 from wagtail.wagtailcore.models import PageManager
 
 from jobmanager.models.django import (
-    JobCategory, JobLocation, JobLength, ServiceType
+    JobCategory, JobLocation, JobLength, ServiceType, JobType
 )
 from v1.models import CFGOVPage
 from v1.models.snippets import ReusableText
 
+from django import forms
 
 class JobListingPage(CFGOVPage):
+
     description = RichTextField('Summary')
     open_date = models.DateField('Open date')
     close_date = models.DateField('Close date')
@@ -65,10 +67,13 @@ class JobListingPage(CFGOVPage):
         help_text='Optional: Add content for an additional section '
                   'that will display at end of job description.'
     )
+
     content_panels = CFGOVPage.content_panels + [
         MultiFieldPanel([
             FieldPanel('division', classname='full'),
             InlinePanel('grades', label='Grades'),
+            InlinePanel('job_types', label='JobTypes'),
+
             FieldRowPanel([
                 FieldPanel('open_date', classname='col6'),
                 FieldPanel('close_date', classname='col6'),
@@ -81,6 +86,7 @@ class JobListingPage(CFGOVPage):
                 FieldPanel('service_type', classname='col6'),
                 FieldPanel('job_length', classname='col6'),
             ]),
+
         ], heading='Details'),
         MultiFieldPanel([
             FieldPanel('location', classname='full'),

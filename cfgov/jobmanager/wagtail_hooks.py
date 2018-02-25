@@ -6,7 +6,7 @@ from wagtail.contrib.modeladmin.options import (
 from wagtail.contrib.modeladmin.views import CreateView, EditView, InspectView
 
 from jobmanager.models import (
-    ApplicantType, Grade, JobCategory, Region, Office, ServiceType, JobLength
+    ApplicantType, Grade, JobCategory, Region, Office, ServiceType, JobLength, JobType
 )
 
 
@@ -90,6 +90,12 @@ class JobLengthModelAdmin(ModelAdmin):
     list_display = ('job_length',)
 
 
+class JobTypeModelAdmin(ModelAdmin):
+    model = JobType
+    menu_label = 'Job Types'
+    menu_icon = 'site'
+    list_display = ('job_type')
+
 @modeladmin_register
 class MyModelAdminGroup(ModelAdminGroup):
     menu_label = 'Job listings'
@@ -98,6 +104,7 @@ class MyModelAdminGroup(ModelAdminGroup):
         ApplicantTypeModelAdmin,
         JobCategoryModelAdmin,
         JobGradeModelAdmin,
+        JobTypeModelAdmin,
         ServiceTypeModelAdmin,
         JobLengthModelAdmin,
         JobOfficeModelAdmin,

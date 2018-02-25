@@ -137,3 +137,11 @@ class City(models.Model):
 
     def __unicode__(self):
         return '{}, {}'.format(self.name, self.state.abbreviation)
+
+
+class JobType(models.Model):
+    name = models.CharField(
+        max_length=255,
+        verbose_name="Job type")
+    govdelivery_question_id = models.CharField(
+        max_length=255)

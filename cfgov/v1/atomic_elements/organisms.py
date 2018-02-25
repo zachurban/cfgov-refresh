@@ -230,6 +230,35 @@ class EmailSignUp(blocks.StructBlock):
         js = ['email-signup.js']
 
 
+
+class EmailTopicSection(blocks.StructBlock):
+    section_heading = blocks.CharBlock(required=False)
+    topics = blocks.ListBlock(
+        blocks.StructBlock([
+            ('topic_text', blocks.CharBlock(required=True)),
+            ('govdelivery_id', blocks.CharBlock(required=True))
+        ])
+    )
+
+class EmailTopicSignUp(blocks.StructBlock):
+    heading = blocks.CharBlock(required=False)
+    gd_code = blocks.CharBlock(required=False)
+    email_input_label = blocks.CharBlock(required=True)
+    email_input_placeholder = blocks.CharBlock(required=False)
+    topic_section_header = blocks.CharBlock(required=False)
+    disclaimer = blocks.RichTextBlock()
+    topic_sections = blocks.ListBlock(
+        EmailTopicSection()
+    )
+
+    class Meta:
+        icon = 'mail'
+        template = '_includes/organisms/topical-email-signup.html'
+
+    class Media:
+        js = []
+
+
 class RegComment(blocks.StructBlock):
     document_id = blocks.CharBlock(
         required=True,
