@@ -35,6 +35,7 @@ USE_ETAGS = True
 # Application definition
 
 INSTALLED_APPS = (
+    'permissions_viewer',
     'wagtail.wagtailcore',
     'wagtail.wagtailadmin',
     'wagtail.wagtaildocs',
@@ -78,7 +79,6 @@ INSTALLED_APPS = (
     'sheerlike',
     'legacy',
     'django_extensions',
-    'reversion',
     'jobmanager',
     'wellbeing',
     'search',
@@ -381,9 +381,6 @@ if os.environ.get('S3_ENABLED', 'False') == 'True':
     MEDIA_URL = os.path.join(os.environ.get('AWS_S3_URL'), AWS_S3_ROOT, '')
 
 # Govdelivery
-
-GOVDELIVERY_USER = os.environ.get('GOVDELIVERY_USER')
-GOVDELIVERY_PASSWORD = os.environ.get('GOVDELIVERY_PASSWORD')
 GOVDELIVERY_ACCOUNT_CODE = os.environ.get('GOVDELIVERY_ACCOUNT_CODE')
 
 # LOAD OPTIONAL APPS
@@ -464,9 +461,6 @@ BACKENDS = {
 # Regulations in eRegs that should display the update-in-progress message
 EREGS_REGULATION_UPDATES = ['1002', '1003', '1005', '1010', '1011', '1012', '1013', '1024', '1026']
 
-# GovDelivery environment variables
-ACCOUNT_CODE = os.environ.get('GOVDELIVERY_ACCOUNT_CODE')
-
 # Regulations.gov environment variables
 REGSGOV_BASE_URL = os.environ.get('REGSGOV_BASE_URL')
 REGSGOV_API_KEY = os.environ.get('REGSGOV_API_KEY')
@@ -542,7 +536,8 @@ CSP_IMG_SRC = (
     '*.tiles.mapbox.com',
     'stats.search.usa.gov',
     'data:',
-    'www.facebook.com')
+    'www.facebook.com',
+    'www.gravatar.com')
 
 # These specify what URL's we allow to appear in frames/iframes
 CSP_FRAME_SRC = (
