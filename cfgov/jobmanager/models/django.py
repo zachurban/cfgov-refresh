@@ -30,6 +30,10 @@ class Grade(models.Model):
     grade = models.CharField(max_length=32)
     salary_min = models.IntegerField()
     salary_max = models.IntegerField()
+    govdelivery_question_id = models.CharField(
+        max_length=255)
+    govdelivery_answer_id = models.CharField(
+        max_length=255)
 
     def __unicode__(self):
         return self.grade
@@ -145,3 +149,10 @@ class JobType(models.Model):
         verbose_name="Job type")
     govdelivery_question_id = models.CharField(
         max_length=255)
+    govdelivery_answer_id = models.CharField(
+        max_length=255)
+    class Meta:
+        ordering = ('name',)
+
+    def __unicode__(self):
+        return self.name

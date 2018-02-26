@@ -15,7 +15,7 @@ import v1.atomic_elements.organisms
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('v1', '0099_add_rule_options_to_modules'),
+        ('v1', '0100_update_display_names_for_categories'),
     ]
 
     operations = [

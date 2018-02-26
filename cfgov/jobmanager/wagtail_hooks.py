@@ -94,7 +94,7 @@ class JobTypeModelAdmin(ModelAdmin):
     model = JobType
     menu_label = 'Job Types'
     menu_icon = 'site'
-    list_display = ('job_type')
+    list_display = ('name',)
 
 @modeladmin_register
 class MyModelAdminGroup(ModelAdminGroup):
