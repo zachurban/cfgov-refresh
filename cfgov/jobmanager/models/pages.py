@@ -154,6 +154,47 @@ class JobListingPage(CFGOVPage):
         context['cities'] = self.location.cities.all()
         return context
 
+    def generate_description(self):
+        description = (
+            '<div>' +
+            '<h4>Summary</h4>' +
+            self.description +
+            '</div>'
+        )
+        if self.responsibilities:
+            description += (
+                '<div>' +
+                '<h4>Responsibilities</h4>' +
+                self.responsibilities +
+                '</div>'
+            )
+        if self.travel_required:
+            travel = self.travel_details if self.travel_details \
+                else '<p>Yes</p>'
+            description += (
+                '<div>' +
+                '<h4>Travel Required</h4>' +
+                travel +
+                '</div>'
+            )
+        if self.additional_section_title and self.additional_section_content:
+            description += (
+                '<div>'
+                '<h4>' + self.additional_section_title + '</h4>' +
+                self.additional_section_content +
+                '</div>'
+            )
+        if self.service_type and self.job_length:
+            description += (
+                '<div>'
+                '<h4>Position type</h4>' +
+                unicode(self.service_type) +
+                ', ' +
+                unicode(self.job_length).lower() +
+                '</div>'
+            )
+        return description
+
     @property
     def page_js(self):
         return super(JobListingPage, self).page_js + ['read-more.js']

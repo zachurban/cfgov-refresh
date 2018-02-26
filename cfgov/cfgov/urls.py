@@ -35,6 +35,7 @@ from v1.views import (
     password_reset_confirm, welcome
 )
 from v1.views.documents import DocumentServeView
+from v1.feeds import IndeedFeed, GlassdoorFeed
 
 
 oah = SheerSite('owning-a-home')
@@ -225,6 +226,9 @@ urlpatterns = [
     url(r'^careers/(?P<path>.*)$', RedirectView.as_view(
         url='/about-us/careers/%(path)s', permanent=True)),
 
+    url(r'indeed-feed/', IndeedFeed()),
+    url(r'glassdoor-feed/', GlassdoorFeed()),
+    
     url(r'^transcripts/', include([
         url(r'^how-to-apply-for-a-federal-job-with-the-cfpb/$',
             SheerTemplateView.as_view(
