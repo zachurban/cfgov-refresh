@@ -76,7 +76,7 @@ var template = {
   chartTooltipMultiple: chartTooltipMultiple
 };
 
-var UNDEFINED;
+import { params } from './params';
 
 // Set some properties for the histogram.
 var chart = {

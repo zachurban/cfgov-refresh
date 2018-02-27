@@ -1,5 +1,7 @@
 const $ = require( '../../node_modules/jquery' );
 
+let UNDEFINED;
+
 // List all the parameters the user can change and set
 // their default values.
 // `verbotenKeys` are as follows:
@@ -28,7 +30,6 @@ const params = {
     $.extend( params, _getSelections() );
   }
 };
-
 
 /**
  * Get values of all HTML elements in the control panel.
