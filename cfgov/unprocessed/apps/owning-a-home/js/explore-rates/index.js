@@ -78,30 +78,6 @@ var template = {
 
 var UNDEFINED;
 
-// List all the parameters the user can change and set
-// their default values.
-var params = {
-  'credit-score':   700,
-  'down-payment':   '20,000',
-  'house-price':    '200,000',
-  'loan-amount':    UNDEFINED,
-  'location':       'AL',
-  'rate-structure': 'fixed',
-  'loan-term':      30,
-  'loan-type':      'conf',
-  'arm-type':       '5-1',
-  'edited':         false,
-  'isJumbo':        false,
-  'prevLoanType':   '',
-  'prevLocation':   '',
-  'verbotenKeys':   [ 9, 37, 38, 39, 40, 13, 16 ], // tab, arrow keys, enter, shift
-  'update':         function() {
-    this.prevLoanType = this['loan-type'];
-    this.prevLocation = this.location;
-    $.extend( params, getSelections() );
-  }
-};
-
 // Set some properties for the histogram.
 var chart = {
   $el:           $( '#chart' ),
@@ -190,23 +166,6 @@ function getData() {
   } );
 
   return promise;
-}
-
-/**
- * Get values of all HTML elements in the control panel.
- * @returns {Object} Key-value hash of element ids and values.
- */
-function getSelections() {
-
-  var selections = {};
-  var ids = [];
-
-  for ( var param in params ) {
-    selections[param] = getSelection( param );
-  }
-
-  return selections;
-
 }
 
 /**
