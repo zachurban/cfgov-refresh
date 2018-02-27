@@ -36,7 +36,10 @@ module.exports = {
     ]
   },
   test: {
-    src:   paths.unprocessed + '/js/**/*.js',
+    src: [
+      paths.unprocessed + '/apps/**/js/**/*.js',
+      paths.unprocessed + '/js/**/*.js'
+    ],
     tests: paths.test,
     reporter: environment.CONTINUOUS_INTEGRATION
   },

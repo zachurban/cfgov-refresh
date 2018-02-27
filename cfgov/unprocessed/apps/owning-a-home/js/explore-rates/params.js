@@ -36,10 +36,9 @@ const params = {
  * @returns {Object} Key-value hash of element ids and values.
  */
 function _getSelections() {
-  var selections = {};
-  var ids = [];
+  const selections = {};
 
-  for ( var param in params ) {
+  for ( const param in params ) {
     selections[param] = getSelection( param );
   }
 
