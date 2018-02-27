@@ -46,4 +46,4 @@ function _getSelections() {
   return selections;
 }
 
-export { params };
+module.exports = params;
