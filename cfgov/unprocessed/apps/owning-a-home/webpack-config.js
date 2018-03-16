@@ -67,14 +67,6 @@ const conf = {
     filename: '[name]',
     jsonpFunction: 'apps'
   },
-  resolveLoader: {
-    alias: {
-      'handlebars-loader': path.resolve( 
-        __dirname, 'node_modules', 'handlebars-loader' 
-      )
-    },
-    mainFields: [ 'loader', 'main' ]
-  },
   plugins: [
     COMMON_CHUNK_CONFIG,
     COMMON_UGLIFY_CONFIG
