@@ -112,12 +112,6 @@ module.exports = {
       src:  paths.modules + '/cf-icons/src/fonts/*',
       dest: paths.processed + '/fonts/'
     },
-    timelinejs: {
-      src: [
-        paths.modules + '/timelinejs/build/**/*'
-      ],
-      dest: paths.processed + '/apps/timelinejs'
-    },
     lightbox2: {
       src: [
         paths.modules + '/lightbox2/dist/**/*'

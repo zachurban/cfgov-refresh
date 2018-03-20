@@ -1,9 +1,10 @@
+const browserSync = require( 'browser-sync' );
+const configCopy = require( '../config' ).copy;
+const del = require( 'del' );
 const gulp = require( 'gulp' );
 const gulpChanged = require( 'gulp-changed' );
-const configCopy = require( '../config' ).copy;
 const handleErrors = require( '../utils/handle-errors' );
-const browserSync = require( 'browser-sync' );
-const del = require( 'del' );
+const paths = require( '../../config/environment' ).paths;
 
 /**
  * Generic copy files flow from source to destination.
@@ -36,13 +37,28 @@ gulp.task( 'copy:jsonKBYO', () => {
   return _genericCopy( jsonKBYO.src, jsonKBYO.dest );
 } );
 
-gulp.task( 'copy:timelinejs', () => {
-  const timelinejs = configCopy.timelinejs;
-  return _genericCopy( timelinejs.src, timelinejs.dest )
-    .on( 'end', () => {
-      del( timelinejs.dest + '/css/themes' );
-    } );
-} );
+/**
+ * Copy timeline JS from /know-before-you-owe/ node_modules to static_built.
+ * @returns {PassThrough} A source stream.
+ */
+function copyTimelineJS() {
+  const appName = 'know-before-you-owe';
+  const timelinejsSrc = paths.unprocessed +
+                       `/apps/${ appName }/node_modules/` +
+                       'timelinejs/build/**/*';
+  const timelinejsDest = `${ paths.processed }/apps/${ appName }/timelinejs`;
+
+  console.log( timelinejsSrc );
+
+  const processed = _genericCopy( timelinejsSrc, timelinejsDest );
+  processed.on( 'end', () => {
+    del( timelinejsDest + '/css/themes' );
+  } );
+
+  return processed;
+}
+
+gulp.task( 'copy:timelinejs', copyTimelineJS );
 
 gulp.task( 'copy:lightbox2', () => {
   const lightbox2 = configCopy.lightbox2;
