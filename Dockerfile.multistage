@@ -1,0 +1,51 @@
+FROM centos:7 as python_common
+	
+RUN yum -y install epel-release mod_wsgi mariadb postgresql && \
+    yum-config-manager --enable cr && \
+    yum clean all && rm -rf /var/cache/yum
+
+FROM python_common as python_build
+RUN yum -y install which gcc gcc-c++ kernel-devel httpd-devel make mariadb-devel postgresql-devel python-devel \
+                   python-setuptools \
+    && yum clean all
+run easy_install pip
+RUN pip install -U setuptools
+
+WORKDIR /src/
+copy requirements /src/requirements
+copy cfgov /src/cfgov
+run grep -v git+https /src/requirements/optional-public.txt > /src/requirements/optional-nogit.txt
+run pip install -r /src/requirements/deployment.txt
+run pip install -r /src/requirements/optional-nogit.txt
+
+
+FROM node:8 as frontend_build
+RUN npm install -g gulp
+WORKDIR /src/
+ADD config /src/config
+ADD gulp /src/gulp
+ADD cli-flag.sh /src/
+ADD frontend.sh /src/
+ADD gulpfile.js /src/
+ADD package.json /src/
+ADD package-lock.json /src/
+ADD cfgov/unprocessed /tmp/unprocessed
+RUN mkdir /src/cfgov
+RUN ln -s  /tmp/unprocessed /src/cfgov/unprocessed &&\
+    npm --prefix ./cfgov/unprocessed/apps/owning-a-home install ./cfgov/unprocessed/apps/owning-a-home &&\
+    ./frontend.sh production &&\
+    unlink /src/cfgov/unprocessed
+    
+
+
+FROM python_common as python_deploy
+copy --from=python_build /src/cfgov /src/cfgov/
+copy --from=frontend_build /src/cfgov/static_built/ /src/cfgov/static_built/
+copy static.in/* /src/cfgov/static_built/
+copy --from=python_build /usr/lib/python2.7/site-packages/ /usr/lib/python2.7/site-packages/
+copy --from=python_build /usr/lib64/python2.7/site-packages/ /usr/lib64/python2.7/site-packages/
+ENV DJANGO_SETTINGS_MODULE=cfgov.settings.production
+WORKDIR /src/
+RUN ALLOWED_HOSTS='["*"]' python cfgov/manage.py collectstatic --noinput
+EXPOSE 80
+CMD apachectl -DFOREGROUND
