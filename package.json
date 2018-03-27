@@ -92,6 +92,8 @@
     "merge-stream": "1.0.1",
     "minimist": "1.2.0",
     "mkdirp": "0.5.1",
+    "pa11y": "5.0.3",
+    "pa11y-ci": "2.0.1",
     "protractor": "5.3.0",
     "protractor-accessibility-plugin": "github:cfpb/protractor-accessibility-plugin#on-page-load",
     "protractor-cucumber-framework": "4.2.0",
@@ -101,7 +103,8 @@
   },
   "scripts": {
     "test": "snyk test",
-    "postinstall": "node scripts/npm/apps-install"
+    "postinstall": "node scripts/npm/apps-install",
+    "test-pa11y": "./node_modules/.bin/pa11y-ci"
   },
   "snyk": true
 }
