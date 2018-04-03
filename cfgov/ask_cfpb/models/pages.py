@@ -113,19 +113,19 @@ def get_question_referrer_data(request, categories):
         referrer = request.META.get('HTTP_REFERER', '')
         path = urlparse(referrer).path
         portal_data = CONSUMER_TOOLS_PORTAL_PAGES.get(path)
+
         if portal_data:
             category = categories.filter(slug=portal_data[1]).first()
             breadcrumbs = [{'title': portal_data[0], 'href': path}]
-            return (category, breadcrumbs)
-        elif path.startswith(tuple(JOURNEY_URLS.keys())):
+            return (category, breadcrumbs)            
+        else:
             for key in JOURNEY_URLS:
-                if path.startswith(journey_url):
+                if path.startswith(key):
                     breadcrumbs = [{
                         'title': JOURNEY_URLS[key],
                         'href': path
                     }]
                     return (categories.first(), breadcrumbs)
-        else:
             match = re.search(r'ask-cfpb/category-([A-Za-z0-9-_]*)/', path)
             if match.group(1):
                 category = categories.filter(slug=match.group(1)).first()
