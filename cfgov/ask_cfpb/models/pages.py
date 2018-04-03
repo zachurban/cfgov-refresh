@@ -61,6 +61,14 @@ CONSUMER_TOOLS_PORTAL_PAGES = {
         'student-loans')
 }
 
+JOURNEY_URLS = {
+    '/owning-a-home/process': '1. Preparing to shop',
+    '/owning-a-home/prepare': '1. Preparing to shop',
+    '/owning-a-home/explore': '2. Exploring your options',
+    '/owning-a-home/compare': '3. Comparing loan offers',
+    '/owning-a-home/close': '4. Closing on your new home',
+}
+
 
 def get_reusable_text_snippet(snippet_title):
     try:
@@ -109,6 +117,14 @@ def get_question_referrer_data(request, categories):
             category = categories.filter(slug=portal_data[1]).first()
             breadcrumbs = [{'title': portal_data[0], 'href': path}]
             return (category, breadcrumbs)
+        elif path.startswith(tuple(JOURNEY_URLS.keys())):
+            for key in JOURNEY_URLS:
+                if path.startswith(journey_url):
+                    breadcrumbs = [{
+                        'title': JOURNEY_URLS[key],
+                        'href': path
+                    }]
+                    return (categories.first(), breadcrumbs)
         else:
             match = re.search(r'ask-cfpb/category-([A-Za-z0-9-_]*)/', path)
             if match.group(1):
