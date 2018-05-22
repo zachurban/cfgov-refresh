@@ -135,17 +135,26 @@
                     {% if nav_overview_url %}
 {# add conditional check for # in url around a element #}
 
+                        {% if nav_overview_url == '#' %}
+
+                        <h2 class="">{{ nav_overview }}</h2>
 {# use a heading or span element when it's a # link #}
 
-{# remove conditionals that check for # inside the a element #}
 
 {# test on mobile and desktop and voiceover #}
 
-                    <a class="{{ _classes( nav_depth, '-overview-link' ) }}
-                              {{ _classes( nav_depth, '-overview-link__current' ) if nav_overview_url == request.path else '' }}"
-                        {{ '' if nav_overview_url == request.path else 'href=' + nav_overview_url | e }}>
-                        {{ nav_overview ~ ' Overview' }}
-                    </a>
+                        {% else %}
+
+{# remove conditionals that check for # inside the a element #}
+
+                        <a class="{{ _classes( nav_depth, '-overview-link' ) }}
+                                  {{ _classes( nav_depth, '-overview-link__current' ) if nav_overview_url == request.path else '' }}"
+                            {{ '' if nav_overview_url == request.path else 'href=' + nav_overview_url | e }}>
+                            {{ nav_overview ~ ' Overview' }}
+                        </a>
+
+                        {% endif %}
+
                     {% endif %}
                 </span>
                 {% endif %}
