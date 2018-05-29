@@ -46,12 +46,12 @@
 {%- for group in nav_groups %}
 <div class="{{ _classes( nav_depth, '-list' ) }}">
     {% if group.title %}
-    <div class="h5
+    <h4 class="h5
               {{ base_class ~ '_group-heading' }}
               {{ base_class ~ '_group-heading' ~ '__hidden' if group.hide_title else ''}} "
         {% if group.hide_title %} aria-hidden="true"{% endif %}>
         {{group.title | safe}}
-    </div>
+    </h4>
     {% endif %}
     <ul class="m-list
                m-list__unstyled">
@@ -137,7 +137,7 @@
 
                         {% if nav_overview_url == '#' %}
 
-                        <h2 class="">{{ nav_overview }}</h2>
+                        <h3 class="{{ _classes( nav_depth, '-overview-heading' ) }}">{{ nav_overview }}</h3>
 {# use a heading or span element when it's a # link #}
 
 
@@ -147,11 +147,11 @@
 
 {# remove conditionals that check for # inside the a element #}
 
-                        <a class="{{ _classes( nav_depth, '-overview-link' ) }}
+                        <h3><a class="{{ _classes( nav_depth, '-overview-link' ) }}
                                   {{ _classes( nav_depth, '-overview-link__current' ) if nav_overview_url == request.path else '' }}"
                             {{ '' if nav_overview_url == request.path else 'href=' + nav_overview_url | e }}>
                             {{ nav_overview ~ ' Overview' }}
-                        </a>
+                        </a></h3>
 
                         {% endif %}
 
@@ -202,6 +202,7 @@
             u-hide-on-mobile"
      data-js-hook="behavior_flyout-menu"
      aria-label="main menu">
+    <h2 class="u-visually-hidden">Navigation menu</h2>
     <button class="{{ base_class ~ '_trigger' }}"
             data-js-hook="behavior_flyout-menu_trigger"
             aria-pressed="false">
