@@ -2,6 +2,7 @@
 const BaseTransition = require( '../../modules/transition/BaseTransition' );
 const behavior = require( '../../modules/util/behavior' );
 const breakpointState = require( '../../modules/util/breakpoint-state' );
+const dataHook = require( '../../modules/util/data-hook' );
 const EventObserver = require( '../../modules/util/EventObserver' );
 const standardType = require( '../../modules/util/standard-type' );
 
@@ -98,7 +99,7 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
     // Set initial aria attributes to false.
     _setAriaAttr( 'expanded', _triggerDom, 'false' );
     _setAriaAttr( 'hidden', _contentDom, 'true' );
-    _contentDom.tabIndex = -1;
+    _setTabIndex( _contentDom, -1 );
 
     _triggerDom.addEventListener( 'click', handleTriggerClickedBinded );
     _triggerDom.addEventListener( 'touchstart', _handleTouchStart );
@@ -232,7 +233,7 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
         { target: this, type: 'expandBegin' }
       );
       _setAriaAttr( 'hidden', _contentDom, 'false' );
-      _contentDom.tabIndex = 0;
+      _setTabIndex( _contentDom, null );
 
       if ( _expandTransitionMethod ) {
         const hasTransition = _expandTransition &&
@@ -300,7 +301,7 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
 
       _setAriaAttr( 'expanded', _triggerDom, false );
       _setAriaAttr( 'hidden', _contentDom, 'true' );
-      _contentDom.tabIndex = -1;
+      _setTabIndex( _contentDom, -1 );
       _setAriaAttr( 'expanded', _contentDom, false );
 
       /* TODO: Remove or uncomment when keyboard navigation is in.
@@ -348,6 +349,26 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
       );
     }
     this.dispatchEvent( 'collapseEnd', { target: this, type: 'collapseEnd' } );
+  }
+
+  /**
+   * Turn tabIndex off for children of elem.
+   * @param {HTMLNode} elem - parent element.
+   */
+  function _setTabIndex( elem, index ) {
+    if ( index === null ) {
+      elem.removeAttribute( 'tabindex' );
+    } else {
+      elem.tabIndex = index;
+    }
+    let children = elem.children;
+    let child;
+    for ( let i = 0, len = children.length; i < len; i++ ) {
+      child = children[i];
+      if ( !dataHook.contains( child, FlyoutMenu.BASE_CLASS + '_content' ) ) {
+        _setTabIndex( child, index );
+      }
+    }
   }
 
   /**
