@@ -54,11 +54,10 @@ describe( 'FlyoutMenu', () => {
     } );
 
     it( 'should have correct state before initializing', () => {
+      expect( contentDom.getAttribute( 'aria-hidden' ) ).toBeNull();
       expect( triggerDom.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
       expect( contentDom.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
-      expect(
-        altTriggerDom.getAttribute( 'aria-expanded' )
-      ).toBe( 'false' );
+      expect( altTriggerDom.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
 
       expect( flyoutMenu.isAnimating() ).toBe( false );
       expect( flyoutMenu.isExpanded() ).toBe( false );
@@ -141,6 +140,7 @@ describe( 'FlyoutMenu', () => {
       );
 
       // Check expected aria attributes state.
+      expect( contentDom.getAttribute( 'aria-hidden' ) ).toBe( 'false' );
       expect( triggerDom.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
       expect( contentDom.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
       expect( altTriggerDom.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
@@ -187,6 +187,7 @@ describe( 'FlyoutMenu', () => {
       );
 
       // Check expected aria attribute states.
+      expect( contentDom.getAttribute( 'aria-hidden' ) ).toBe( 'true' );
       expect( triggerDom.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
       expect( contentDom.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
       expect( altTriggerDom.getAttribute( 'aria-expanded' ) ).toBe( 'false' );

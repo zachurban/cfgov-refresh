@@ -97,6 +97,8 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
 
     // Set initial aria attributes to false.
     _setAriaAttr( 'expanded', _triggerDom, 'false' );
+    _setAriaAttr( 'hidden', _contentDom, 'true' );
+    _contentDom.tabIndex = -1;
 
     _triggerDom.addEventListener( 'click', handleTriggerClickedBinded );
     _triggerDom.addEventListener( 'touchstart', _handleTouchStart );
@@ -229,6 +231,8 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
         'expandBegin',
         { target: this, type: 'expandBegin' }
       );
+      _setAriaAttr( 'hidden', _contentDom, 'false' );
+      _contentDom.tabIndex = 0;
 
       if ( _expandTransitionMethod ) {
         const hasTransition = _expandTransition &&
@@ -295,6 +299,8 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
       }
 
       _setAriaAttr( 'expanded', _triggerDom, false );
+      _setAriaAttr( 'hidden', _contentDom, 'true' );
+      _contentDom.tabIndex = -1;
       _setAriaAttr( 'expanded', _contentDom, false );
 
       /* TODO: Remove or uncomment when keyboard navigation is in.
