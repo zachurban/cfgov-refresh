@@ -2,7 +2,7 @@
 const BaseTransition = require( '../../modules/transition/BaseTransition' );
 const behavior = require( '../../modules/util/behavior' );
 const breakpointState = require( '../../modules/util/breakpoint-state' );
-const dataHook = require( '../../modules/util/data-hook' );
+import dataHook from '../../modules/util/data-hook';
 const EventObserver = require( '../../modules/util/EventObserver' );
 const standardType = require( '../../modules/util/standard-type' );
 
@@ -352,8 +352,10 @@ function FlyoutMenu( element ) { // eslint-disable-line max-statements, no-inlin
   }
 
   /**
-   * Turn tabIndex off for children of elem.
-   * @param {HTMLNode} elem - parent element.
+   * Set tabindex attribute for elem.
+   * @param {HTMLNode} elem - An element to set tabindex on.
+   * @param {number} index - Value to set for tabindex.
+   *   If null is set, the attribute is removed.
    */
   function _setTabIndex( elem, index ) {
     if ( index === null ) {
