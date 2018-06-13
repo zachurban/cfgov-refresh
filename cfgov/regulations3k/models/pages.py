@@ -1,6 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 
+import os
 import re
+import json
 from collections import OrderedDict
 from functools import partial
 
@@ -29,7 +31,8 @@ from v1.models import CFGOVPage, CFGOVPageManager
 class RegulationLandingPage(CFGOVPage):
     """landing page for eregs"""
     objects = CFGOVPageManager()
-    subpage_types = ['regulations3k.RegulationPage']
+    subpage_types = ['regulations3k.RegulationPage',
+                     'regulations3k.RegulationSearchPage']
     regs = Part.objects.order_by('part_number')
 
     def get_context(self, request, *args, **kwargs):
@@ -42,6 +45,28 @@ class RegulationLandingPage(CFGOVPage):
 
     def get_template(self, request):
         return 'regulations3k/base.html'
+
+
+class RegulationSearchPage(CFGOVPage):
+    """search page for eregs"""
+    objects = CFGOVPageManager()
+    parent_page_types = ['regulations3k.RegulationLandingPage']
+    subpage_types = []
+
+    def get_context(self, request, *args, **kwargs):
+
+        fixtures_dir = os.path.dirname(__file__)
+        search_json = os.path.join(fixtures_dir, '../fixtures/search_data.json')
+
+        with open(search_json) as json_file:
+            search_data = json.load(json_file)
+
+        context = super(CFGOVPage, self).get_context(request, *args, **kwargs)
+        context.update(search_data)
+        return context
+
+    def get_template(self, request):
+        return 'regulations3k/search-page.html'
 
 
 class RegulationPage(RoutablePageMixin, SecondaryNavigationJSMixin, CFGOVPage):
