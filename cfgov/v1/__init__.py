@@ -119,14 +119,14 @@ def parse_links(value):
 
     # This adds the link markup
     link_tags = get_link_tags(soup)
-    add_link_markup(link_tags)
+    tags = add_link_markup(link_tags)
 
-    return soup
+    return tags
 
 
 def get_link_tags(soup):
     tags = []
-    for a in soup.find_all('a', href=True):
+    for a in soup.find_all('a'):
         if not is_image_tag(a):
             tags.append(a)
     return tags
@@ -156,6 +156,7 @@ def add_link_markup(tags):
         if not tag.attrs.get('class', None):
             tag.attrs.update({'class': []})
         if tag['href'].startswith('/external-site/?'):
+            yield tag['href']
             components = urlparse(tag['href'])
             arguments = parse_qs(components.query)
             if 'ext_url' in arguments:
@@ -163,6 +164,7 @@ def add_link_markup(tags):
                 tag['href'] = signed_redirect(external_url)
 
         elif NONCFPB_LINK_PATTERN.match(tag['href']):
+            yield tag['href']
             # Sets the icon to indicate you're leaving consumerfinance.gov
             tag.attrs['class'].append(LINK_ICON_CLASSES)
 
