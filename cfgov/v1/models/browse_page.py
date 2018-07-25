@@ -15,6 +15,7 @@ from v1 import blocks as v1_blocks
 from v1.atomic_elements import molecules, organisms
 from v1.models.base import CFGOVPage
 from v1.util.util import get_secondary_nav_items
+from ask_cfpb.models.blocks import AskMetadata
 
 
 class BrowsePage(CFGOVPage):
@@ -24,6 +25,7 @@ class BrowsePage(CFGOVPage):
     ], blank=True)
 
     content = StreamField([
+        ('ask_metadata', AskMetadata()),
         ('bureau_structure', organisms.BureauStructure()),
         ('info_unit_group', organisms.InfoUnitGroup()),
         ('well', organisms.Well()),

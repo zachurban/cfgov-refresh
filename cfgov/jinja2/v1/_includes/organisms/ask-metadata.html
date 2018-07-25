@@ -1,0 +1,26 @@
+Ask {{ answer_id }} Metadata
+<br>
+<br>
+Snippet: {{ snippet | safe }}
+<br>
+Categories:
+<br>
+{% for category in categories %}
+  {{ category }}
+  <br>
+{% endfor %}
+<br>
+Subcategories:
+<br>
+{% for subcategory in subcategories %}
+  {{ subcategory }}
+  <br>
+{% endfor %}
+<br>
+Related questions:
+<br>
+{% for related_question in related_questions %}
+  {{ related_question }}
+  <br>
+{% endfor %}
+<br>
