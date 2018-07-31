@@ -45,13 +45,19 @@
         </span>
         <span class="o-expandable_header-right o-expandable_link">
             <span class="o-expandable_cue o-expandable_cue-open">
-                {{ 'Show' if true else 'Mostrar' }}
-                {{ expandable_cue_additional_text }}
+                <span class="o-expandable_cue-label
+                            {{ 'u-hidden' if value.hide_cue_label else '' }}">
+                    {{ 'Show' if true else 'Mostrar' }}
+                    {{ expandable_cue_additional_text }}
+                </span>
                 {{ svg_icon('plus-round') }}
             </span>
             <span class="o-expandable_cue o-expandable_cue-close">
-                {{ 'Hide' if true else 'Ocultar' }}
-                {{ expandable_cue_additional_text }}
+                <span class="o-expandable_cue-label
+                            {{ 'u-hidden' if value.hide_cue_label else '' }}">
+                    {{ 'Hide' if true else 'Ocultar' }}
+                    {{ expandable_cue_additional_text }}
+                </span>
                 {{ svg_icon('minus-round') }}
             </span>
         </span>
