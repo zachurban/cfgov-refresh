@@ -16,23 +16,13 @@
 // Regs3K secondary nav sections
 .o-regs3k-sections {
 
-    .o-expandable {
-        margin-bottom: 0;
-    }
-
     .o-expandable_target {
         .respond-to-min( @bp-med-min, {
             display: block;
             padding: unit( ( @grid_gutter-width / 2 ) / @base-font-size-px, em ) 0;
         } );
         border: 0;
-    }
-
-    .o-expandable_label {
-        .heading-4();
-        letter-spacing: inherit;
-        margin-bottom: 0;
-        text-transform: none;
+        padding-right: 0;
     }
 
     .o-expandable_header {
@@ -60,7 +50,6 @@
         .respond-to-max( @bp-sm-max {
             border-bottom: 1px solid @gray-40;
             content: ' ';
-            margin: 0 15px;
             display: block;
         } );
     }
@@ -77,7 +66,10 @@
 
     .o-regs3k-navigation_header {
         .u-show-on-stacked;
-        .h4 {
+        padding: unit( 10px / @base-font-size-px, em )
+                 0
+                 unit( 7px / @base-font-size-px, em );
+        .o-expandable_label {
             text-transform: uppercase;
         }
     }
