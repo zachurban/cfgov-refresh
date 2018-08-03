@@ -270,9 +270,9 @@ class Answer(models.Model):
             "on a money topic portal (e.g. /consumer-tools/debt-collection)."))
     snippet = RichTextField(
         blank=True,
+        features=['bold', 'italic'],
         help_text=(
-            "Optional answer intro, 180-200 characters max. "
-            "Avoid adding links, images, videos or other rich text elements."))
+            "Optional answer intro, 180-200 characters max."))
     answer = RichTextField(
         blank=True,
         help_text=(
