@@ -66,9 +66,10 @@ def parse_subparts(part_soup, part):
         version=PAYLOAD.version)
     appendix_subpart.save()
     PAYLOAD.subparts['appendix_subpart'] = appendix_subpart
+    interp_title = ("Supplement I to Part {} "
+                    "\N{EM DASH} Official Interpretations")
     interp_subpart = Subpart(
-        title="Supplement I to Part {} - Official Interpretations".format(
-            part.part_number),
+        title=interp_title.format(part.part_number),
         label="Interpretations",
         subpart_type=Subpart.INTERPRETATION,
         version=PAYLOAD.version)
@@ -330,7 +331,8 @@ def parse_appendices(appendices, part):
     subpart = PAYLOAD.subparts['appendix_subpart']
     for i, _appendix in enumerate(appendices):
         n_value = _appendix['N']
-        head = _appendix.find('HEAD').text.strip()
+        head = _appendix.find(
+            'HEAD').text.strip().replace(' - ', ' \N{EM DASH} ')
         _appendix.find('HEAD').replaceWith('')
         default_label = int_to_alpha(i + 1).upper()
         label = get_appendix_label(n_value, head, default_label)
@@ -445,17 +447,17 @@ def register_interp_reference(interp_id, section_tag):
 
 def parse_interps(interp_div, part, subpart):
     """
-    Break up interpretations by reg section, and then create a mapping
-    of interp references to be inserted in the related regdown.
+    Break up interpretations by reg section, and create a reference mapping.
+
+    The references link parts of interpretations to related paragraphs
+    in a regulation section.
 
     Example: Reg B section 1002.2, paragraph {c-1-ii}
-
     If that paragraph had an interpretation, the interp reference would be:
 
     see(2-c-1-ii-Interp)
 
     This would refer to a part of interpretation section 1002-Interp-2
-
     In that file, the related content would need to be marked with this ID:
 
     {2-c-1-ii-Interp}
@@ -464,7 +466,6 @@ def parse_interps(interp_div, part, subpart):
 
     {2-c-1-ii-Interp-1}
     """
-
     section_headings = [
         tag for tag in interp_div.find('HEAD').findNextSiblings()
         if (tag.name in ['HD1', 'HD2', 'HD3']
