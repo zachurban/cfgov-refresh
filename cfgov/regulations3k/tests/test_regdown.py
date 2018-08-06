@@ -6,11 +6,21 @@ import unittest
 import markdown
 
 from regulations3k.regdown import (
-    DEFAULT_RENDER_BLOCK_REFERENCE, extract_labeled_paragraph, regdown
+    DEFAULT_CONTENTS_RESOLVER, DEFAULT_RENDER_BLOCK_REFERENCE,
+    DEFAULT_URL_RESOLVER, RegulationsExtension, extract_labeled_paragraph,
+    regdown
 )
 
 
 class RegulationsExtensionTestCase(unittest.TestCase):
+
+    def setUp(self):
+        # Ensure that each test gets the default RegsExtension config
+        RegulationsExtension.config['url_resolver'][0] = DEFAULT_URL_RESOLVER
+        RegulationsExtension.config['contents_resolver'][0] = \
+            DEFAULT_CONTENTS_RESOLVER
+        RegulationsExtension.config['render_block_reference'][0] = \
+            DEFAULT_RENDER_BLOCK_REFERENCE
 
     def test_label(self):
         text = '{my-label} This is a paragraph with a label.'
@@ -268,6 +278,18 @@ class RegulationsExtensionTestCase(unittest.TestCase):
         self.assertIn('<span class="regdown-form_extend">_______'
                       '<span></span></span>',
                       regdown('Field: _______'))
+
+    def test_svg_preserved_namespace_in_block_reference(self):
+        svg = '''<svg xmlns="http://www.w3.org/2000/svg"></svg>'''
+        contents_resolver = lambda l: 'This will never be rendered'
+        render_block_reference = lambda c, **kwargs: svg
+        text = 'see(foo-bar)'
+        result = regdown(
+            text,
+            contents_resolver=contents_resolver,
+            render_block_reference=render_block_reference
+        )
+        self.assertIn(svg, result)
 
 
 class RegdownUtilsTestCase(unittest.TestCase):

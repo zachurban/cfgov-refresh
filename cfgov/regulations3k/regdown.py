@@ -53,11 +53,15 @@ Can be any number of underscores between 2 and 50.
 from __future__ import unicode_literals
 
 import re
+from collections import Iterable
+from itertools import chain
+from six import string_types as basestring
 
 from markdown import markdown, util
-from markdown.blockprocessors import BlockProcessor, ParagraphProcessor
+from markdown.blockprocessors import ParagraphProcessor
 from markdown.extensions import Extension
 from markdown.inlinepatterns import DoubleTagPattern, Pattern, SimpleTagPattern
+from markdown.preprocessors import Preprocessor
 from mdx_emdash import EmDashExtension
 
 
@@ -130,16 +134,12 @@ class RegulationsExtension(Extension):
         del md.inlinePatterns['emphasis2']
 
         # Add block reference processor for `see(label)` syntax
-        md.parser.blockprocessors.add(
-            'blockreference',
-            BlockReferenceProcessor(
-                md.parser,
-                url_resolver=self.getConfig('url_resolver'),
-                contents_resolver=self.getConfig('contents_resolver'),
-                render_block_reference=self.getConfig(
-                    'render_block_reference'),
-            ),
-            '<paragraph'
+        md.preprocessors['blockreference'] = BlockReferencePreprocessor(
+            markdown_instance=md,
+            url_resolver=self.getConfig('url_resolver'),
+            contents_resolver=self.getConfig('contents_resolver'),
+            render_block_reference=self.getConfig(
+                'render_block_reference'),
         )
 
         # Replace the default paragraph processor with one that handles
@@ -229,53 +229,63 @@ class LabeledParagraphProcessor(ParagraphProcessor):
                 p.text = text
 
 
-class BlockReferenceProcessor(BlockProcessor):
-    """ Process `see(label)` as an blockquoted reference.
-    To render the block reference, the extension must be initialized with a
-    callable render_block_reference option that will take the contents of
-    the block reference, rendering to HTML, and return the HTML.
-    """
+class BlockReferencePreprocessor(Preprocessor):
 
     RE = re.compile(r'(?:^)see\((?P<label>[\w-]+)\)(?:\n|$)')
 
     def __init__(self,
-                 parser,
+                 markdown_instance=None,
                  url_resolver=None,
                  contents_resolver=None,
                  render_block_reference=None):
-        super(BlockReferenceProcessor, self).__init__(parser)
+        super(BlockReferencePreprocessor, self).__init__(
+            markdown_instance=markdown_instance
+        )
         self.url_resolver = url_resolver
         self.contents_resolver = contents_resolver
         self.render_block_reference = render_block_reference
 
-    def test(self, parent, block):
-        return self.RE.search(block)
+    def _process_line(self, line):
+        match = self.RE.match(line)
+        if not match:
+            return line
 
-    def run(self, parent, blocks):
-        block = blocks.pop(0)
-        match = self.RE.match(block)
+        # Without a contents_resolver, we can't resolve block contents
+        if (not callable(self.contents_resolver) or
+                not callable(self.render_block_reference)):
+            return ''
 
-        if match:
-            # Without a contents_resolver, we can't resolve block contents
-            if (not callable(self.contents_resolver) or
-                    not callable(self.render_block_reference)):
-                return
+        label = match.group('label')
+        contents = self.contents_resolver(label)
+        url = self.url_resolver(label)
 
-            label = match.group('label')
-            contents = self.contents_resolver(label)
-            url = self.url_resolver(label)
+        # If the contents we got is empty, just ignore the reference
+        if contents == '':
+            return ''
 
-            if contents == '':
-                return
+        rendered_contents = self.render_block_reference(
+            contents,
+            url=url
+        )
 
-            rendered_contents = self.render_block_reference(
-                contents,
-                url=url
+        # Split out the lines and we'll explode them later
+        return rendered_contents.splitlines()
+
+    def run(self, lines):
+        # Process the lines
+        processed_lines = [self._process_line(line) for line in lines]
+
+        # Get a new flat list of lines. _process_lines inserts a list of lines
+        # in place of a line that matches our reference, so we need to flatten
+        # the resulting list
+        return list(
+            chain.from_iterable(
+                item if isinstance(item, Iterable)
+                and not isinstance(item, basestring)
+                else [item]
+                for item in processed_lines
             )
-
-            parent.append(
-                util.etree.fromstring(rendered_contents.encode('utf-8'))
-            )
+        )
 
 
 def makeExtension(*args, **kwargs):
