@@ -134,13 +134,19 @@ class RegulationsExtension(Extension):
         del md.inlinePatterns['emphasis2']
 
         # Add block reference processor for `see(label)` syntax
-        md.preprocessors['blockreference'] = BlockReferencePreprocessor(
-            markdown_instance=md,
-            url_resolver=self.getConfig('url_resolver'),
-            contents_resolver=self.getConfig('contents_resolver'),
-            render_block_reference=self.getConfig(
-                'render_block_reference'),
+        md.preprocessors.insert(
+            0,
+            'blockreference',
+            BlockReferencePreprocessor(
+                markdown_instance=md,
+                url_resolver=self.getConfig('url_resolver'),
+                contents_resolver=self.getConfig('contents_resolver'),
+                render_block_reference=self.getConfig(
+                    'render_block_reference'
+                )
+            )
         )
+        print(md.preprocessors)
 
         # Replace the default paragraph processor with one that handles
         # `{label}` syntax and gives default hash-based ids to paragraphs
@@ -269,7 +275,7 @@ class BlockReferencePreprocessor(Preprocessor):
         )
 
         # Split out the lines and we'll explode them later
-        return rendered_contents.splitlines()
+        return rendered_contents.lstrip().splitlines()
 
     def run(self, lines):
         # Process the lines
