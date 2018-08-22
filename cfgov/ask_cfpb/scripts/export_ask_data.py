@@ -102,7 +102,7 @@ def export_questions(path='/tmp'):
     slug = 'ask-cfpb-{}.csv'.format(timestamp)
     file_path = '{}/{}'.format(path, slug).replace('//', '/')
     with open(file_path, 'w') as f:
-        writer = unicodecsv.writer(f, encoding='windows-1252')
+        writer = unicodecsv.writer(f, encoding='UTF-8')
         writer.writerow(HEADINGS)
         for row in assemble_output():
             writer.writerow(
