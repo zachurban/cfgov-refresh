@@ -16,7 +16,7 @@ from haystack.query import SearchQuerySet
 
 from wagtail.contrib.wagtailroutablepage.models import RoutablePageMixin, route
 from wagtail.wagtailadmin.edit_handlers import (
-    FieldPanel, ObjectList, StreamFieldPanel, TabbedInterface
+    FieldPanel, MultiFieldPanel, ObjectList, StreamFieldPanel, TabbedInterface
 )
 from wagtail.wagtailcore.fields import RichTextField, StreamField
 from wagtail.wagtailcore.models import Page
@@ -662,3 +662,39 @@ class AnswerPage(CFGOVPage):
             return None
 
         return self.answer_base.category.first().category_image
+
+class AskTagPage(CFGOVPage):
+    from ask_cfpb.models import Category
+    cats = [(cat.name, cat.name) for cat in Category.objects.all()]
+
+    ask_category = models.CharField(
+        choices=cats,
+        max_length=255
+    )
+    tag = models.CharField(max_length=255,)
+    content_panels = CFGOVPage.content_panels + [
+        MultiFieldPanel([
+            FieldPanel('ask_category'),
+            FieldPanel('tag'),
+        ], heading='Ask info'),
+    ]
+
+    edit_handler = TabbedInterface([
+        ObjectList(content_panels, heading='Content'),
+        ObjectList(CFGOVPage.sidefoot_panels, heading='Sidebar'),
+        ObjectList(CFGOVPage.settings_panels, heading='Configuration'),
+    ])
+
+    objects = CFGOVPageManager()
+
+
+    template = 'ask-cfpb/tagged-content-page.html'
+
+    def get_context(self, request, *args, **kwargs):
+        context = super(AskTagPage, self).get_context(request)
+        from ask_cfpb.models import Answer
+        context['answers'] = Answer.objects.filter(
+            category__name=self.ask_category,
+            search_tags__icontains=self.tag
+        ).order_by('question')
+        return context

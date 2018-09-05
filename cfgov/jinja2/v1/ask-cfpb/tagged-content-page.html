@@ -1,0 +1,26 @@
+{% extends 'layout-2-1-bleedbar.html' %}
+
+{% import 'form_block.html' as form_block with context %}
+{% import 'templates/render_block.html' as render_block with context %}
+{% import 'templates/streamfield-sidefoot.html' as streamfield_sidefoot with context %}
+
+{% block content_main_modifiers -%}
+    {{ super() }} content__flush-bottom
+{%- endblock %}
+
+{% block content_main %}
+    {% for answer in answers %}
+    	<div class="block u-mb30 {{'block__flush-top' if loop.index == 1 else 'block__border-top block__padded-top'}}">
+    		<h3>{{ answer.question | safe }}</h3>
+    		<p>{{ answer.snippet | safe }}</p>
+        </div>
+    {% endfor %}
+{% endblock %}
+
+{% block content_sidebar_modifiers -%}
+    o-sidebar-content
+{%- endblock %}
+
+{% block content_sidebar scoped -%}
+    {{ streamfield_sidefoot.render(page.sidefoot) }}
+{%- endblock %}
