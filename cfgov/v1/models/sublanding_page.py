@@ -6,6 +6,7 @@ from wagtail.wagtailcore.fields import StreamField
 from wagtail.wagtailcore.models import PageManager
 from wagtail.wagtailimages.blocks import ImageChooserBlock
 
+from ask_cfpb.models import blocks as ask_blocks
 from jobmanager.models import JobListingList
 from v1 import blocks as v1_blocks
 from v1.atomic_elements import molecules, organisms
@@ -19,6 +20,8 @@ class SublandingPage(CFGOVPage):
         ('hero', molecules.Hero()),
     ], blank=True)
     content = StreamField([
+        ('ask_block_v1', ask_blocks.TextVsLinkBlock()),
+        ('ask_block_v2', ask_blocks.TextAndLinkBlock()),
         ('text_introduction', molecules.TextIntroduction()),
         ('featured_content', molecules.FeaturedContent()),
         ('info_unit_group', organisms.InfoUnitGroup()),
