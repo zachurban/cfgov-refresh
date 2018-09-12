@@ -409,6 +409,10 @@ class CFGOVPage(Page):
     def post_preview_cache_key(self):
         return 'post_preview_{}'.format(self.id)
 
+    @property
+    def page_type(self):
+        return self.__class__.__name__
+
 
 class CFGOVPageCategory(Orderable):
     page = ParentalKey(CFGOVPage, related_name='categories')

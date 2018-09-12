@@ -1,0 +1,78 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+{% block titletag %}{% trans "External Links Management" %}{% endblock %}
+
+{% block content %}
+
+    <div class="nice-padding">
+        <h2>External Links Manager</h2>
+
+        <div class="help-block help-info">
+            <p>Enter an external URL to search all pages in Wagtail for occurrences of that URL</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <ul class="fields">
+                <li>
+            <div class="field url_field url_input">
+            <div class="input">
+            {{ form.url }}
+            </div>
+            </div>
+            </li>
+        </ul>
+        <button type="submit" class="button">Submit</button>
+        </form>
+        <table class="listing">
+            <thead>
+            <tr>
+                <td> Page title </td>
+                <td> Live page URL(s) </td>
+                <td> Parent page </td>
+                <td> Date last updated </td>
+                <td> Type </td>
+                <td> Link to edit </td>
+            </tr>
+            </thead>
+            <tbody>
+                {% for page in pages %}
+                <tr>
+                    <td> {{ page.title | truncatechars:60 }} </td>
+                    <td><a href={{ page.url }} target="_blank">{{ page.url | truncatechars:50 }}</a></td>
+                    <td><a href={{ page.parent.url }} target="_blank">{{ page.parent.title }}</a></td>
+                    <td> {{ page.last_published_at }} </td>
+                    <td> {{ page.specific.page_type | truncatechars:20 }} </td>
+                    <td><a href=/admin/pages/{{page.id}}/edit/ target="_blank">/admin/pages/{{page.id}}/edit/</a></td>
+                </tr>
+                {% endfor %}
+                {% for answer in answers %}
+                <tr>
+                    <td>{{ answer.english_page.title | truncatechars:60 }}</td>
+                    <td>
+                        <a href={{ answer.english_page.url }} target="_blank">
+                            {{ answer.english_page.url | truncatechars:50 }}
+                        </a>
+                        <br>
+                        <a href={{ answer.spanish_page.url }} target="_blank">
+                            {{ answer.spanish_page.url | truncatechars:50 }}
+                        </a>
+                    </td>
+                    <td>
+                        <a href={{ answer.english_page.parent.url }} target="_blank">
+                            {{ answer.english_page.parent.title }}
+                        </a>
+                    </td>
+                    <td> {{ answer.updated_at }} </td>
+                    <td>AnswerPage</td>
+                    <td>
+                        <a href=/admin/ask_cfpb/answer/edit/{{answer.id}}/ target="_blank">
+                            /admin/ask_cfpb/answer/edit/{{answer.id}}/
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+{% endblock %}
