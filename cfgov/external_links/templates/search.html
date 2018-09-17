@@ -48,6 +48,36 @@
                     <td> {{ page.status_string | upper }} </td>
                 </tr>
                 {% endfor %}
+                {% for snippet in reusable_texts %}
+                <tr>
+                    <td>{{ snippet.title }}<br>
+                        <button><a href=/admin/snippets/v1/reusabletext/{{snippet.id}}/ target="_blank">EDIT</a></button>
+                    </td>
+                    <td><a href=/admin/snippets/v1/reusabletext/ target="_blank">Reusable Texts</td>
+                    <td>N/A</td>
+                    <td>Snippet</td>
+                </tr>
+                {% endfor %}
+                {% for snippet in resources %}
+                <tr>
+                    <td>{{ snippet.title }}<br>
+                        <button><a href=/admin/snippets/v1/resource/{{snippet.id}}/ target="_blank">EDIT</a></button>
+                    </td>
+                    <td><a href=/admin/snippets/v1/resource/ target="_blank">Resources</td>
+                    <td>N/A</td>
+                    <td>Snippet</td>
+                </tr>
+                {% endfor %}
+                {% for snippet in contacts %}
+                <tr>
+                    <td>{{ snippet.heading }}<br>
+                        <button><a href=/admin/snippets/v1/contact/{{snippet.id}}/ target="_blank">EDIT</a></button>
+                    </td>
+                    <td><a href=/admin/snippets/v1/contact/ target="_blank">Contacts</td>
+                    <td>N/A</td>
+                    <td>Snippet</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
 

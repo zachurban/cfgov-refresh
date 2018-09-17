@@ -13,6 +13,7 @@ from v1.models.landing_page import LandingPage
 from v1.models.learn_page import (
     AbstractFilterPage, DocumentDetailPage, EventPage, LearnPage
 )
+from v1.models.snippets import Contact, Resource, ReusableText
 from v1.models.sublanding_filterable_page import SublandingFilterablePage
 from v1.models.sublanding_page import SublandingPage
 
@@ -46,10 +47,18 @@ class SearchView(View):
             'answer', 'snippet'
         ]))
 
-        num_results = len(pages)
+        contacts = list(Contact.objects.filter(body__contains=url))
+        resources = list(Resource.objects.filter(link__contains=url)) + list(
+            Resource.objects.filter(alternate_link__contains=url))
+        reusable_texts = list(ReusableText.objects.filter(text__contains=url))
+
+        num_results = len(pages + contacts + resources + reusable_texts)
 
         return render(request, self.template_name, {
             'form': form,
             'pages': pages,
+            'contacts': contacts,
+            'resources': resources,
+            'reusable_texts': reusable_texts,
             'num_results': num_results,
         })
