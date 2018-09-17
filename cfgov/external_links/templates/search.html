@@ -1,0 +1,55 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+{% block titletag %}{% trans "External Links Management" %}{% endblock %}
+
+{% block content %}
+
+    <div class="nice-padding">
+        <h2>External Links Manager</h2>
+
+        <div class="help-block help-info">
+            <p>Enter an external URL to search all pages in Wagtail for occurrences of that URL</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <ul class="fields">
+                <li>
+            <div class="field url_field url_input">
+            <div class="input">
+            {{ form.url }}
+            </div>
+            </div>
+            </li>
+        </ul>
+        <button type="submit" class="button">Submit</button>
+        </form>
+        <br>
+        NUMBER OF RESULTS: {{ num_results }}
+        <table class="listing">
+            <thead>
+            <tr>
+                <td> TITLE </td>
+                <td> PARENT </td>
+                <td> UPDATED </td>
+                <td> TYPE </td>
+                <td> STATUS </td>
+            </tr>
+            </thead>
+            <tbody>
+                {% for page in pages %}
+                <tr>
+                    <td> {{ page.title | truncatechars:100 }} <br>
+                         <button><a href=/admin/pages/{{page.id}}/edit/ target="_blank">EDIT</a></button>
+                         <button><a href={{ page.url }} target="_blank">VIEW LIVE</a></button>
+                    </td>
+                    <td><a href={{ page.parent.url }} target="_blank">{{ page.parent.title }}</a></td>
+                    <td> {{ page.last_published_at }} </td>
+                    <td> {{ page.specific.get_verbose_name }} </td>
+                    <td> {{ page.status_string | upper }} </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+{% endblock %}
