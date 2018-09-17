@@ -1,7 +1,8 @@
 from __future__ import absolute_import
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.template.loader import render_to_string
-
+from django.core.exceptions import ValidationError
+from django.forms.utils import ErrorList
 from wagtail.wagtailcore import blocks
 
 from ask_cfpb.models.django import Answer
@@ -91,12 +92,14 @@ class AllTextItem(blocks.StructBlock):
         ctx = super(AllTextItem, self).get_context(
             value, parent_context=parent_context)
         if value['answer_id']:
-            answer = Answer.objects.get(id=value['answer_id'])
-            if answer:
-                ctx['page_link'] = answer.english_page \
-                    if answer.english_page else None
-                ctx['heading'] = value['heading'] \
-                    if value['heading'] else answer.statement
+            try:
+                answer = Answer.objects.get(id=value['answer_id'])
+            except Exception:
+                return
+            ctx['page_link'] = answer.english_page \
+                if answer.english_page else None
+            ctx['heading'] = value['heading'] \
+                if value['heading'] else answer.statement           
         else:
             for x in ['page_link', 'external_link',
                       'heading', 'heading_level']:
@@ -105,6 +108,23 @@ class AllTextItem(blocks.StructBlock):
         ctx['link_text'] = value['link_text']
         ctx['heading_level'] = value['heading_level']
         return ctx
+
+    def clean(self, value):
+        cleaned = super(AllTextItem, self).clean(value)
+
+        if cleaned.get('answer_id'):
+            try:
+                answer = Answer.objects.get(id=cleaned['answer_id'])
+            except ObjectDoesNotExist:
+                raise ValidationError(
+                    'Validation error in TextItem: '
+                    'Ask answer does not exist',
+                    params={'answer_id': ErrorList([
+                        'Answer with given id does not exist.'
+                    ])}
+                )
+
+        return cleaned
 
     class Meta:
         template = '_includes/ask/ask-text-item.html'
@@ -141,15 +161,35 @@ class AllLinkItem(blocks.StructBlock):
             value, parent_context=parent_context)
         print parent_context
         if value['answer_id']:
-            answer = Answer.objects.get(id=value['answer_id'])
-            if answer.english_page:
-                ctx['page_link'] = answer.english_page
-            ctx['link_text'] = value['link_text'] \
-                if value['link_text'] else answer.statement
+            try:
+                answer = Answer.objects.get(id=value['answer_id'])
+                if answer.english_page:
+                    ctx['page_link'] = answer.english_page
+                ctx['link_text'] = value['link_text'] \
+                    if value['link_text'] else answer.statement
+            except Exception:
+                return  
         else:
             for x in ['link_text', 'page_link', 'external_link']:
                 ctx[x] = value[x]
         return ctx
+ 
+    def clean(self, value):
+        cleaned = super(AllLinkItem, self).clean(value)
+
+        if cleaned.get('answer_id'):
+            try:
+                answer = Answer.objects.get(id=cleaned['answer_id'])
+            except ObjectDoesNotExist:
+                raise ValidationError(
+                    'Validation error in LinkItem: '
+                    'Ask answer does not exist',
+                    params={'answer_id': ErrorList([
+                        'Answer with given id does not exist.'
+                    ])}
+                )
+
+        return cleaned
 
     class Meta:
         template = '_includes/ask/ask-link-item.html'
@@ -227,14 +267,33 @@ class AskLinkItem(blocks.StructBlock):
     def get_context(self, value, parent_context=None):
         ctx = super(AskLinkItem, self).get_context(
             value, parent_context=parent_context)
+        try:
+            answer = Answer.objects.get(id=value['answer_id'])
+            ctx['answer'] = answer
+            if answer.english_page:
+                ctx['page_link'] = answer.english_page
+            ctx['link_text'] = value['link_text'] \
+                if value['link_text'] else answer.statement
+            return ctx
+        except Exception:
+            return
 
-        answer = Answer.objects.get(id=value['answer_id'])
-        ctx['answer'] = answer
-        if answer.english_page:
-            ctx['page_link'] = answer.english_page
-        ctx['link_text'] = value['link_text'] \
-            if value['link_text'] else answer.statement
-        return ctx
+    def clean(self, value):
+        cleaned = super(AskLinkItem, self).clean(value)
+
+        if cleaned.get('answer_id'):
+            try:
+                answer = Answer.objects.get(id=cleaned['answer_id'])
+            except ObjectDoesNotExist:
+                raise ValidationError(
+                    'Validation error in LinkItem: '
+                    'Ask answer does not exist',
+                    params={'answer_id': ErrorList([
+                        'Answer with given id does not exist.'
+                    ])}
+                )
+
+        return cleaned
 
     class Meta:
         template = '_includes/ask/ask-link-item.html'
@@ -298,17 +357,37 @@ class AskTextItem(blocks.StructBlock):
     def get_context(self, value, parent_context=None):
         ctx = super(AskTextItem, self).get_context(
             value, parent_context=parent_context)
+        try:
+            answer = Answer.objects.get(id=value['answer_id'])
+            ctx['answer'] = answer
+            if answer.english_page:
+                ctx['page_link'] = answer.english_page
+            ctx['heading'] = value['heading'] \
+                if value['heading'] else answer.statement
+            ctx['body'] = value['body']
+            ctx['link_text'] = value['link_text']
+            ctx['heading_level'] = value['heading_level']
+            return ctx
+        except Exception:
+                return
 
-        answer = Answer.objects.get(id=value['answer_id'])
-        ctx['answer'] = answer
-        if answer.english_page:
-            ctx['page_link'] = answer.english_page
-        ctx['heading'] = value['heading'] \
-            if value['heading'] else answer.statement
-        ctx['body'] = value['body']
-        ctx['link_text'] = value['link_text']
-        ctx['heading_level'] = value['heading_level']
-        return ctx
+    def clean(self, value):
+        cleaned = super(AskTextItem, self).clean(value)
+
+        if cleaned.get('answer_id'):
+            try:
+                answer = Answer.objects.get(id=cleaned['answer_id'])
+            except ObjectDoesNotExist:
+                raise ValidationError(
+                    'Validation error in TextItem: '
+                    'Ask answer does not exist',
+                    params={'answer_id': ErrorList([
+                        'Answer with given id does not exist.'
+                    ])}
+                )
+
+        return cleaned
+
 
     class Meta:
         template = '_includes/ask/ask-text-item.html'
