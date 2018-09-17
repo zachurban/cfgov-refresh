@@ -568,6 +568,7 @@ class AnswerPage(CFGOVPage):
     search_fields = Page.search_fields + [
         index.SearchField('question'),
         index.SearchField('answer'),
+        index.SearchField('snippet'),
         index.SearchField('answer_base'),
         index.FilterField('language')
     ]

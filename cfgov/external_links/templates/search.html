@@ -1,0 +1,97 @@
+{% extends "wagtailadmin/base.html" %}
+{% load i18n %}
+{% block titletag %}{% trans "External Links Management" %}{% endblock %}
+
+{% block content %}
+
+    <div class="nice-padding">
+        <h2>External links</h2>
+
+        <div class="help-block help-info">
+            <p>Enter an external link in the input field to see a list of pages that contain the URL.</p>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <ul class="fields">
+                <li>
+            <div class="field url_field url_input">
+            <div class="input">
+            {{ form.url }}
+            </div>
+            </div>
+            </li>
+        </ul>
+        <button type="submit" class="button">Search</button>
+        </form>
+        <br>
+        {% if form.errors %}
+        ERRORS:
+        <br>
+            {% for field in form %}
+                {{ field.name }}:
+                {% for error in field.errors %}
+                    {{ error }}
+                {% endfor %}
+            {% endfor %}
+        {% endif %}
+        <br>
+        <br>
+        NUMBER OF RESULTS: {{ num_results }}
+        <table class="listing">
+            <thead>
+            <tr>
+                <td> TITLE </td>
+                <td> PARENT </td>
+                <td> UPDATED </td>
+                <td> TYPE </td>
+                <td> STATUS </td>
+            </tr>
+            </thead>
+            <tbody>
+                {% for page in pages %}
+                <tr>
+                    <td> {{ page.title | truncatechars:100 }} <br>
+                         <button><a href=/admin/pages/{{page.id}}/edit/ target="_blank">EDIT</a></button>
+                         <button><a href={{ page.url }} target="_blank">VIEW LIVE</a></button>
+                    </td>
+                    <td><a href={{ page.parent.url }} target="_blank">{{ page.parent.title }}</a></td>
+                    <td> {{ page.specific.latest_revision_created_at }} </td>
+                    <td> {{ page.specific.get_verbose_name }} </td>
+                    <td> {{ page.status_string | upper }} </td>
+                </tr>
+                {% endfor %}
+                {% for snippet in contacts %}
+                <tr>
+                    <td>{{ snippet.heading }}<br>
+                        <button><a href=/admin/snippets/v1/contact/{{snippet.id}}/ target="_blank">EDIT</a></button>
+                    </td>
+                    <td><a href=/admin/snippets/v1/contact/ target="_blank">Contacts</td>
+                    <td>N/A</td>
+                    <td>Snippet</td>
+                </tr>
+                {% endfor %}
+                {% for snippet in resources %}
+                <tr>
+                    <td>{{ snippet.title }}<br>
+                        <button><a href=/admin/snippets/v1/resource/{{snippet.id}}/ target="_blank">EDIT</a></button>
+                    </td>
+                    <td><a href=/admin/snippets/v1/resource/ target="_blank">Resources</td>
+                    <td>N/A</td>
+                    <td>Snippet</td>
+                </tr>
+                {% endfor %}
+                {% for snippet in reusable_texts %}
+                <tr>
+                    <td>{{ snippet.title }}<br>
+                        <button><a href=/admin/snippets/v1/reusabletext/{{snippet.id}}/ target="_blank">EDIT</a></button>
+                    </td>
+                    <td><a href=/admin/snippets/v1/reusabletext/ target="_blank">Reusable Texts</td>
+                    <td>N/A</td>
+                    <td>Snippet</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+
+{% endblock %}
