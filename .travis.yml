@@ -37,8 +37,8 @@ install:
 
 branches:
   only:
-    - master
     - test-run-dj111
+    - master
 
 before_script:
   - psql -c "ALTER USER travis WITH PASSWORD 'travis';"
