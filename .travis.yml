@@ -37,7 +37,6 @@ install:
 
 branches:
   only:
-    - test-run-dj111
     - master
 
 before_script:
