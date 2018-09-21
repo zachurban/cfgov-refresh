@@ -52,7 +52,8 @@ class SearchView(View):
             Resource.objects.filter(alternate_link__contains=url))
         reusable_texts = list(ReusableText.objects.filter(text__contains=url))
 
-        num_results = len(pages + contacts + resources + reusable_texts)
+        page_num = len(pages)
+        snippet_num = len(contacts + resources + reusable_texts)
 
         return render(request, self.template_name, {
             'form': form,
@@ -60,5 +61,6 @@ class SearchView(View):
             'contacts': contacts,
             'resources': resources,
             'reusable_texts': reusable_texts,
-            'num_results': num_results,
+            'page_num': page_num,
+            'snippet_num': snippet_num
         })
