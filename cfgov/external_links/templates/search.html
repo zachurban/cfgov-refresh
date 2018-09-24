@@ -36,62 +36,73 @@
         {% endif %}
         <br>
         <br>
-        NUMBER OF RESULTS: {{ num_results }}
-        <table class="listing">
-            <thead>
-            <tr>
-                <td> TITLE </td>
-                <td> PARENT </td>
-                <td> UPDATED </td>
-                <td> TYPE </td>
-                <td> STATUS </td>
-            </tr>
-            </thead>
-            <tbody>
-                {% for page in pages %}
-                <tr>
-                    <td> {{ page.title | truncatechars:100 }} <br>
-                         <button><a href=/admin/pages/{{page.id}}/edit/ target="_blank">EDIT</a></button>
-                         <button><a href={{ page.url }} target="_blank">VIEW LIVE</a></button>
-                    </td>
-                    <td><a href={{ page.parent.url }} target="_blank">{{ page.parent.title }}</a></td>
-                    <td> {{ page.specific.latest_revision_created_at }} </td>
-                    <td> {{ page.specific.get_verbose_name }} </td>
-                    <td> {{ page.status_string | upper }} </td>
-                </tr>
-                {% endfor %}
-                {% for snippet in contacts %}
-                <tr>
-                    <td>{{ snippet.heading }}<br>
-                        <button><a href=/admin/snippets/v1/contact/{{snippet.id}}/ target="_blank">EDIT</a></button>
-                    </td>
-                    <td><a href=/admin/snippets/v1/contact/ target="_blank">Contacts</td>
-                    <td>N/A</td>
-                    <td>Snippet</td>
-                </tr>
-                {% endfor %}
-                {% for snippet in resources %}
-                <tr>
-                    <td>{{ snippet.title }}<br>
-                        <button><a href=/admin/snippets/v1/resource/{{snippet.id}}/ target="_blank">EDIT</a></button>
-                    </td>
-                    <td><a href=/admin/snippets/v1/resource/ target="_blank">Resources</td>
-                    <td>N/A</td>
-                    <td>Snippet</td>
-                </tr>
-                {% endfor %}
-                {% for snippet in reusable_texts %}
-                <tr>
-                    <td>{{ snippet.title }}<br>
-                        <button><a href=/admin/snippets/v1/reusabletext/{{snippet.id}}/ target="_blank">EDIT</a></button>
-                    </td>
-                    <td><a href=/admin/snippets/v1/reusabletext/ target="_blank">Reusable Texts</td>
-                    <td>N/A</td>
-                    <td>Snippet</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        
+        {% if pages %}
+            <h2>Number of page results: {{ num_page_results }}</h2>
+            {% include "wagtailadmin/pages/listing/_list_explore.html" with show_parent=1 allow_navigation=0 %}
+        {% endif %}
+
+        {% if reusable_texts or resources or contacts %}
+            <h2>Number of snippet results: {{ num_snippet_results }}</h2>
+            <table class="listing">
+                <thead>
+                    <tr class="table-headers">
+                        <th>Title</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for snippet in reusable_texts %}
+                    <tr>
+                        <td class="title" valign="top">
+                            <h2>
+                                <a href="{% url 'wagtailsnippets:edit' 'v1' 'reusabletext' snippet.pk %}" target="_blank">
+                                    {{ snippet }}
+                                </a>
+                            </h2>
+                        </td>
+                        <td valign="top">
+                            <a href="{% url 'wagtailsnippets:list' 'v1' 'reusabletext' %}" target="_blank">
+                                Reusable Texts
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for snippet in resources %}
+                    <tr>
+                        <td valign="top"class="title" valign="top">
+                            <h2>
+                                <a href="{% url 'wagtailsnippets:edit' 'v1' 'resource' snippet.pk %}" target="_blank">
+                                    {{ snippet }}
+                                </a>
+                            </h2>
+                        </td>
+                        <td>
+                            <a href="{% url 'wagtailsnippets:list' 'v1' 'resource' %}" target="_blank">
+                                Resources
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% for snippet in contacts %}
+                    <tr>
+                        <td class="title" valign="top">
+                            <h2>
+                                <a href="{% url 'wagtailsnippets:edit' 'v1' 'contact' snippet.pk %}" target="_blank">
+                                    {{ snippet }}
+                                </a>
+                            </h2>
+                        </td>
+                        <td>
+                            <a href="{% url 'wagtailsnippets:list' 'v1' 'contact' %}" target="_blank">
+                                Contacts
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
 
 
 {% endblock %}
