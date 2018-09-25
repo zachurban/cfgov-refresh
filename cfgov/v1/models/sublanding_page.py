@@ -20,8 +20,7 @@ class SublandingPage(CFGOVPage):
         ('hero', molecules.Hero()),
     ], blank=True)
     content = StreamField([
-        ('ask_block_v1', ask_blocks.TextVsLinkBlock()),
-        ('ask_block_v2', ask_blocks.TextAndLinkBlock()),
+        ('ask_block', ask_blocks.TextAndLinkBlock()),
         ('text_introduction', molecules.TextIntroduction()),
         ('featured_content', molecules.FeaturedContent()),
         ('info_unit_group', organisms.InfoUnitGroup()),

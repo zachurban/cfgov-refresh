@@ -1,4 +1,4 @@
-{% set url = page_link.url if page_link else external_link | default('#') %}
+{% set url = page_link.url if page_link else external_link | default('/') %}
 {% if heading and heading_level %}
 	{% if heading_level == 'b' %}
 	<p>
