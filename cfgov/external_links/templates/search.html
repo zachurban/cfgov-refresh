@@ -6,7 +6,6 @@
 
     <div class="nice-padding">
         <h2>External links</h2>
-
         <div class="help-block help-info">
             <p>Enter an external link in the input field to see a list of pages that contain the URL.</p>
         </div>
@@ -14,28 +13,26 @@
             {% csrf_token %}
             <ul class="fields">
                 <li>
-            <div class="field url_field url_input">
+            <div class="field 
+                        url_field
+                        url_input
+                        {% if form.url.errors %} error {% endif %}">
             <div class="input">
             {{ form.url }}
             </div>
+             {% if form.url.errors %}
+                <p class="error-message">
+                    {% for error in form.url.errors %}
+                        <span>{{ error|escape }}</span>
+                    {% endfor %}
+                </p>
+            {% endif %}
             </div>
             </li>
         </ul>
         <button type="submit" class="button">Search</button>
         </form>
-        <br>
-        {% if form.errors %}
-        ERRORS:
-        <br>
-            {% for field in form %}
-                {{ field.name }}:
-                {% for error in field.errors %}
-                    {{ error }}
-                {% endfor %}
-            {% endfor %}
-        {% endif %}
-        <br>
-        <br>
+
         
         {% if pages %}
             <h2>Number of page results: {{ num_page_results }}</h2>
