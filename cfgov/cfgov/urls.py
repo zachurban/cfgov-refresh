@@ -5,9 +5,8 @@ from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse
 from django.shortcuts import render
-from django.views.defaults import page_not_found
 from django.views.generic.base import RedirectView, TemplateView
 
 from wagtail.contrib.wagtailsitemaps.views import sitemap
@@ -26,9 +25,11 @@ from core.views import (
     ExternalURLNoticeView, govdelivery_subscribe, regsgov_comment
 )
 from legacy.views import token_provider
+from legacy.views.complaint import ComplaintLandingView
 from legacy.views.housing_counselor import (
     HousingCounselorPDFView, HousingCounselorView
 )
+from regulations3k.views import redirect_eregs
 from transition_utilities.conditional_urls import include_if_app_enabled
 from v1.auth_forms import CFGOVPasswordChangeForm
 from v1.views import (
@@ -49,6 +50,20 @@ def flagged_wagtail_template_view(flag_name, template_name):
         flag_name=flag_name,
         template_name=template_name,
         condition=False
+    )
+
+
+def flagged_wagtail_only_view(flag_name, regex_path, url_name=None):
+    """If flag is set, serve page from Wagtail, otherwise raise 404."""
+    def this_view_always_raises_http404(request, *args, **kwargs):
+        raise Http404('flag {} not set'.format(flag_name))
+
+    return flagged_url(
+        flag_name,
+        regex_path,
+        lambda request: ServeView.as_view()(request, request.path),
+        fallback=this_view_always_raises_http404,
+        name=url_name,
     )
 
 
@@ -219,8 +234,9 @@ urlpatterns = [
         namespace='retirement_api'
     )),
 
-    url(r'^data-research/consumer-complaints/',
-        include_if_app_enabled('complaintdatabase', 'complaintdatabase.urls')),
+    url(r'^data-research/consumer-complaints/$',
+        ComplaintLandingView.as_view(),
+        name='complaint-landing'),
 
     # CCDB5-API
     flagged_url('CCDB5_RELEASE',
@@ -239,11 +255,6 @@ urlpatterns = [
         include_if_app_enabled('ratechecker', 'ratechecker.urls')),
     url(r'^oah-api/county/',
         include_if_app_enabled('countylimits', 'countylimits.urls')),
-
-    url(r'^eregs-api/',
-        include_if_app_enabled('regcore', 'regcore.urls')),
-    url(r'^eregulations/',
-        include_if_app_enabled('regulations', 'regulations.urls')),
 
     url(r'^find-a-housing-counselor/$',
         HousingCounselorView.as_view(),
@@ -272,7 +283,7 @@ urlpatterns = [
         template_name='knowbeforeyouowe/creditcards/tool.html'),
         name='cckbyo'),
     # Form csrf token provider for JS form submission
-    url(r'^token-provider/', token_provider),
+    url(r'^token-provider/', token_provider, name='csrf-token-provider'),
 
     # data-research-api
     url(r'^data-research/mortgages/api/v1/',
@@ -376,41 +387,60 @@ urlpatterns = [
                 r'^search/',
                 include('search.urls')),
 
-    flagged_url('TDP_CRTOOL',
-                r'^practitioner-resources/youth-financial-education/curriculum-review/tool/',  # noqa: E501
-                include_if_app_enabled('teachers_digital_platform',
-                                       'teachers_digital_platform.tool_urls')),
+    flagged_wagtail_only_view(
+        'TDP_SEARCH_INTERFACE',
+        r'^practitioner-resources/youth-financial-education/teach/activities/',
+        'tdp_search'),
+
+    flagged_wagtail_only_view(
+        'TDP_STATIC_PAGE',
+        r'^practitioner-resources/youth-financial-education/teach/'),
+
+    flagged_wagtail_only_view(
+        'TDP_STATIC_PAGE',
+        r'^practitioner-resources/youth-financial-education/learn/'),
+
+    flagged_wagtail_only_view(
+        'TDP_STATIC_PAGE',
+        r'practitioner-resources/youth-financial-education2/'),
+
+    flagged_wagtail_only_view(
+        'TDP_STATIC_PAGE',
+        r'^practitioner-resources/youth-financial-education/glossary-financial-terms/'),  # noqa: E501
+
+    flagged_wagtail_only_view(
+        'TDP_STATIC_PAGE',
+        r'^practitioner-resources/youth-financial-education/resources-research/'),  # noqa: E501
 
     flagged_url('TDP_CRTOOL',
-            r'^practitioner-resources/youth-financial-education/curriculum-review/before-you-begin/',  # noqa: E501
-            include_if_app_enabled('teachers_digital_platform',
-                                    'teachers_digital_platform.begin_urls')),
+        r'^practitioner-resources/youth-financial-education/curriculum-review/tool/',  # noqa: E501
+        include_if_app_enabled('teachers_digital_platform',
+                               'teachers_digital_platform.tool_urls')),
 
-    flagged_url('TDP_CRTOOL_PROTOTYPES',
-            r'^practitioner-resources/youth-financial-education/curriculum-review/prototypes/',  # noqa: E501
-            include_if_app_enabled('teachers_digital_platform',
-                                    'teachers_digital_platform.prototypes_urls')),  # noqa: E501
+    flagged_url('TDP_CRTOOL',
+        r'^practitioner-resources/youth-financial-education/curriculum-review/before-you-begin/',  # noqa: E501
+        include_if_app_enabled('teachers_digital_platform',
+                                'teachers_digital_platform.begin_urls')),
+
+    flagged_wagtail_only_view(
+        'TDP_CRTOOL',
+        r'^practitioner-resources/youth-financial-education/curriculum-review/$'),  # noqa: E501
 
     flagged_url('TDP_BB_TOOL',
-            r'^practitioner-resources/youth-financial-education/learn-about-the-building-blocks/take-a-tour',  # noqa: E501
-            include_if_app_enabled('teachers_digital_platform',
+        r'^practitioner-resources/youth-financial-education/tour',  # noqa: E501
+        include_if_app_enabled('teachers_digital_platform',
                                     'teachers_digital_platform.bb_urls')),
 
-    flagged_url(
-        'REGULATIONS3K',
-        r'^policy-compliance/rulemaking/regulations/',
-        lambda request: ServeView.as_view()(request, request.path),
-        fallback=page_not_found,
-        name='regulations'
-    ),
-    flagged_url(
-        'REGULATIONS3K',
+    url(
         r'^regulations3k-service-worker.js',
         TemplateView.as_view(
         template_name='regulations3k/regulations3k-service-worker.js',
         content_type='application/javascript'),
         name='regulations3k-service-worker.js'
     ),
+
+    # Explicitly redirect eRegulations URLs to Regulations3000
+    url(r'^eregulations/.*', redirect_eregs, name='eregs-redirect'),
 
 ]
 
@@ -458,7 +488,6 @@ if settings.ALLOW_ADMIN_URL:
         url(r'^admin/account/change_password/$',
             change_password,
             name='wagtailadmin_account_change_password'),
-        url(r'^django-admin/', include(admin.site.urls)),
         url(r'^admin/', include(wagtailadmin_urls)),
 
     ]

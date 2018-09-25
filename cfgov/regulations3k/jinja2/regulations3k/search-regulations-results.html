@@ -3,19 +3,19 @@
 {% import 'molecules/pagination.html' as pagination with context %}
 
 <div class="results_header">
-    {% if current_count > 0 %}
+    {% if current_count and current_count > 0 %}
     <div class="results_count">
-        <h3>
+        <h2 class="h3">
             Showing {{ current_count }}
             match{% if current_count > 1 %}es{% endif %}
             {% if total_count > current_count %}
                 out of {{ total_count }} total results
             {% endif %}
-        </h3>
+        </h2>
     </div>
     {% else %}
     <div class="results_count no-results">
-        <h3>No results match your filters.</h3>
+        <h2 class="h3">No results match your filters.</h2>
         <p>Try adjusting your filters or searching for different terms.</p>
     </div>
     {% endif %}
@@ -43,6 +43,7 @@
     </div>
     {% endif %}
 </div>
+{% if current_count %}
 <div class="results_list">
     {% for result in results %}
         {{ search_item.render( result ) }}
@@ -51,3 +52,4 @@
 <div class="results_paginator">
     {{ pagination.render( paginator.num_pages, current_page, '', '', 'Previous', 'Next' ) }}
 </div>
+{% endif %}

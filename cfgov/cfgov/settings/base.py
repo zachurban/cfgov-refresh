@@ -1,6 +1,7 @@
 import os
 import sys
 
+import django
 from django.conf import global_settings
 from django.utils.translation import ugettext_lazy as _
 
@@ -91,12 +92,8 @@ OPTIONAL_APPS = [
     {'import': 'paying_for_college',
      'apps': ('paying_for_college', 'haystack',)},
     {'import': 'retirement_api', 'apps': ('retirement_api',)},
-    {'import': 'complaint', 'apps': ('complaint',
-     'complaintdatabase', 'complaint_common',)},
     {'import': 'ratechecker', 'apps': ('ratechecker', 'rest_framework')},
     {'import': 'countylimits', 'apps': ('countylimits', 'rest_framework')},
-    {'import': 'regcore', 'apps': ('regcore', 'regcore_read')},
-    {'import': 'regulations', 'apps': ('regulations',)},
     {'import': 'complaint_search', 'apps': ('complaint_search', 'rest_framework')},
     {'import': 'ccdb5_ui', 'apps': ('ccdb5_ui', )},
     {'import': 'teachers_digital_platform', 'apps': ('teachers_digital_platform', 'mptt', 'haystack')},
@@ -182,6 +179,13 @@ TEMPLATES = [
     },
 ]
 
+# TODO: Remove this when support for Django < 1.9 is removed.
+# The ability to specify builtins like this was added in Django 1.9.
+# https://docs.djangoproject.com/en/dev/releases/1.9/#templates
+if django.VERSION[:2] >= (1, 9):
+    TEMPLATES[0]['OPTIONS']['builtins'] = [
+        'overextends.templatetags.overextends_tags',
+    ]
 
 WSGI_APPLICATION = 'cfgov.wsgi.application'
 
@@ -441,9 +445,6 @@ LOGIN_FAILS_ALLOWED = os.environ.get('LOGIN_FAILS_ALLOWED', 5)
 LOGIN_REDIRECT_URL = '/login/welcome/'
 LOGIN_URL = "/login/"
 
-# The base URL for the API that we use to access layers and the regulation.
-API_BASE = os.environ.get('EREGS_API_BASE', '')
-
 # When we generate an full HTML version of the regulation, we want to
 # write it out somewhere. This is where.
 OFFLINE_OUTPUT_DIR = ''
@@ -452,21 +453,6 @@ DATE_FORMAT = 'n/j/Y'
 
 GOOGLE_ANALYTICS_ID = ''
 GOOGLE_ANALYTICS_SITE = ''
-
-CACHE_MIDDLEWARE_ALIAS = 'default'
-CACHE_MIDDLEWARE_KEY_PREFIX = 'eregs'
-CACHE_MIDDLEWARE_SECONDS = 1800
-
-# eRegs
-BACKENDS = {
-    'regulations': 'regcore.db.django_models.DMRegulations',
-    'layers': 'regcore.db.django_models.DMLayers',
-    'notices': 'regcore.db.django_models.DMNotices',
-    'diffs': 'regcore.db.django_models.DMDiffs',
-}
-
-# Regulations in eRegs that should display the update-in-progress message
-EREGS_REGULATION_UPDATES = ['1002', '1003', '1005', '1010', '1011', '1012', '1013', '1024', '1026']
 
 # Regulations.gov environment variables
 REGSGOV_BASE_URL = os.environ.get('REGSGOV_BASE_URL')
@@ -644,11 +630,11 @@ FLAGS = {
     # Teacher's Digital Platform Customer Review Tool
     'TDP_CRTOOL': {'environment is': 'beta'},
 
-    # Teacher's Digital Platform Customer Review Tool Prototypes Pages
-    'TDP_CRTOOL_PROTOTYPES': {'environment is': 'beta'},
-
     # Teacher's Digital Platform Search Interface Tool
     'TDP_SEARCH_INTERFACE': {'environment is': 'beta'},
+
+    # Teacher's Digital Platform Static Pages
+    'TDP_STATIC_PAGE': {'environment is': 'beta'},
 
     # Teacher's Digital Platform Building Blocks Tool
     'TDP_BB_TOOL': {'environment is': 'beta'},
@@ -659,8 +645,6 @@ FLAGS = {
 
     # Ping google on page publication in production only
     'PING_GOOGLE_ON_PUBLISH': {'environment is': 'production'},
-
-    'REGULATIONS3K': {},
 
     'LEGACY_HUD_API': {'environment is': 'production'},
 

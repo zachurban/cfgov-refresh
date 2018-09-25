@@ -10,22 +10,30 @@ from data_research.models import ConferenceRegistration
 class ConferenceRegistrationFormTests(TestCase):
     capacity = 100
     govdelivery_code = 'TEST-CODE'
+    govdelivery_question_id = '12345'
+    govdelivery_answer_id = '67890'
 
     def test_invalid_form_if_fields_are_missing(self):
         form = ConferenceRegistrationForm(
             capacity=self.capacity,
             govdelivery_code=self.govdelivery_code,
+            govdelivery_question_id=self.govdelivery_question_id,
+            govdelivery_answer_id=self.govdelivery_answer_id,
             data={'foo': 'bar'}
         )
         self.assertFalse(form.is_valid())
 
     def get_valid_form(
         self,
-        attendee_type=ConferenceRegistrationForm.ATTENDEE_IN_PERSON
+        attendee_type=ConferenceRegistrationForm.ATTENDEE_IN_PERSON,
+        govdelivery_question_id=None,
+        govdelivery_answer_id=None
     ):
         return ConferenceRegistrationForm(
             capacity=self.capacity,
             govdelivery_code=self.govdelivery_code,
+            govdelivery_question_id=govdelivery_question_id,
+            govdelivery_answer_id=govdelivery_answer_id,
             data={
                 'attendee_type': attendee_type,
                 'name': 'A User',
@@ -92,6 +100,35 @@ class ConferenceRegistrationFormTests(TestCase):
                 }
             )]
         )
+
+    def test_form_save_commit_true_subscribes_and_sets_question(self):
+        form = self.get_valid_form(
+            govdelivery_question_id='12345',
+            govdelivery_answer_id='67890'
+        )
+        form.is_valid()
+        form.save()
+
+        self.assertEqual(MockGovDelivery.calls, [
+            (
+                'set_subscriber_topics',
+                (),
+                {
+                    'contact_details': 'user@domain.com',
+                    'topic_codes': ['TEST-CODE'],
+                    'send_notifications': True,
+                }
+            ),
+            (
+                'set_subscriber_answer_to_select_question',
+                (),
+                {
+                    'contact_details': 'user@domain.com',
+                    'question_id': '12345',
+                    'answer_id': '67890',
+                }
+            ),
+        ])
 
     def make_capacity_registrants(self, govdelivery_code, attendee_type):
         registrant = ConferenceRegistration(
