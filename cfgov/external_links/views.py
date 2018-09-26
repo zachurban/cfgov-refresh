@@ -37,11 +37,6 @@ class SearchView(View):
 
     def post(self, request):
         form = ExternalLinksForm(request.POST)
-        if form.errors:
-            return render(request, self.template_name, {
-                'form': form
-            })
-
         url = form.data['url']
         pages = []
 
