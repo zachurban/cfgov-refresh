@@ -6,7 +6,7 @@ from django.core.urlresolvers import reverse
 from wagtail.wagtailadmin.menu import MenuItem
 from wagtail.wagtailcore import hooks
 
-from external_links.views import SearchView
+from search.views import SearchView
 
 
 @hooks.register('register_admin_urls')

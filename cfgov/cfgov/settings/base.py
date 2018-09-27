@@ -80,7 +80,6 @@ INSTALLED_APPS = (
     'core',
     'legacy',
     'django_extensions',
-    'external_links',
     'jobmanager',
     'wellbeing',
     'search',
