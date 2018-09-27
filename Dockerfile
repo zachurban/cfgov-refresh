@@ -1,8 +1,33 @@
-FROM centos:7
-RUN yum -y install https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-7-x86_64/pgdg-centos10-10-2.noarch.rpm && \
-    yum -y install which gcc gcc-c++ kernel-devel mailcap make postgresql10 postgresql10-devel python-devel && \
-    yum clean all
-ADD  https://bootstrap.pypa.io/get-pip.py /src/get-pip.py
-COPY requirements /src/requirements
-COPY extend-environment.sh /etc/profile.d/extend-environment.sh
-RUN python /src/get-pip.py && pip install -r /src/requirements/local.txt
+FROM node:10.11.0-alpine as frontend
+WORKDIR /usr/src/app
+COPY . ./
+RUN apk update && apk upgrade && \
+    apk add --no-cache bash git openssh
+RUN ./frontend.sh
+
+FROM python:2.7.15-alpine
+WORKDIR /usr/src/app
+COPY config *.sh .env ./
+COPY requirements ./requirements
+COPY cfgov ./cfgov
+ADD  https://bootstrap.pypa.io/get-pip.py ./get-pip.py
+RUN set -ex \
+    && apk update && apk upgrade \
+    && apk add --no-cache \
+            gcc \
+            make \
+            bash \
+            libc-dev \
+            musl-dev \
+            linux-headers \
+            zlib-dev \
+            libxml2-dev \
+            libxslt-dev \
+            libffi-dev \
+            jpeg-dev \
+            pcre-dev \
+            postgresql-dev \
+            postgresql-client \
+    && python ./get-pip.py && pip install -r ./requirements/local.txt
+COPY --from=frontend /usr/src/app/cfgov/static_built /usr/src/app/cfgov/static_built
+RUN ./setup.sh docker
