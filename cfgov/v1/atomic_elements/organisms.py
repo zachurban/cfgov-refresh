@@ -1079,6 +1079,38 @@ class DataSnapshot(blocks.StructBlock):
         help_text='Descriptive sentence, e.g. In year-over-year originations'
     )
 
+    # Inquiry/Tightness Indices
+    inquiry_month = blocks.DateBlock(
+        required=False,
+        max_length=20,
+        help_text='Month of latest entry in dataset for inquiry data'
+    )
+    inquiry_year_over_year_change = blocks.CharBlock(
+        required=False,
+        max_length=20,
+        help_text='Percentage change, e.g. 5.6% increase'
+    )
+    inquiry_year_over_year_change_text = blocks.CharBlock(
+        required=False,
+        max_length=100,
+        help_text='Descriptive sentence, e.g. In year-over-year inquiries'
+    )
+    tightness_month = blocks.DateBlock(
+        required=False,
+        max_length=20,
+        help_text='Month of latest entry in dataset for credit tightness data'
+    )
+    tightness_year_over_year_change = blocks.CharBlock(
+        required=False,
+        max_length=20,
+        help_text='Percentage change, e.g. 5.6% increase'
+    )
+    tightness_year_over_year_change_text = blocks.CharBlock(
+        required=False,
+        max_length=100,
+        help_text='Descriptive sentence, e.g. In year-over-year credit tightness'  # noqa
+    )
+
     # Select an image
     image = images_blocks.ImageChooserBlock(required=False, icon='image')
 
