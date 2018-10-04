@@ -20,5 +20,7 @@ def register_external_links_url():
 def register_external_links_menu():
     return MenuItem('External Links',
                     reverse('external-links'),
-                    classnames='icon icon-search',
+                    classnames='icon icon-link',
                     order=10000)
+
+
