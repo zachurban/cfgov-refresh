@@ -30,22 +30,27 @@ COPY static.in ./static.in
 ADD  https://bootstrap.pypa.io/get-pip.py ./get-pip.py
 RUN set -ex \
     && apk update && apk upgrade \
-    && apk add --no-cache \
+    && apk add --no-cache --virtual .build-deps \
             gcc \
             make \
-            bash \
-            curl \
-            libc-dev \
             musl-dev \
-            linux-headers \
             zlib-dev \
             libxml2-dev \
             libxslt-dev \
             libffi-dev \
             jpeg-dev \
-            pcre-dev \
             postgresql-dev \
+    && apk add --no-cache \
+            bash \
+            curl \
             postgresql-client \
-    && python ./get-pip.py && pip install -r ./requirements/local.txt
+            musl \
+            zlib \
+            libxml2 \
+            libxslt \
+            libffi \
+            jpeg \
+    && python ./get-pip.py \
+    && ./setup.sh docker \
+    && apk del .build-deps
 COPY --from=frontend /usr/src/app/cfgov/static_built /usr/src/app/cfgov/static_built
-RUN ./setup.sh docker
