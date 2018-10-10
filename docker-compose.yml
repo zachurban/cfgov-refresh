@@ -22,14 +22,13 @@ services:
         environment:
             ES_HOST: elasticsearch
         volumes:
-            - ./:/src/cfgov-refresh
-            - ./develop-apps:/src/develop-apps
+            - ./:/usr/src/app
         entrypoint:
             - sh
-            - /src/cfgov-refresh/cfgov/entrypoint.sh
+            - /usr/src/app/cfgov/entrypoint.sh
         depends_on:
             - elasticsearch
             - postgres
-        working_dir: /src/cfgov-refresh
+        working_dir: /usr/src/app/
         stdin_open: true
         tty: true
