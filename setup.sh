@@ -9,12 +9,6 @@
 # Set script to exit on any errors.
 set -e
 
-ENVVAR=.env
-if [ ! -f $ENVVAR ]; then
-  echo 'Creating default environment variables...'
-  cp "$ENVVAR"_SAMPLE $ENVVAR
-fi
-
 if [ "$1" != "docker" ]; then
   ./frontend.sh $1
 fi

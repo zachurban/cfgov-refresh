@@ -1,4 +1,3 @@
-develop-apps
 .tox
 collectstatic
 *.sql
