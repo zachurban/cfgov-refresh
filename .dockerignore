@@ -1,8 +1,8 @@
+develop-apps
 .tox
 collectstatic
 *.sql
 .github
-node_modules
 docs
 .vendor
 html

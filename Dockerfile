@@ -52,6 +52,7 @@ RUN set -ex \
             libjpeg-turbo-dev \
     && apk add --no-cache \
             nodejs-current \
+            npm \
             yarn \
             bash \
             curl \
@@ -66,6 +67,6 @@ RUN set -ex \
             libwebp \
             libjpeg-turbo \
     && python ./get-pip.py \
-    && bash ./backend.sh docker \
+    && bash -c './backend.sh docker' \
     && apk del .build-deps
 COPY --from=frontend /usr/src/app/cfgov/static_built /usr/src/static_built
