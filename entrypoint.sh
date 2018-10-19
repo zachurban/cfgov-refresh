@@ -11,8 +11,10 @@ for d in /usr/src/app/develop-apps/*/ ; do
     if [ -d "$d" ]; then
       export PYTHONPATH=$d:$PYTHONPATH
       if [ ! -d "$d/node_modules" ]; then
-        echo "Building frontend for: $d"
-        "$d/frontend.sh"
+        if [ -f "$d/frontend.sh" ]; then
+          echo "Building frontend for: $d"
+          "$d/frontend.sh"
+        fi
       fi
     fi
 done
