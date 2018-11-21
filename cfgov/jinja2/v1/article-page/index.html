@@ -1,0 +1,66 @@
+{% extends 'layout-2-1-bleedbar.html' %}
+
+{% import 'form_block.html' as form_block with context %}
+{% import 'organisms/item-introduction.html' as item_introduction with context %}
+{% import 'templates/render_block.html' as render_block with context %}
+{% import 'templates/streamfield-sidefoot.html' as streamfield_sidefoot with context %}
+
+{% block content_main_modifiers -%}
+    {{ super() }} content__flush-bottom
+{%- endblock %}
+
+{% block content_main %}
+    <style>
+        .o-post-preview {
+            margin-bottom: 30px;
+        }
+        .o-post-preview + .o-post-preview {
+            padding-top: 30px;
+            border-top: 1px solid #b4b5b6;
+            margin-top: 0;
+        }
+    </style>
+    {% for block in page.header -%}
+        {% if block.block_type == 'item_introduction' %}
+            {{ item_introduction.render(block.value) }}
+        {% else %}
+            {{ render_block.render(block, loop.index) }}
+        {% endif %}
+    {%- endfor %}
+
+    {% for block in page.content -%}
+        {% if block.block_type == 'feedback' %}
+            {{- form_block.render(block, 'content', loop.index0) -}}
+        {% else %}
+            {{ render_block.render(block, loop.index) }}
+        {% endif %}
+    {%- endfor %}
+
+    <div class="block block__border-top block__padded-top">
+    {% for answer in answers -%} 
+        <article class="o-post-preview">
+            <div class="o-post-preview_content">
+                <h3 class="o-post-preview_title">
+                    <a href="{{ answer.url }}">
+                        {{ answer.question | safe if answer.question else answer.statement | safe }}
+                    </a>
+                </h3>
+                {% if answer.snippet %}
+                    <div class="o-post-preview_description">
+                        {{ answer.snippet | safe }}
+                    </div>
+                {% endif %}
+            </div>
+        </article>
+    {% endfor %}
+    </div>
+{% endblock %}
+
+
+{% block content_sidebar_modifiers -%}
+    o-sidebar-content
+{%- endblock %}
+
+{% block content_sidebar scoped -%}
+    {{ streamfield_sidefoot.render(page.sidefoot) }}
+{%- endblock %}

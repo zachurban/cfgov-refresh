@@ -19,6 +19,7 @@ from v1.models.learn_page import (
     AbstractFilterPage, AgendaItemBlock, DocumentDetailPage, EventPage,
     LearnPage
 )
+from v1.models.article_page import ArticlePage
 from v1.models.menu_item import MenuItem
 from v1.models.newsroom_page import LegacyNewsroomPage, NewsroomPage
 from v1.models.resources import Resource, ResourceTag, TaggableSnippetManager
