@@ -49,6 +49,14 @@ class CFGOVTaggedPages(TaggedItemBase):
         verbose_name_plural = _("Tags")
 
 
+class AskCategoryPages(TaggedItemBase):
+    content_object = ParentalKey('CFGOVPage')
+
+    class Meta:
+        verbose_name = _("Category")
+        verbose_name_plural = _("Categories")
+
+
 class BaseCFGOVPageManager(PageManager):
     def get_queryset(self):
         return PageQuerySet(self.model).order_by('path')
@@ -65,6 +73,13 @@ class CFGOVPage(Page):
                                      related_name='authored_pages')
     tags = ClusterTaggableManager(through=CFGOVTaggedPages, blank=True,
                                   related_name='tagged_pages')
+    ask_categories = ClusterTaggableManager(
+        through=AskCategoryPages,
+        verbose_name='Categories',
+        help_text='A comma separated list of categories',
+        blank=True,
+        related_name='category_pages'
+    )
     shared = models.BooleanField(default=False)
     has_unshared_changes = models.BooleanField(default=False)
     language = models.CharField(
@@ -120,6 +135,7 @@ class CFGOVPage(Page):
         InlinePanel('categories', label="Categories", max_num=2),
         FieldPanel('tags', 'Tags'),
         FieldPanel('authors', 'Authors'),
+        FieldPanel('ask_categories', 'Categories'),
         MultiFieldPanel(Page.settings_panels, 'Scheduled Publishing'),
         FieldPanel('language', 'language'),
     ]

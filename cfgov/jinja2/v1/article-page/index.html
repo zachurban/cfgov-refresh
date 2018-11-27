@@ -4,6 +4,7 @@
 {% import 'organisms/item-introduction.html' as item_introduction with context %}
 {% import 'templates/render_block.html' as render_block with context %}
 {% import 'templates/streamfield-sidefoot.html' as streamfield_sidefoot with context %}
+{% import 'macros/category-icon.html' as category_icon %}
 
 {% block content_main_modifiers -%}
     {{ super() }} content__flush-bottom
@@ -35,6 +36,15 @@
             {{ render_block.render(block, loop.index) }}
         {% endif %}
     {%- endfor %}
+
+    <h1>
+        {{ category_icon.render(page.tag, true) }}
+        {{ page.tag }}
+    </h1>
+    <h2>
+        {{ page.category }}
+    </h2>
+
 
     <div class="block block__border-top block__padded-top">
     {% for answer in answers -%} 

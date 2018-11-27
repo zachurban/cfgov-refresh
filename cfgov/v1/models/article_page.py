@@ -14,7 +14,13 @@ from v1.models.base import CFGOVPage
 
 
 class ArticlePage(CFGOVPage):
-    tag = models.CharField(max_length=500)
+    tag = models.CharField(max_length=500, blank=True)
+    category = models.CharField(max_length=500, blank=True)
+    limit = models.CharField(
+        max_length=3,
+        default='3',
+        help_text='Limit list to this number of items'
+    )
     header = StreamField([
         ('hero', molecules.Hero()),
         ('text_introduction', molecules.TextIntroduction()),
@@ -35,7 +41,9 @@ class ArticlePage(CFGOVPage):
         StreamFieldPanel('header'),
         StreamFieldPanel('content'),
         MultiFieldPanel([
-            FieldPanel('tag', classname="full"),
+            FieldPanel('tag', classname='full'),
+            FieldPanel('category', classname='full'),
+            FieldPanel('limit', classname='full'),
         ], heading='Related answers', classname='collapsible'),
     ]
 
@@ -57,8 +65,13 @@ class ArticlePage(CFGOVPage):
 
     def get_context(self, request, *args, **kwargs):
         from ask_cfpb.models.pages import AnswerPage
-        context = super(ArticlePage, self).get_context(request, *args, **kwargs)
+        answers = AnswerPage.objects.filter(
+            ask_categories__name__in=[self.category]).filter(
+            tags__name__in=[self.tag])[:self.limit]
+        context = super(ArticlePage, self).get_context(
+            request, *args, **kwargs
+        )
         context.update({
-            'answers': AnswerPage.objects.filter(tags__name=self.tag)
+            'answers': answers
         })
         return context
