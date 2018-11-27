@@ -523,10 +523,10 @@ class AnswerPage(CFGOVPage):
     Page type for Ask CFPB answers.
     """
     from ask_cfpb.models import Answer
-    question = RichTextField(blank=True, editable=False)
-    answer = RichTextField(blank=True, editable=False)
+    question = RichTextField(blank=True)
+    answer = RichTextField(blank=True)
     snippet = RichTextField(
-        blank=True, help_text='Optional answer intro', editable=False)
+        blank=True, help_text='Optional answer intro')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     publish_date = models.DateTimeField(default=timezone.now)
@@ -549,6 +549,9 @@ class AnswerPage(CFGOVPage):
     ], blank=True)
 
     content_panels = CFGOVPage.content_panels + [
+        FieldPanel('snippet'),
+        FieldPanel('answer'),
+        FieldPanel('question'),
         FieldPanel('redirect_to'),
     ]
 
