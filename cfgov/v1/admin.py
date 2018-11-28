@@ -7,11 +7,17 @@ from wagtail.wagtailcore.models import Page
 
 from v1.email import send_password_reset_email
 from v1.models import Contact, Feedback
+from v1.models.base import AskCategoryPages
 
 
 admin.site.register(Contact)
 admin.site.unregister(User)
 admin.site.unregister(Page)
+
+
+@admin.register(AskCategoryPages)
+class AskCategoryPagesAdmin(admin.ModelAdmin):
+    search_fields = ['tag__name']
 
 
 @admin.register(User)
