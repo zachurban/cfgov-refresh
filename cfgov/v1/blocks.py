@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.template.loader import render_to_string
 from django.utils.module_loading import import_string
 from django.utils.safestring import SafeText, mark_safe
 from django.utils.text import slugify
@@ -301,3 +302,25 @@ class FeaturedMenuContent(blocks.StructBlock):
     link = Link(required=False, label="H4 link")
     body = blocks.RichTextBlock(required=False)
     image = atoms.ImageBasic(required=False)
+
+
+class RelatedAnswers(blocks.StructBlock):
+    tag = blocks.CharBlock(max_length=500, blank=True)
+    category = blocks.CharBlock(max_length=500, blank=True)
+    limit = blocks.IntegerBlock(
+        max_length=3,
+        default='3',
+        help_text='Limit list to this number of items'
+    )
+
+    def render(self, value, context=None):
+        template = '_includes/related-answers.html'
+        from ask_cfpb.models.pages import AnswerPage
+        answers = AnswerPage.objects.filter(
+            ask_categories__name__in=[value['category']]).filter(
+            tags__name__in=[value['tag']])[:value['limit']]
+        value['answers'] = answers
+        return render_to_string(template, {'value': value})
+
+    class Meta:
+        icon = 'title'

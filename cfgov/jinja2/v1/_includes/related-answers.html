@@ -1,0 +1,29 @@
+{% import 'macros/category-icon.html' as category_icon %}
+
+<h1>
+    {{ category_icon.render(value.tag, true) }}
+    {{ value.tag }}
+</h1>
+<h2>
+    {{ value.category }}
+</h2>
+
+
+<div class="block block__border-top block__padded-top">
+{% for answer in value.answers -%} 
+    <article class="o-post-preview">
+        <div class="o-post-preview_content">
+            <h3 class="o-post-preview_title">
+                <a href="{{ answer.url }}">
+                    {{ answer.question | safe if answer.question else answer.statement | safe }}
+                </a>
+            </h3>
+            {% if answer.snippet %}
+                <div class="o-post-preview_description">
+                    {{ answer.snippet | safe }}
+                </div>
+            {% endif %}
+        </div>
+    </article>
+{% endfor %}
+</div>

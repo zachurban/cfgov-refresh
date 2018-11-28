@@ -49,6 +49,7 @@ class BrowsePage(CFGOVPage):
         ('image_text_50_50_group', organisms.ImageText5050Group()),
         ('half_width_link_blob_group', organisms.HalfWidthLinkBlobGroup()),
         ('third_width_link_blob_group', organisms.ThirdWidthLinkBlobGroup()),
+        ('related_answers', v1_blocks.RelatedAnswers()),
     ], blank=True)
 
     secondary_nav_exclude_sibling_pages = models.BooleanField(default=False)
