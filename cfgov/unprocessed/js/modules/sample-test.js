@@ -3,14 +3,8 @@
    any pages in the site.
    ========================================================================== */
 
-/**
- * Set up event handler for button to scroll to top of page.
- */
 function init() {
-  behavior.attach( 'return-to-top', 'click', event => {
-    event.preventDefault();
-    _scrollToTop();
-  } );
+  return 'krang';
 }
 
 export { init };
