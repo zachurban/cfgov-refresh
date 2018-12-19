@@ -5,7 +5,7 @@ const sampleTestIndex = require(
 describe( 'sample test javascript file', () => {
 
   it( 'should return a string', () => {
-    expect( sampleTestIndex.init() ).toBe( 'blah' );
+    expect( sampleTestIndex.init() ).toBe( 'Shredder' );
   } );
 
 } );
