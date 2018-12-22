@@ -14,10 +14,14 @@ from django.utils.text import Truncator
 from django.utils.translation import ugettext_lazy as _
 from haystack.query import SearchQuerySet
 
+from django import forms
+
 from wagtail.contrib.wagtailroutablepage.models import RoutablePageMixin, route
 from wagtail.wagtailadmin.edit_handlers import (
-    FieldPanel, ObjectList, StreamFieldPanel, TabbedInterface
+    FieldPanel, ObjectList, StreamFieldPanel, TabbedInterface, MultiFieldPanel, FieldRowPanel
 )
+from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
+
 from wagtail.wagtailcore.fields import RichTextField, StreamField
 from wagtail.wagtailcore.models import Page
 from wagtail.wagtailsearch import index
@@ -26,6 +30,8 @@ from v1 import blocks as v1_blocks
 from v1.atomic_elements import molecules, organisms
 from v1.models import CFGOVPage, CFGOVPageManager, LandingPage
 from v1.models.snippets import ReusableText
+
+from ask_cfpb.models import NextStep
 
 
 SPANISH_ANSWER_SLUG_BASE = '/es/obtener-respuestas/slug-es-{}/'
@@ -527,9 +533,19 @@ class AnswerPage(CFGOVPage):
     answer = RichTextField(blank=True)
     snippet = RichTextField(
         blank=True, help_text='Optional answer intro')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    publish_date = models.DateTimeField(default=timezone.now)
+    statement = models.TextField(
+        blank=True,
+        help_text=(
+            "(Optional) Use this field to rephrase the question title as "
+            "a statement. Use only if this answer has been chosen to appear "
+            "on a money topic portal (e.g. /consumer-tools/debt-collection)."))
+    # will pull from the answer model last_edited and last_edited_es
+    last_edited = models.DateTimeField(
+        blank=True,
+        null=True,
+    )
+
+
     answer_base = models.ForeignKey(
         Answer,
         blank=True,
@@ -543,15 +559,63 @@ class AnswerPage(CFGOVPage):
         on_delete=models.SET_NULL,
         related_name='redirected_pages',
         help_text="Choose another Answer to redirect this page to")
+    featured = models.BooleanField(
+        default=False,
+        help_text=(
+            "Check to make this one of two featured answers "
+            "on the landing page."))
+    featured_rank = models.IntegerField(blank=True, null=True)
+    category = models.ManyToManyField(
+        'Category',
+        blank=True,
+        help_text=(
+            "Categorize this answer. "
+            "Avoid putting into more than one category."))
+    subcategory = models.ManyToManyField(
+        'SubCategory',
+        blank=True,
+        help_text=(
+            "Choose only subcategories that belong "
+            "to one of the categories checked above."))
+    search_tags_es = models.CharField(
+        max_length=1000,
+        blank=True,
+        help_text="Spanish search words or phrases, separated by commas")
+    next_step = models.ForeignKey(
+        NextStep,
+        blank=True,
+        null=True,
+        help_text=(
+            "Formerly known as action items or upsell items."
+            "On the web page, these are labeled as "
+            "'Explore related resources.'"))
 
     content = StreamField([
         ('feedback', v1_blocks.Feedback()),
     ], blank=True)
 
     content_panels = CFGOVPage.content_panels + [
-        FieldPanel('snippet'),
-        FieldPanel('answer'),
-        FieldPanel('question'),
+        MultiFieldPanel([
+            FieldPanel('question', classname="title"),
+            FieldPanel('statement', classname="title"),
+            FieldPanel('snippet', classname="full"),
+            FieldPanel('answer', classname="full")],
+            heading="Page content",
+            classname="collapsible"),
+        FieldPanel('last_edited'),
+        MultiFieldPanel([
+            FieldRowPanel([
+                FieldPanel('featured'),
+                FieldPanel('featured_rank')]),
+            FieldPanel('next_step'),
+            FieldPanel(
+                'category', widget=forms.CheckboxSelectMultiple),
+            FieldPanel(
+                'subcategory',
+                widget=forms.CheckboxSelectMultiple),
+            FieldPanel('search_tags_es'),],
+            heading="Metadata",
+            classname="collapsible"),
         FieldPanel('redirect_to'),
     ]
 
