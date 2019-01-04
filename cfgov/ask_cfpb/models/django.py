@@ -133,10 +133,13 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
-    def featured_answers(self):
-        return Answer.objects.filter(
+    def featured_answers(self, language):
+        from .pages import AnswerPage
+        return AnswerPage.objects.filter(
+            language=language,
             category=self,
-            featured=True).order_by('featured_rank')
+            featured=True).order_by('featured_rank'
+        )
 
     @property
     def top_tags_es(self):
@@ -629,9 +632,9 @@ class Answer(models.Model):
                 if self.update_spanish_page:
                     self.create_or_update_page(language='es')
 
-    def delete(self):
-        self.answer_pages.all().delete()
-        super(Answer, self).delete()
+    # def delete(self):
+    #     self.answer_pages.all().delete()
+    #     super(Answer, self).delete()
 
 
 class EnglishAnswerProxy(Answer):

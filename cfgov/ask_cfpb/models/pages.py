@@ -1,3 +1,4 @@
+
 from __future__ import absolute_import, unicode_literals
 
 import json
@@ -540,12 +541,10 @@ class AnswerPage(CFGOVPage):
             "a statement. Use only if this answer has been chosen to appear "
             "on a money topic portal (e.g. /consumer-tools/debt-collection)."))
     # will pull from the answer model last_edited and last_edited_es
-    last_edited = models.DateTimeField(
+    last_edited = models.DateField(
         blank=True,
         null=True,
     )
-
-
     answer_base = models.ForeignKey(
         Answer,
         blank=True,
@@ -577,10 +576,12 @@ class AnswerPage(CFGOVPage):
         help_text=(
             "Choose only subcategories that belong "
             "to one of the categories checked above."))
+
     search_tags_es = models.CharField(
         max_length=1000,
         blank=True,
         help_text="Spanish search words or phrases, separated by commas")
+
     next_step = models.ForeignKey(
         NextStep,
         blank=True,
@@ -589,6 +590,13 @@ class AnswerPage(CFGOVPage):
             "Formerly known as action items or upsell items."
             "On the web page, these are labeled as "
             "'Explore related resources.'"))
+
+    related_questions = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        blank=True,
+        related_name='related_question',
+        help_text='Maximum of 3')
 
     content = StreamField([
         ('feedback', v1_blocks.Feedback()),
@@ -613,7 +621,12 @@ class AnswerPage(CFGOVPage):
             FieldPanel(
                 'subcategory',
                 widget=forms.CheckboxSelectMultiple),
-            FieldPanel('search_tags_es'),],
+            FieldPanel(
+                'related_questions',
+                widget=forms.SelectMultiple,
+                classname="full"),
+            FieldPanel('search_tags_es'),
+            ImageChooserPanel('social_sharing_image')],
             heading="Metadata",
             classname="collapsible"),
         FieldPanel('redirect_to'),
