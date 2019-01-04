@@ -21,6 +21,7 @@ def run():
         #     for related_question in page.answer_base.related_questions.all():
         #         page.related_questions.add(related_question.spanish_page)
         elif page.language == 'en':
+            page.search_tags_es = page.answer_base.search_tags
             page.last_edited = page.answer_base.last_edited
         #     for related_question in page.answer_base.related_questions.all():
         #         page.related_questions.add(related_question.english_page)

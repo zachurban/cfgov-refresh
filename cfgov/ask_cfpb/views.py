@@ -11,15 +11,11 @@ from haystack.inputs import Clean
 from haystack.query import SearchQuerySet
 
 from wagtail.wagtailcore.models import Site
-from wagtailsharing.models import SharingSite
-from wagtailsharing.views import ServeView
 
 from bs4 import BeautifulSoup as bs
 from flags.state import flag_enabled
 
-from ask_cfpb.models import (
-    Answer, AnswerPage, AnswerResultsPage
-)
+from ask_cfpb.models import Answer, AnswerPage, AnswerResultsPage
 
 
 def annotate_links(answer_text):
@@ -76,29 +72,6 @@ def print_answer(request, slug, language, answer_id):
         request,
         'ask-cfpb/answer-page-spanish-printable.html',
         context=print_context)
-
-
-def view_answer(request, slug, language, answer_id):
-    answer_page = get_object_or_404(
-        AnswerPage, language=language, answer_base__id=answer_id)
-    if answer_page.live is False:
-        raise Http404
-    if answer_page.redirect_to:
-        new_page = answer_page.redirect_to.answer_pages.get(language=language)
-        return redirect(new_page.url, permanent=True)
-    if "{}-{}-{}".format(slug, language, answer_id) != answer_page.slug:
-        return redirect(answer_page.url, permanent=True)
-    else:
-        try:
-            sharing_site = SharingSite.find_for_request(request)
-        except SharingSite.DoesNotExist:
-            return answer_page.serve(request)
-        page, args, kwargs = ServeView.get_requested_page(
-            sharing_site.site,
-            request,
-            request.path)
-        return ServeView.serve_latest_revision(
-            page, request, args, kwargs)
 
 
 def ask_search(request, language='en', as_json=False):

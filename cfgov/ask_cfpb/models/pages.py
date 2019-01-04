@@ -1,38 +1,33 @@
 
 from __future__ import absolute_import, unicode_literals
 
-import json
 import re
 from six.moves.urllib.parse import urlparse
 
+from django import forms
 from django.core.paginator import InvalidPage, Paginator
 from django.db import models
 from django.http import Http404
 from django.template.defaultfilters import slugify
 from django.template.response import TemplateResponse
-from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.text import Truncator
 from django.utils.translation import ugettext_lazy as _
-from haystack.query import SearchQuerySet
-
-from django import forms
 
 from wagtail.contrib.wagtailroutablepage.models import RoutablePageMixin, route
 from wagtail.wagtailadmin.edit_handlers import (
-    FieldPanel, ObjectList, StreamFieldPanel, TabbedInterface, MultiFieldPanel, FieldRowPanel
-)
-from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
-
+    FieldPanel, FieldRowPanel, MultiFieldPanel, ObjectList, StreamFieldPanel,
+    TabbedInterface)
 from wagtail.wagtailcore.fields import RichTextField, StreamField
 from wagtail.wagtailcore.models import Page
+from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 from wagtail.wagtailsearch import index
 
+from ask_cfpb.models import NextStep
 from v1 import blocks as v1_blocks
 from v1.atomic_elements import molecules, organisms
 from v1.models import CFGOVPage, CFGOVPageManager, LandingPage
 from v1.models.snippets import ReusableText
-
-from ask_cfpb.models import NextStep
 
 
 SPANISH_ANSWER_SLUG_BASE = '/es/obtener-respuestas/slug-es-{}/'
@@ -281,36 +276,12 @@ class AnswerCategoryPage(RoutablePageMixin, SecondaryNavigationJSMixin,
     def get_context(self, request, *args, **kwargs):
         context = super(
             AnswerCategoryPage, self).get_context(request, *args, **kwargs)
-        sqs = SearchQuerySet()
-        if self.language == 'es':
-            sqs = sqs.filter(content=self.ask_category.name_es)
-        else:
-            sqs = sqs.filter(content=self.ask_category.name)
-        sqs = sqs.models(self.Category)
-        try:
-            facet_map = sqs[0].facet_map
-        except IndexError:
-            facet_map = self.ask_category.facet_map
-        facet_dict = json.loads(facet_map)
-        subcat_ids = facet_dict['subcategories'].keys()
-        answer_ids = facet_dict['answers'].keys()
-        audience_ids = facet_dict['audiences'].keys()
-        subcats = self.SubCategory.objects.filter(
-            pk__in=subcat_ids).values(
-                'id', 'slug', 'slug_es', 'name', 'name_es')
-        answers = self.Answer.objects.filter(
-            pk__in=answer_ids).order_by('-pk').values(
-                'id', 'question', 'question_es',
-                'slug', 'slug_es', 'answer_es')
-        for a in answers:
-            a['answer_es'] = Truncator(a['answer_es']).words(
-                40, truncate=' ...')
-        audiences = self.Audience.objects.filter(
-            pk__in=audience_ids).values('id', 'name')
+        answers = self.ask_category.answerpage_set.filter(
+            language=self.language
+        )
+        subcats = self.ask_category.subcategories.all()
         context.update({
             'answers': answers,
-            'audiences': audiences,
-            'facets': facet_dict,
             'choices': subcats,
             'results_count': answers.count(),
             'get_secondary_nav_items': get_ask_nav_items
@@ -357,9 +328,7 @@ class AnswerCategoryPage(RoutablePageMixin, SecondaryNavigationJSMixin,
         else:
             raise Http404
         context = self.get_context(request)
-        id_key = str(subcat.pk)
-        answers = context['answers'].filter(
-            pk__in=context['facets']['subcategories'][id_key])
+        answers = self.ask_subcategory.answerpage_set.filter(language=self.language)
         paginator = Paginator(answers, 20)
         page_number = validate_page_number(request, paginator)
         page = paginator.page(page_number)
@@ -660,24 +629,24 @@ class AnswerPage(CFGOVPage):
 
     def get_context(self, request, *args, **kwargs):
         context = super(AnswerPage, self).get_context(request)
-        context['answer_id'] = self.answer_base.id
-        context['related_questions'] = self.answer_base.related_questions.all()
+        # context['answer_id'] = self.answer_base.id
+        context['related_questions'] = self.related_questions.all()
         context['description'] = self.snippet if self.snippet \
             else Truncator(self.answer).words(40, truncate=' ...')
-        context['audiences'] = [
-            {'text': audience.name,
-             'url': '/ask-cfpb/audience-{}'.format(
-                    slugify(audience.name))}
-            for audience in self.answer_base.audiences.all()]
+        # context['audiences'] = [
+        #     {'text': audience.name,
+        #      'url': '/ask-cfpb/audience-{}'.format(
+        #             slugify(audience.name))}
+        #     for audience in self.answer_base.audiences.all()]
         if self.language == 'es':
             tag_dict = self.Answer.valid_tags(language='es')
-            context['tags_es'] = [tag for tag in self.answer_base.tags_es
+            context['tags_es'] = [tag for tag in self.tags_es
                                   if tag in tag_dict['valid_tags']]
             context['tweet_text'] = Truncator(self.question).chars(
                 100, truncate=' ...')
             context['disclaimer'] = get_reusable_text_snippet(
                 SPANISH_DISCLAIMER_SNIPPET_TITLE)
-            context['category'] = self.answer_base.category.first()
+            context['category'] = self.category.first()
         elif self.language == 'en':
             # we're not using tags on English pages yet, so cut the overhead
             # tag_dict = self.Answer.valid_tags()
@@ -687,15 +656,15 @@ class AnswerPage(CFGOVPage):
                 ABOUT_US_SNIPPET_TITLE)
             context['disclaimer'] = get_reusable_text_snippet(
                 ENGLISH_DISCLAIMER_SNIPPET_TITLE)
-            context['last_edited'] = self.answer_base.last_edited
+            context['last_edited'] = self.last_edited
             # breadcrumbs and/or category should reflect
             # the referrer if it is a consumer tools portal or
             # ask category page
             context['category'], context['breadcrumb_items'] = \
                 get_question_referrer_data(
-                    request, self.answer_base.category.all())
+                    request, self.category.all())
             subcategories = []
-            for subcat in self.answer_base.subcategory.all():
+            for subcat in self.subcategory.all():
                 if subcat.parent == context['category']:
                     subcategories.append(subcat)
                 for related in subcat.related_subcategories.all():
@@ -734,16 +703,31 @@ class AnswerPage(CFGOVPage):
     # Returns an image for the page's meta Open Graph tag
     @property
     def meta_image(self):
-        if self.answer_base.social_sharing_image:
-            return self.answer_base.social_sharing_image
+        if self.social_sharing_image:
+            return self.social_sharing_image
 
-        if not self.answer_base.category.exists():
+        if not self.category.exists():
             return None
 
-        return self.answer_base.category.first().category_image
+        return self.category.first().category_image
 
     # Overrides the default of page.id for comparing against split testing
     # clusters. See: core.feature_flags.in_split_testing_cluster
     @property
     def split_test_id(self):
         return self.answer_base.id
+
+    @staticmethod
+    def clean_tag_list(taglist):
+        return [
+            tag.replace('"', '').strip()
+            for tag in taglist.split(',')
+            if tag.replace('"', '').strip()]
+
+    @cached_property
+    def tags(self):
+        return self.clean_tag_list(self.search_tags_es)
+
+    @cached_property
+    def tags_es(self):
+        return self.clean_tag_list(self.search_tags_es)

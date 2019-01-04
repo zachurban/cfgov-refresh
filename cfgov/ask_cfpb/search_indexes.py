@@ -2,7 +2,6 @@ from haystack import indexes
 
 from ask_cfpb.models import Category
 from ask_cfpb.models.pages import AnswerPage
-
 from search import fields
 
 
@@ -20,6 +19,9 @@ class AnswerBaseIndex(indexes.SearchIndex, indexes.Indexable):
     url = indexes.CharField(
         use_template=True,
         indexed=False)
+    tags = indexes.MultiValueField(
+        indexed=True,
+        boost=10.0)
     language = indexes.CharField(
         model_attr='language')
     suggestions = indexes.FacetCharField()
@@ -29,6 +31,9 @@ class AnswerBaseIndex(indexes.SearchIndex, indexes.Indexable):
         if obj.question.lower().startswith('what is'):
             data['boost'] = 2.0
         return data
+
+    def prepare_tags(self, obj):
+        return obj.tags
 
     def prepare(self, obj):
         data = super(AnswerBaseIndex, self).prepare(obj)

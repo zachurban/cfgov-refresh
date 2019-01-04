@@ -138,8 +138,7 @@ class Category(models.Model):
         return AnswerPage.objects.filter(
             language=language,
             category=self,
-            featured=True).order_by('featured_rank'
-        )
+            featured=True).order_by('featured_rank')
 
     @property
     def top_tags_es(self):
@@ -501,7 +500,7 @@ class Answer(models.Model):
 
     @cached_property
     def tags(self):
-        return self.clean_tag_list(self.search_tags)
+        return self.clean_tag_list(self.search_tags_es)
 
     @cached_property
     def tags_es(self):
