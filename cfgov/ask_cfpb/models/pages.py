@@ -294,7 +294,7 @@ class AnswerCategoryPage(RoutablePageMixin, SecondaryNavigationJSMixin,
                 ENGLISH_DISCLAIMER_SNIPPET_TITLE)
             context['breadcrumb_items'] = get_ask_breadcrumbs()
         elif self.language == 'es':
-            context['tags'] = self.ask_category.top_tags_es
+            context['tags_es'] = self.ask_category.top_tags_es
         return context
 
     # Returns an image for the page's meta Open Graph tag
@@ -458,27 +458,8 @@ class TagResultsPage(RoutablePageMixin, AnswerResultsPage):
 
     @route(r'^(?P<tag>[^/]+)/$')
     def tag_search(self, request, **kwargs):
-        from ask_cfpb.models import Answer
-        tag_dict = Answer.valid_tags(language=self.language)
         tag = kwargs.get('tag').replace('_', ' ')
-        if not tag or tag not in tag_dict['valid_tags']:
-            raise Http404
-        if self.language == 'es':
-            self.answers = [
-                (SPANISH_ANSWER_SLUG_BASE.format(a.id),
-                 a.question_es,
-                 Truncator(a.answer_es).words(40, truncate=' ...'))
-                for a in tag_dict['tag_map'][tag]
-                if a.answer_pages.filter(language='es', live=True)
-            ]
-        else:
-            self.answers = [
-                (ENGLISH_ANSWER_SLUG_BASE.format(a.id),
-                 a.question,
-                 Truncator(a.answer).words(40, truncate=' ...'))
-                for a in tag_dict['tag_map'][tag]
-                if a.answer_pages.filter(language='en', live=True)
-            ]
+        self.answers = AnswerPage.objects.filter(search_tags__contains=tag).filter(language='es')
         paginator = Paginator(self.answers, 20)
         page_number = validate_page_number(request, paginator)
         page = paginator.page(page_number)
@@ -546,10 +527,10 @@ class AnswerPage(CFGOVPage):
             "Choose only subcategories that belong "
             "to one of the categories checked above."))
 
-    search_tags_es = models.CharField(
+    search_tags = models.CharField(
         max_length=1000,
         blank=True,
-        help_text="Spanish search words or phrases, separated by commas")
+        help_text="Search words or phrases, separated by commas")
 
     next_step = models.ForeignKey(
         NextStep,
@@ -566,6 +547,8 @@ class AnswerPage(CFGOVPage):
         blank=True,
         related_name='related_question',
         help_text='Maximum of 3')
+
+    answer_id = models.IntegerField(default=0)
 
     content = StreamField([
         ('feedback', v1_blocks.Feedback()),
@@ -594,7 +577,7 @@ class AnswerPage(CFGOVPage):
                 'related_questions',
                 widget=forms.SelectMultiple,
                 classname="full"),
-            FieldPanel('search_tags_es'),
+            FieldPanel('search_tags'),
             ImageChooserPanel('social_sharing_image')],
             heading="Metadata",
             classname="collapsible"),
@@ -640,7 +623,7 @@ class AnswerPage(CFGOVPage):
         #     for audience in self.answer_base.audiences.all()]
         if self.language == 'es':
             tag_dict = self.Answer.valid_tags(language='es')
-            context['tags_es'] = [tag for tag in self.tags_es
+            context['tags_es'] = [tag for tag in self.tags
                                   if tag in tag_dict['valid_tags']]
             context['tweet_text'] = Truncator(self.question).chars(
                 100, truncate=' ...')
@@ -725,9 +708,6 @@ class AnswerPage(CFGOVPage):
             if tag.replace('"', '').strip()]
 
     @cached_property
-    def tags(self):
-        return self.clean_tag_list(self.search_tags_es)
+    def clean_search_tags(self):
+        return self.clean_tag_list(self.search_tags)
 
-    @cached_property
-    def tags_es(self):
-        return self.clean_tag_list(self.search_tags_es)

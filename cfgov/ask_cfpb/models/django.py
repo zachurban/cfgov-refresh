@@ -146,7 +146,7 @@ class Category(models.Model):
         valid_dict = Answer.valid_tags(language='es')
         cleaned = []
         for a in self.answer_set.all():
-            cleaned += a.tags_es
+            cleaned += a.tags
         valid_clean = [tag for tag in cleaned
                        if tag in valid_dict['valid_tags']]
         counter = collections.Counter(valid_clean)
@@ -500,11 +500,7 @@ class Answer(models.Model):
 
     @cached_property
     def tags(self):
-        return self.clean_tag_list(self.search_tags_es)
-
-    @cached_property
-    def tags_es(self):
-        return self.clean_tag_list(self.search_tags_es)
+        return self.clean_tag_list(self.search_tags)
 
     @classmethod
     def valid_tags(cls, language='en'):
@@ -522,8 +518,8 @@ class Answer(models.Model):
         tag_map = {}
         if language == 'es':
             for a in cls.objects.all():
-                cleaned += a.tags_es
-                for tag in a.tags_es:
+                cleaned += a.tags
+                for tag in a.tags:
                     if tag not in tag_map:
                         tag_map[tag] = [a]
                     else:
