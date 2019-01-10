@@ -142,11 +142,12 @@ class Category(models.Model):
 
     @property
     def top_tags_es(self):
+        from .pages import AnswerPage
         import collections
-        valid_dict = Answer.valid_tags(language='es')
+        valid_dict = AnswerPage.valid_tags(language='es')
         cleaned = []
-        for a in self.answer_set.all():
-            cleaned += a.tags
+        for a in self.answerpage_set.all():
+            cleaned += a.clean_search_tags
         valid_clean = [tag for tag in cleaned
                        if tag in valid_dict['valid_tags']]
         counter = collections.Counter(valid_clean)
@@ -490,52 +491,7 @@ class Answer(models.Model):
 
     def audience_strings(self):
         return [audience.name for audience in self.audiences.all()]
-
-    @staticmethod
-    def clean_tag_list(taglist):
-        return [
-            tag.replace('"', '').strip()
-            for tag in taglist.split(',')
-            if tag.replace('"', '').strip()]
-
-    @cached_property
-    def tags(self):
-        return self.clean_tag_list(self.search_tags)
-
-    @classmethod
-    def valid_tags(cls, language='en'):
-        """
-        Search tags are arbitrary and messy. This function serves 2 purposes:
-        - Assemble a whitelist of tags that are safe for search.
-        - Exclude tags that are attached to only one answer.
-        Tags are useless until they can be used to collect at least 2 answers.
-
-        This method returns a dict {'valid_tags': [], tag_map: {}}
-        valid_tags is an alphabetical list of valid tags.
-        tag_map is a dictionary mapping tags to questions.
-        """
-        cleaned = []
-        tag_map = {}
-        if language == 'es':
-            for a in cls.objects.all():
-                cleaned += a.tags
-                for tag in a.tags:
-                    if tag not in tag_map:
-                        tag_map[tag] = [a]
-                    else:
-                        tag_map[tag].append(a)
-        else:
-            for a in cls.objects.all():
-                cleaned += a.tags
-                for tag in a.tags:
-                    if tag not in tag_map:
-                        tag_map[tag] = [a]
-                    else:
-                        tag_map[tag].append(a)
-        tag_counter = Counter(cleaned)
-        valid = sorted(
-            tup[0] for tup in tag_counter.most_common() if tup[1] > 1)
-        return {'valid_tags': valid, 'tag_map': tag_map}
+    
 
     def has_live_page(self):
         if not self.answer_pages.all():

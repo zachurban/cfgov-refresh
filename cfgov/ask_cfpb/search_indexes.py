@@ -33,7 +33,7 @@ class AnswerBaseIndex(indexes.SearchIndex, indexes.Indexable):
         return data
 
     def prepare_tags(self, obj):
-        return obj.tags
+        return obj.clean_search_tags
 
     def prepare(self, obj):
         data = super(AnswerBaseIndex, self).prepare(obj)

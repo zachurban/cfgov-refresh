@@ -1,5 +1,6 @@
 
 from __future__ import absolute_import, unicode_literals
+from collections import Counter, OrderedDict
 
 import re
 from six.moves.urllib.parse import urlparse
@@ -622,8 +623,8 @@ class AnswerPage(CFGOVPage):
         #             slugify(audience.name))}
         #     for audience in self.answer_base.audiences.all()]
         if self.language == 'es':
-            tag_dict = self.Answer.valid_tags(language='es')
-            context['tags_es'] = [tag for tag in self.tags
+            tag_dict = self.valid_tags(language='es')
+            context['tags_es'] = [tag for tag in self.clean_search_tags
                                   if tag in tag_dict['valid_tags']]
             context['tweet_text'] = Truncator(self.question).chars(
                 100, truncate=' ...')
@@ -710,4 +711,39 @@ class AnswerPage(CFGOVPage):
     @cached_property
     def clean_search_tags(self):
         return self.clean_tag_list(self.search_tags)
+
+    @classmethod
+    def valid_tags(cls, language='en'):
+        """
+        Search tags are arbitrary and messy. This function serves 2 purposes:
+        - Assemble a whitelist of tags that are safe for search.
+        - Exclude tags that are attached to only one answer.
+        Tags are useless until they can be used to collect at least 2 answers.
+
+        This method returns a dict {'valid_tags': [], tag_map: {}}
+        valid_tags is an alphabetical list of valid tags.
+        tag_map is a dictionary mapping tags to questions.
+        """
+        cleaned = []
+        tag_map = {}
+        if language == 'es':
+            for a in cls.objects.all():
+                cleaned += a.clean_search_tags
+                for tag in a.clean_search_tags:
+                    if tag not in tag_map:
+                        tag_map[tag] = [a]
+                    else:
+                        tag_map[tag].append(a)
+        else:
+            for a in cls.objects.all():
+                cleaned += a.clean_search_tags
+                for tag in a.clean_search_tags:
+                    if tag not in tag_map:
+                        tag_map[tag] = [a]
+                    else:
+                        tag_map[tag].append(a)
+        tag_counter = Counter(cleaned)
+        valid = sorted(
+            tup[0] for tup in tag_counter.most_common() if tup[1] > 1)
+        return {'valid_tags': valid, 'tag_map': tag_map}
 
