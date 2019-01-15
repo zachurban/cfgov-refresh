@@ -8,7 +8,10 @@ from django.utils import html
 
 import unicodecsv
 
-from ask_cfpb.models import Answer
+from ask_cfpb.models.django import (
+    Answer, Audience, Category, NextStep, SubCategory
+)
+from ask_cfpb.models.pages import AnswerPage
 
 
 html_parser = HTMLParser.HTMLParser()
@@ -40,44 +43,48 @@ def clean_and_strip(data):
 
 
 def assemble_output():
-    answers = Answer.objects.all()
+    answers = Answer.objects.values()
     output_rows = []
     for answer in answers:
         output = {heading: '' for heading in HEADINGS}
-        output['ASK_ID'] = answer.id
-        output['Question'] = answer.question
-        output['ShortAnswer'] = clean_and_strip(
-            answer.snippet)
-        output['Answer'] = clean_and_strip(
-            answer.answer)
-
-        if answer.english_page:
-            output['URL'] = answer.english_page.url_path.replace(
-                '/cfgov', '')
-            output['Live'] = answer.english_page.live
-            output['Redirect'] = answer.english_page.redirect_to_id
-        output['SpanishQuestion'] = answer.question_es.replace('\x81', '')
+        output['ASK_ID'] = answer['id']
+        output['Question'] = answer['question']
+        output['ShortAnswer'] = clean_and_strip(answer['snippet'])
+        output['Answer'] = clean_and_strip(answer['answer'])
+        output['SpanishQuestion'] = answer['question_es'].replace('\x81', '')
         output['SpanishAnswer'] = clean_and_strip(
-            answer.answer_es).replace('\x81', '')
+            answer['answer_es']).replace('\x81', '')
 
-        if answer.spanish_page:
-            output['SpanishURL'] = answer.spanish_page.url_path.replace(
-                '/cfgov', '')
-            output['SpanishLive'] = answer.spanish_page.live
-            output['SpanishRedirect'] = answer.spanish_page.redirect_to_id
+        pages = AnswerPage.objects.filter(
+            answer_base__id=answer['id']).values()
+        for page in pages:
+            if page['language'] == 'en':
+                output['URL'] = page['url_path'].replace('/cfgov', '')
+                output['Live'] = page['live']
+                output['Redirect'] = page['redirect_to_id']
+            elif page['language'] == 'es':
+                output['SpanishURL'] = page['url_path'].replace('/cfgov', '')
+                output['SpanishLive'] = page['live']
+                output['SpanishRedirect'] = page['redirect_to_id']
 
-        output['Topic'] = (answer.category.first().name
-                           if answer.category.all() else '')
+        category = Category.objects.filter(
+            answer__id=answer['id']).values('name').first()
+        subcategories = SubCategory.objects.filter(
+            answer__id=answer['id']).values('name')
+        audiences = Audience.objects.filter(
+            answer__id=answer['id']).values('name')
+        next_step = NextStep.objects.filter(
+            answer__id=answer['id']).values('title').first()
+        related_questions = Answer.objects.get(
+            id=answer['id']).related_questions.values('id')
+
+        output['Topic'] = category['name'] if category else ''
         output['SubCategories'] = " | ".join(
-            [subcat.name for subcat in answer.subcategory.all()])
-        output['Audiences'] = " | ".join(
-            aud.name for aud in answer.audiences.all())
+            subcat['name'] for subcat in subcategories)
+        output['Audiences'] = " | ".join(aud['name'] for aud in audiences)
         output['RelatedQuestions'] = " | ".join(
-            ['{}'.format(a.id) for a in answer.related_questions.all()])
-        output['RelatedResources'] = (
-            answer.next_step.title
-            if answer.next_step
-            else '')
+            ['{}'.format(a['id']) for a in related_questions])
+        output['RelatedResources'] = next_step['title'] if next_step else ''
         output_rows.append(output)
     return output_rows
 
