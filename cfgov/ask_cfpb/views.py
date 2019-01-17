@@ -11,16 +11,11 @@ from haystack.inputs import Clean
 from haystack.query import SearchQuerySet
 
 from wagtail.wagtailcore.models import Site
-from wagtailsharing.models import SharingSite
-from wagtailsharing.views import ServeView
 
 from bs4 import BeautifulSoup as bs
 from flags.state import flag_enabled
 
-from ask_cfpb.models import (
-    Answer, AnswerPage, AnswerResultsPage, EnglishAnswerProxy,
-    SpanishAnswerProxy
-)
+from ask_cfpb.models import Answer, AnswerPage, AnswerResultsPage
 
 
 def annotate_links(answer_text):
@@ -79,48 +74,25 @@ def print_answer(request, slug, language, answer_id):
         context=print_context)
 
 
-def view_answer(request, slug, language, answer_id):
-    answer_page = get_object_or_404(
-        AnswerPage, language=language, answer_base__id=answer_id)
-    if answer_page.live is False:
-        raise Http404
-    if answer_page.redirect_to:
-        new_page = answer_page.redirect_to.answer_pages.get(language=language)
-        return redirect(new_page.url, permanent=True)
-    if "{}-{}-{}".format(slug, language, answer_id) != answer_page.slug:
-        return redirect(answer_page.url, permanent=True)
-    else:
-        try:
-            sharing_site = SharingSite.find_for_request(request)
-        except SharingSite.DoesNotExist:
-            return answer_page.serve(request)
-        page, args, kwargs = ServeView.get_requested_page(
-            sharing_site.site,
-            request,
-            request.path)
-        return ServeView.serve_latest_revision(
-            page, request, args, kwargs)
-
-
 def ask_search(request, language='en', as_json=False):
     if 'selected_facets' in request.GET:
         return redirect_ask_search(request, language=language)
     language_map = {
-        'en': {'slug': 'ask-cfpb-search-results',
-               'query': SearchQuerySet().models(EnglishAnswerProxy)},
-        'es': {'slug': 'respuestas',
-               'query': SearchQuerySet().models(SpanishAnswerProxy)}
+        'en': 'ask-cfpb-search-results',
+        'es': 'respuestas'
     }
-    _map = language_map[language]
-    sqs = _map['query']
+    sqs = SearchQuerySet().models(AnswerPage)
     clean_query = Clean(request.GET.get('q', ''))
     clean_qstring = clean_query.query_string.strip()
     qstring = clean_qstring
-    query_sqs = sqs.filter(content=clean_query)
+    query_sqs = sqs.filter(
+        content=clean_query,
+        language=language
+    )
     results_page = get_object_or_404(
         AnswerResultsPage,
         language=language,
-        slug=_map['slug']
+        slug=language_map[language]
     )
 
     # If there's no query string, don't search
@@ -173,11 +145,11 @@ def ask_autocomplete(request, language='en'):
         'term', '').strip().replace('<', '')
     if not term:
         return JsonResponse([], safe=False)
-    if language == 'es':
-        sqs = SearchQuerySet().models(SpanishAnswerProxy)
-    else:
-        sqs = SearchQuerySet().models(EnglishAnswerProxy)
-    sqs = sqs.autocomplete(autocomplete=term)
+    sqs = SearchQuerySet().models(AnswerPage)
+    sqs = sqs.autocomplete(
+        autocomplete=term,
+        language=language
+    )
     results = [{'question': result.autocomplete,
                 'url': result.url}
                for result in sqs[:20]]
