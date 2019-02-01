@@ -17,10 +17,7 @@ from wagtailsharing.views import ServeView
 from bs4 import BeautifulSoup as bs
 from flags.state import flag_enabled
 
-from ask_cfpb.models import (
-    Answer, AnswerPage, AnswerResultsPage, EnglishAnswerProxy,
-    SpanishAnswerProxy
-)
+from ask_cfpb.models import Answer, AnswerPage, AnswerResultsPage
 
 
 def annotate_links(answer_text):
@@ -107,9 +104,9 @@ def ask_search(request, language='en', as_json=False):
         return redirect_ask_search(request, language=language)
     language_map = {
         'en': {'slug': 'ask-cfpb-search-results',
-               'query': SearchQuerySet().models(EnglishAnswerProxy)},
+               'query': SearchQuerySet().models(AnswerPage)},
         'es': {'slug': 'respuestas',
-               'query': SearchQuerySet().models(SpanishAnswerProxy)}
+               'query': SearchQuerySet().models(AnswerPage)}
     }
     _map = language_map[language]
     sqs = _map['query']
@@ -173,10 +170,7 @@ def ask_autocomplete(request, language='en'):
         'term', '').strip().replace('<', '')
     if not term:
         return JsonResponse([], safe=False)
-    if language == 'es':
-        sqs = SearchQuerySet().models(SpanishAnswerProxy)
-    else:
-        sqs = SearchQuerySet().models(EnglishAnswerProxy)
+    sqs = SearchQuerySet().models(AnswerPage)
     sqs = sqs.autocomplete(autocomplete=term)
     results = [{'question': result.autocomplete,
                 'url': result.url}
