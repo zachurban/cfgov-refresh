@@ -2,6 +2,12 @@ from importlib import import_module
 
 from unittest import TestCase
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
+
 
 class TestMigrationXXXX(TestCase):
 
@@ -11,6 +17,9 @@ class TestMigrationXXXX(TestCase):
         cls.migration = import_module('v1.migrations.XXXX_remove_status_in_related_metadata')
 
     def test_remove_status_in_related_metadata(self):
+        mock_page_or_revision = mock.MagicMock(
+            url_path='/cfgov/policy-compliance/enforcement/actions/my_action'
+        )
         data = {
             'content': [
                 {
@@ -30,7 +39,9 @@ class TestMigrationXXXX(TestCase):
             ]
         }
 
-        migrated = self.migration.remove_status_in_related_metadata(None, data)
+        migrated = self.migration.remove_status_in_related_metadata(
+            mock_page_or_revision, data
+        )
         self.assertEqual(
             migrated,
             {
@@ -45,3 +56,13 @@ class TestMigrationXXXX(TestCase):
                 ]
             }
         )
+
+    def test_ignore_wrong_url(self):
+        mock_page_or_revision = mock.MagicMock(
+            url_path='/cfgov//administrative-adjudication-proceedings/proceed'
+        )
+        data = {'content': 'This is some content'}
+        migrated = self.migration.remove_status_in_related_metadata(
+            mock_page_or_revision, data
+        )
+        self.assertEqual(migrated, data)

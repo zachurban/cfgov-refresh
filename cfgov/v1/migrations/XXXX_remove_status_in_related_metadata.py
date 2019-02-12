@@ -13,8 +13,9 @@ logger = logging.getLogger(__name__)
 
 def remove_status_in_related_metadata(page_or_revision, data):
     """ Removes "Status" heading and blob from related metadata blocks. """
-    # if 'enforcement/actions' not in page_or_revision.url_path:
-    #     return data
+    if 'enforcement/actions' not in page_or_revision.url_path:
+        return data
+
     content = data['content']
     filtered_content = [
         block for block in content
@@ -33,7 +34,6 @@ def forwards(apps, schema_editor):
         page_types_and_fields,
         remove_status_in_related_metadata
     )
-    import sys; sys.exit(1)
 
 
 class Migration(migrations.Migration):
