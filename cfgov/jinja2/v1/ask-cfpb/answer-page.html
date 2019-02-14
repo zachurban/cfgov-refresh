@@ -112,12 +112,12 @@
 
 {% block content_sidebar scoped  %}
 
-    {% if page.next_step %}
+    {% if page.related_resource %}
         <div class="block block__flush-top">
             <h3 >
                 Explore related resources
             </h3>
-            {{ page.next_step.text | safe }}
+            {{ page.related_resource.text | safe }}
         </div>
     {% endif %}
     {% if page.sidebar_panels %}

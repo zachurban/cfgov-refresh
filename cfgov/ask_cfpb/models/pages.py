@@ -24,12 +24,15 @@ from wagtail.wagtailcore.fields import RichTextField, StreamField
 from wagtail.wagtailcore.models import Page
 from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 from wagtail.wagtailsearch import index
+from wagtail.wagtailsnippets.edit_handlers import SnippetChooserPanel
+
+from wagtailautocomplete.edit_handlers import AutocompletePanel
 
 from ask_cfpb.models import NextStep
 from v1 import blocks as v1_blocks
 from v1.atomic_elements import molecules, organisms
 from v1.models import CFGOVPage, CFGOVPageManager, LandingPage
-from v1.models.snippets import ReusableText
+from v1.models.snippets import ReusableText, RelatedResource
 
 
 SPANISH_ANSWER_SLUG_BASE = '/es/obtener-respuestas/slug-es-{}/'
@@ -511,6 +514,13 @@ class AnswerPage(CFGOVPage):
         on_delete=models.SET_NULL,
         related_name='redirected_pages',
         help_text="Choose another Answer to redirect this page to")
+    redirect_to_page = models.ForeignKey(
+        'self',
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name='redirect_to_pages',
+        help_text="Choose another AnswerPage to redirect this page to")
     featured = models.BooleanField(
         default=False,
         help_text=(
@@ -535,14 +545,11 @@ class AnswerPage(CFGOVPage):
         blank=True,
         help_text="Search words or phrases, separated by commas")
 
-    next_step = models.ForeignKey(
-        NextStep,
+    related_resource = models.ForeignKey(
+        RelatedResource,
         blank=True,
-        null=True,
-        help_text=(
-            "Formerly known as action items or upsell items."
-            "On the web page, these are labeled as "
-            "'Explore related resources.'"))
+        null=True
+    )
 
     related_questions = models.ManyToManyField(
         'self',
@@ -567,24 +574,17 @@ class AnswerPage(CFGOVPage):
             classname="collapsible"),
         FieldPanel('last_edited'),
         MultiFieldPanel([
-            FieldRowPanel([
-                FieldPanel('featured'),
-                FieldPanel('featured_rank')]),
-            FieldPanel('next_step'),
-            FieldPanel(
-                'category', widget=forms.CheckboxSelectMultiple),
-            FieldPanel(
-                'subcategory',
-                widget=forms.CheckboxSelectMultiple),
-            FieldPanel(
+            SnippetChooserPanel('related_resource'),
+            AutocompletePanel(
                 'related_questions',
-                widget=forms.SelectMultiple,
-                classname="full"),
+                page_type='ask_cfpb.AnswerPage',
+                is_single=False),
             FieldPanel('search_tags'),
-            ImageChooserPanel('social_sharing_image')],
+            ImageChooserPanel('social_sharing_image'),
+            FieldPanel('answer_id')],
             heading="Metadata",
             classname="collapsible"),
-        FieldPanel('redirect_to'),
+        AutocompletePanel('redirect_to_page', page_type='ask_cfpb.AnswerPage'),
     ]
 
     sidebar = StreamField([
@@ -668,7 +668,7 @@ class AnswerPage(CFGOVPage):
 
     @property
     def status_string(self):
-        if self.redirect_to:
+        if self.redirect_to_page:
             if not self.live:
                 return _("redirected but not live")
             else:

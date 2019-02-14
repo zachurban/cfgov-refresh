@@ -16,9 +16,13 @@ from wagtailsharing.views import ServeView
 
 from flags.urls import flagged_url
 from flags.views import FlaggedTemplateView
+from wagtailautocomplete.urls.admin import (
+    urlpatterns as autocomplete_admin_urls
+)
 
 from ask_cfpb.views import (
-    ask_autocomplete, ask_search, print_answer, redirect_ask_search
+    ask_autocomplete, ask_search, print_answer, redirect_ask_search,
+    view_answer
 )
 from core.conditional_urls import include_if_app_enabled
 from core.views import (
@@ -338,6 +342,12 @@ urlpatterns = [
     url(r'^(?P<language>es)/obtener-respuestas/buscar/(?P<as_json>json)/$',
         ask_search,
         name='ask-search-es-json'),
+    url(r'^(?i)ask-cfpb/([-\w]{1,244})-(en)-(\d{1,6})/$',
+        view_answer,
+        name='ask-english-answer'),
+    url(r'^es/obtener-respuestas/([-\w]{1,244})-(es)-(\d{1,6})/$',
+        view_answer,
+        name='ask-spanish-answer'),
     url(r'^es/obtener-respuestas/([-\w]{1,244})-(es)-(\d{1,6})/imprimir/$',
         print_answer,
         name='ask-spanish-print-answer'),
@@ -450,6 +460,7 @@ if settings.ALLOW_ADMIN_URL:
         url(r'^admin/account/change_password/$',
             change_password,
             name='wagtailadmin_account_change_password'),
+        url(r'^admin/autocomplete/', include(autocomplete_admin_urls)),
         url(r'^admin/', include(wagtailadmin_urls)),
 
     ]
