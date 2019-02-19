@@ -24,6 +24,7 @@ from wagtail.wagtailadmin.edit_handlers import (
 from wagtail.wagtailcore.fields import RichTextField, StreamField
 from wagtail.wagtailcore.models import Page
 from wagtail.wagtailsearch import index
+from wagtail.wagtailcore import blocks
 
 from v1 import blocks as v1_blocks
 from v1.atomic_elements import molecules, organisms
@@ -551,6 +552,19 @@ class AnswerPage(CFGOVPage):
             "to style it. Click again to unstyle the tip."
         )
     )
+    answer_content = StreamField([
+        ('text', blocks.RichTextBlock(
+                    features=[
+                        'link', 'ol', 'ul', 'h2', 'h3', 'document-link', 'image', 'embed'
+                    ])
+        ),
+        ('table_block', organisms.AtomicTableBlock(
+            table_options={'renderer': 'html'})),
+        ('tip', v1_blocks.Tip()),
+        ('warning', v1_blocks.Warning()),
+        ('heading', v1_blocks.AskHeadingBlock())
+        
+    ], blank=True)
     snippet = RichTextField(blank=True, help_text='Optional answer intro')
     search_tags = models.CharField(
         max_length=1000,
@@ -593,6 +607,7 @@ class AnswerPage(CFGOVPage):
         FieldPanel('statement'),
         FieldPanel('snippet'),
         FieldPanel('answer'),
+        StreamFieldPanel('answer_content'),
         FieldPanel('search_tags'),
         FieldPanel('redirect_to'),
     ]
@@ -629,6 +644,8 @@ class AnswerPage(CFGOVPage):
         context['related_questions'] = self.answer_base.related_questions.all()
         context['description'] = self.snippet if self.snippet \
             else Truncator(self.answer).words(40, truncate=' ...')
+        context['answer_content'] = self.answer_content
+        
         context['audiences'] = [
             {'text': audience.name,
              'url': '/ask-cfpb/audience-{}'.format(

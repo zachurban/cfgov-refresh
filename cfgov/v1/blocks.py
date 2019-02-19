@@ -301,3 +301,41 @@ class FeaturedMenuContent(blocks.StructBlock):
     link = Link(required=False, label="H4 link")
     body = blocks.RichTextBlock(required=False)
     image = atoms.ImageBasic(required=False)
+
+class Tip(blocks.StructBlock):
+    content = blocks.RichTextBlock(
+                features=[
+                        'link', 'ol', 'ul', 'document-link', 'image', 'embed'
+                    ])
+    class Meta:
+        icon = 'title'
+        template = '_includes/ask/tip.html'
+
+
+class Warning(blocks.StructBlock):
+    content = blocks.RichTextBlock(
+                features=[
+                        'link', 'ol', 'ul', 'document-link', 'image', 'embed'
+                    ])
+    class Meta:
+        icon = 'title'
+        template = '_includes/ask/warning.html'
+
+class AskHeadingLevelBlock(blocks.ChoiceBlock):
+    choices = [
+        ('heading1', 'Heading level 1'),
+        ('heading2', 'Heading level 2'),
+        ('heading3', 'Heading level 3'),
+    ]
+    classname = 'heading-level-block'
+
+class AskHeadingBlock(blocks.StructBlock):
+    text = HeadingTextBlock(required=False)
+    level = AskHeadingLevelBlock(default='heading1')
+    
+    class Meta:
+        icon = 'title'
+        template = '_includes/ask/ask-heading.html'
+        form_template = (
+            'admin/form_templates/struct-with-block-wrapper-classes.html'
+        )
