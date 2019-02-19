@@ -564,7 +564,7 @@ class AnswerPage(CFGOVPage):
         ('warning', v1_blocks.Warning()),
         ('heading', v1_blocks.AskHeadingBlock())
         
-    ], blank=True)
+    ], blank=True, verbose_name='Answer')
     snippet = RichTextField(blank=True, help_text='Optional answer intro')
     search_tags = models.CharField(
         max_length=1000,
@@ -606,7 +606,6 @@ class AnswerPage(CFGOVPage):
         FieldPanel('question'),
         FieldPanel('statement'),
         FieldPanel('snippet'),
-        FieldPanel('answer'),
         StreamFieldPanel('answer_content'),
         FieldPanel('search_tags'),
         FieldPanel('redirect_to'),
@@ -623,7 +622,11 @@ class AnswerPage(CFGOVPage):
         ('reusable_text', v1_blocks.ReusableTextChooserBlock(ReusableText)),
     ], blank=True)
 
-    sidebar_panels = [StreamFieldPanel('sidebar'), ]
+    sidebar_panels = [
+        StreamFieldPanel('sidebar'),
+        FieldPanel('answer'),
+
+    ]
 
     search_fields = Page.search_fields + [
         index.SearchField('answer'),

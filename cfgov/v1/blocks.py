@@ -302,8 +302,9 @@ class FeaturedMenuContent(blocks.StructBlock):
     body = blocks.RichTextBlock(required=False)
     image = atoms.ImageBasic(required=False)
 
+
 class Tip(blocks.StructBlock):
-    content = blocks.RichTextBlock(
+    tip_content = blocks.RichTextBlock(
                 features=[
                         'link', 'ol', 'ul', 'document-link', 'image', 'embed'
                     ])
@@ -313,13 +314,14 @@ class Tip(blocks.StructBlock):
 
 
 class Warning(blocks.StructBlock):
-    content = blocks.RichTextBlock(
+    warning_content = blocks.RichTextBlock(
                 features=[
                         'link', 'ol', 'ul', 'document-link', 'image', 'embed'
                     ])
     class Meta:
         icon = 'title'
         template = '_includes/ask/warning.html'
+
 
 class AskHeadingLevelBlock(blocks.ChoiceBlock):
     choices = [
@@ -328,6 +330,7 @@ class AskHeadingLevelBlock(blocks.ChoiceBlock):
         ('heading3', 'Heading level 3'),
     ]
     classname = 'heading-level-block'
+
 
 class AskHeadingBlock(blocks.StructBlock):
     text = HeadingTextBlock(required=False)

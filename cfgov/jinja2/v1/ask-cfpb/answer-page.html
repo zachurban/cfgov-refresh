@@ -67,7 +67,6 @@
                     o-expandable__read-more">
             <div class="o-expandable_content" id="answer-content">
                 <div class="answer-text">
-                    {{ page.answer | richtext | safe }}
                     {% for block in page.answer_content %}
                         {% include_block block %}
                     {% endfor %}
