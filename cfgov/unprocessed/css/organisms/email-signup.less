@@ -36,13 +36,11 @@
 */
 
 .o-email-signup {
-    .respond-to-range( @bp-sm-min, @bp-sm-max {
-        .grid_column(6);
-
-        &:last-child:nth-last-child(2) {
-            .grid_column(12);
-        }
-    } );
+    .a-text-input {
+        // Keep inputs in a wider layout to a reasonable width.
+        // 370 = 4 columns at max grid width
+        max-width: unit( 370px / @base-font-size-px, rem );
+    }
 
     .respond-to-max( @bp-xs-max, {
         .a-label__heading {
@@ -51,8 +49,7 @@
     } );
 }
 
-.o-email-signup .m-btn-group,
-.o-email-popup .m-btn-group {
+.o-email-signup .m-btn-group {
     display: flex;
     margin-top: unit( @grid_gutter-width / 2 / @base-font-size-px, em );
     align-items: flex-start;
