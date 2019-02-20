@@ -3,6 +3,7 @@ import os
 from django.utils.text import slugify
 
 import boto3
+
 from agreements.models import Issuer
 
 
