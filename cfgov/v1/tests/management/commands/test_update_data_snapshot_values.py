@@ -40,13 +40,18 @@ class UpdateDataSnapshotValuesTestCase(TestCase):
             response = self.client.get('/browse/')
 
             # July 2018 data:
-            self.assertContains(response, '917,007') # Student loans originated
-            self.assertContains(response, '$16.6 billion') # Dollar volume of new loans
-            self.assertContains(response, '48.0% increase') # In year-over-year originations
             self.assertContains(response, 'July&nbsp;2018')
-            self.assertContains(response, 'Loans originated')
-            self.assertContains(response, 'Dollar value of new loans')
+            self.assertContains(response, '917,007')
+            # why does this fail?
+            self.assertContains(response, 'Student loans originated')
+
+            self.assertContains(response, '$16.6 billion')
+            # why does this fail?
+            self.assertContains(response, 'Dollar volume of new loans')
+
+            self.assertContains(response, '48.0% increase')
             self.assertContains(response, 'In year-over-year originations')
+
             # Should not contain inquiry and tightness values
             self.assertNotContains(response, 'In year-over-year inquiries')
             self.assertNotContains(
@@ -79,19 +84,24 @@ class UpdateDataSnapshotValuesTestCase(TestCase):
                 'update_data_snapshot_values',
                 '--snapshot_file={}'.format(filename)
             )
-            # July 2018 
+
             response = self.client.get('/browse/')
-            self.assertContains(response, '2.5 million') # Auto loans originated
-            self.assertContains(response, '$54.6 billion') # Dollar volume of new loans
-            self.assertContains(response, '7.3% increase') # In year-over-year originations 
             self.assertContains(response, 'July&nbsp;2018')
+            self.assertContains(response, '2.5 million')
             self.assertContains(response, 'Loans originated')
-            self.assertContains(response, 'Dollar value of new loans')
+
+            self.assertContains(response, '$54.6 billion')
+            # why does this fail?
+            self.assertContains(response, 'Dollar volume of new loans')
+            
+            self.assertContains(response, '7.3% increase')
             self.assertContains(response, 'In year-over-year originations')
+
             # Inquiry and tightness values
             self.assertContains(response, '7.9% increase')
-            self.assertContains(response, '2.8% increase')
             self.assertContains(response, 'In year-over-year inquiries')
+
+            self.assertContains(response, '2.8% increase')
             self.assertContains(
                 response,
                 'In year-over-year credit tightness'
